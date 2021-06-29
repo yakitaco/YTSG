@@ -2,6 +2,105 @@
 using System.Collections.Generic;
 
 namespace YTSG {
+
+    // SFEN(Shogi Forsyth-Edwards Notation)表記法
+    static class sfen {
+        // SFEN 形式からkomaクラスへ(先頭のみ)[cnt 何文字目か]
+        public static koma toKoma(string str, ref int cnt, int suzi, int dan) {
+            bool nari = false;
+            KomaType type = KomaType.None;
+            int teban = TEIGI.TEBAN_SENTE;
+            // 成り
+            if (str[cnt] == '+') {
+                cnt++;
+                nari = true;
+            }
+            // 駒
+            switch (str[cnt]) {
+                case 'P':
+                    type = KomaType.Fuhyou;
+                    teban = TEIGI.TEBAN_SENTE;
+                    break;
+                case 'L':
+                    type = KomaType.Kyousha;
+                    teban = TEIGI.TEBAN_SENTE;
+                    break;
+                case 'N':
+                    type = KomaType.Keima;
+                    teban = TEIGI.TEBAN_SENTE;
+                    break;
+                case 'S':
+                    type = KomaType.Ginsyou;
+                    teban = TEIGI.TEBAN_SENTE;
+                    break;
+                case 'R':
+                    type = KomaType.Hisya;
+                    teban = TEIGI.TEBAN_SENTE;
+                    break;
+                case 'B':
+                    type = KomaType.Kakugyou;
+                    teban = TEIGI.TEBAN_SENTE;
+                    break;
+                case 'G':
+                    type = KomaType.Kinsyou;
+                    teban = TEIGI.TEBAN_SENTE;
+                    break;
+                case 'K':
+                    type = KomaType.Ousyou;
+                    teban = TEIGI.TEBAN_SENTE;
+                    break;
+                case 'p':
+                    type = KomaType.Fuhyou;
+                    teban = TEIGI.TEBAN_GOTE;
+                    break;
+                case 'l':
+                    type = KomaType.Kyousha;
+                    teban = TEIGI.TEBAN_GOTE;
+                    break;
+                case 'n':
+                    type = KomaType.Keima;
+                    teban = TEIGI.TEBAN_GOTE;
+                    break;
+                case 's':
+                    type = KomaType.Ginsyou;
+                    teban = TEIGI.TEBAN_GOTE;
+                    break;
+                case 'r':
+                    type = KomaType.Hisya;
+                    teban = TEIGI.TEBAN_GOTE;
+                    break;
+                case 'b':
+                    type = KomaType.Kakugyou;
+                    teban = TEIGI.TEBAN_GOTE;
+                    break;
+                case 'g':
+                    type = KomaType.Kinsyou;
+                    teban = TEIGI.TEBAN_GOTE;
+                    break;
+                case 'k':
+                    type = KomaType.Ousyou;
+                    teban = TEIGI.TEBAN_GOTE;
+                    break;
+                default:
+                    break;
+            }
+            cnt++;
+            koma k = new koma(teban, type, suzi, dan);
+
+            // 成りフラグがONの場合、裏返す
+            if (nari == true) k.doKNari();
+
+            return k;
+        }
+
+        // komaクラスからSFEN形式へ
+        //public string fromKoma(koma k){
+        //
+        //}
+
+    }
+
+
     //盤情報
     class BanInfo {
         public koma[,] BanKo = new koma[TEIGI.SIZE_SUZI, TEIGI.SIZE_DAN];   //盤上情報
@@ -65,8 +164,50 @@ namespace YTSG {
         }
 
         //盤情報作成(指定の場面)
-        public BanInfo(string str) {
+        public BanInfo(string oki, string mochi) {
+            OkiKo[TEIGI.TEBAN_SENTE] = new List<koma>();
+            OkiKo[TEIGI.TEBAN_GOTE] = new List<koma>();
+            for (int i = 0; i < 7; i++) {
+                MochiKo[TEIGI.TEBAN_SENTE, i] = new List<koma>();
+                MochiKo[TEIGI.TEBAN_GOTE, i] = new List<koma>();
+            }
 
+            // 場面の設定
+            int j = 0;
+            for (int i = 0; i < TEIGI.SIZE_DAN; i++) {
+                int suzi = 0;
+                while (suzi < 9) {
+                    suzi = 0;
+                    // 数字(空白の数)
+                    if (int.TryParse(oki.Substring(j, 1), out var num)) {
+                        suzi += num;
+                        j++;
+                    } else {
+                        // 駒配置
+                        this.addKoma(sfen.toKoma(oki, ref j, suzi, i));
+                        suzi++;
+                    }
+                }
+                j++;
+            }
+
+            // 持ち駒の設定
+            j = 0;
+            while ((j < mochi.Length) && (mochi[j] != '-')) {
+                // 数字(駒の数) ★2桁もアリ(未実装)
+                int num = 0;
+                if (int.TryParse(mochi.Substring(j, 1), out num)) {
+                    j++;
+                } else {
+                    num = 1;
+                }
+
+                // 持ち駒追加(複数駒ありを考慮)
+                koma k = sfen.toKoma(mochi, ref j, 9, 9);
+                for (int i = 0; i < num; i++) {
+                    this.addKoma(new koma(k.p, k.type, 9, 9));
+                }
+            }
         }
 
         //盤情報作成(コピー)
@@ -235,7 +376,7 @@ namespace YTSG {
         public string showBanInfo() {
             string str = "";
             for (int j = 0; j < TEIGI.SIZE_DAN; j++) {
-                for (int i = TEIGI.SIZE_SUZI -1; i >=0; i--)  {
+                for (int i = TEIGI.SIZE_SUZI - 1; i >= 0; i--) {
                     // 駒が置いてある
                     if (BanKo[i, j] != null) {
                         // 先手
@@ -338,7 +479,7 @@ namespace YTSG {
                                     break;
                             }
                         }
-                    // 駒がおいてない
+                        // 駒がおいてない
                     } else {
                         str += "__|";
                     }
@@ -373,6 +514,13 @@ namespace YTSG {
 
             return str;
         }
+
+        // pos by player
+        // 自分基準の位置 左上(0,0) 右下(9,9)
+        //public static koPos posBplayer(koPos){
+        //    
+        //}
+
 
     }
 }

@@ -11,6 +11,7 @@ namespace YTSG {
     class aiThink {
 
         System.Random r = new System.Random();
+        public int maxDepth; // 最大読み深さ
 
         //ランダムに一手動かす
         //public void RandomeMove(int teban, ref BanInfo ban)
@@ -168,6 +169,7 @@ namespace YTSG {
 
         koPos think(int teban, BanInfo ban, int depth, int abscore, int up_score) {
             int score = -99999;
+            koPos kp = null;
             //Form1.Form1Instance.addMsg("think MochiKo= " + ban.OkiKo[teban].Count + ", " + ban.OkiKo[teban].Count + ":" + teban);
             List<koPos> teAllList = new List<koPos>();
 
@@ -201,7 +203,7 @@ namespace YTSG {
             }
 
             // 降順にソート
-            teAllList.Sort((a, b) => b.val - a.val);
+            //teAllList.Sort((a, b) => b.val - a.val);
 
             if (depth > 0) {
 
@@ -221,9 +223,15 @@ namespace YTSG {
 
                     if (abscore > up_score - te.val) break;
 
-                    if (score < te.val) score = te.val;
+                    if (score < te.val) {
+                        score = te.val;
+                        kp = te;
+                    }
 
                 }
+            } else {
+                // 最下層
+                kp = teAllList.Max();
             }
 
             return teAllList.Max();
