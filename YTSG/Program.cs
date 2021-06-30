@@ -108,7 +108,7 @@ namespace YTSG {
         public pPos(int _p, int _x, int _y) {
             x = _x;
             y = _y;
-            y = _p;
+            p = _p;
         }
         
         // プレイヤーから見た位置(0,0 左上)
@@ -308,9 +308,9 @@ namespace YTSG {
                     if (tesuu == 30) tekouho.ResetJoseki();
 
                     koPos ret;
-                    if ((tesuu < 10)||(nokori< 60000)) {
+                    if ((tesuu < 20)||(nokori< 60000)) {
                         ret = cpu.thinkMove(myTeban, ban, 3); //コンピュータ思考
-                    } else if ((tesuu < 20)||(nokori< 150000)) {
+                    } else if ((tesuu < 40)||(nokori< 150000)) {
                         ret = cpu.thinkMove(myTeban, ban, 4); //コンピュータ思考
                     } else {
                         ret = cpu.thinkMove(myTeban, ban, 5); //コンピュータ思考
@@ -387,6 +387,11 @@ namespace YTSG {
                             } else {
                                 teban = TEIGI.TEBAN_GOTE;
                             }
+
+                            /* 盤情報表示 */
+                            string b = ban.showBanInfo();
+                            Form1.Form1Instance.addMsg("" + b);
+                            Thread.Sleep(10000);
                         }
 
                         initFlg = false;

@@ -172,21 +172,28 @@ namespace YTSG {
             koPos kp = null;
             //Form1.Form1Instance.addMsg("think MochiKo= " + ban.OkiKo[teban].Count + ", " + ban.OkiKo[teban].Count + ":" + teban);
             List<koPos> teAllList = new List<koPos>();
+            
+            ban.renewIdouList();
 
             //int tecount = 0;
 
             //int[,,] IdouList = ban.idouList();
 
-            if (depth < 1) {
-                ban.kikiList();
-            }
+            //if (depth < 1) {
+            //    ban.kikiList();
+            //}
 
             //指せる手を全てリスト追加
             foreach (koma km in ban.OkiKo[teban]) {
                 List<koPos> poslist = km.baninfo(ban);
 
                 foreach (koPos pos in poslist) {
-                    if (ban.IdouList[teban, pos.x, pos.y] >= ban.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, pos.x, pos.y]) teAllList.Add(pos);
+                    if (ban.IdouList[teban, pos.x, pos.y] < ban.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, pos.x, pos.y]) {
+                        if ((ban.BanKo[pos.x, pos.y] ==null)||(pos.val < 100)) {
+                            continue;
+                        }
+                    }
+                    teAllList.Add(pos);
                 }
             }
             if (depth > 1) {  //最下層+1では無視

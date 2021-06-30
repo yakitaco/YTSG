@@ -53,6 +53,7 @@
     <Compile Include="moveParam.cs" />
     <Compile Include="SaveLog.cs" />
     <Compile Include="koma.cs" />
+    <Compile Include="sfen.cs" />
     <Compile Include="usiIO.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
