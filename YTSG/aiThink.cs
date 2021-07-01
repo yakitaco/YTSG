@@ -138,8 +138,11 @@ namespace YTSG {
                     //1手動かしてみる
                     ban_local.moveKoma(ko_local, teAllList[cnt_local], teAllList[cnt_local].nari, false);
 
-                    koPos nexTe = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, teAllList[cnt_local].val);
-                    teAllList[cnt_local].val -= nexTe.val;
+                    List<koPos> nexTe = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, teAllList[cnt_local].val);
+                    if (nexTe.Count > 0) {
+                        teAllList[cnt_local].val -= nexTe[0].val;
+                    }
+                    
 
                     //詰み発見のため残り処理スキップ
                     if (teAllList[cnt_local].val > 90000) {
@@ -147,8 +150,12 @@ namespace YTSG {
                             teCnt = 999;
                         }
                     }
-
-                    Form1.Form1Instance.addMsg("[" + Task.CurrentId + "]teAll[" + cnt_local + "].val = " + teAllList[cnt_local].val + "(" + (teAllList[cnt_local].x + 1) + "," + (teAllList[cnt_local].y + 1) + ")" + teAllList[cnt_local].ko.type + "<NX>(" + (nexTe.x + 1) + "," + (nexTe.y + 1) + ")" + nexTe.ko.type);
+                    string aaa = "";
+                    foreach (var n in nexTe) {
+                        aaa += "->[" + n.val + "](" + (n.x + 1) + "," + (n.y + 1) + ")" + n.ko.type;
+                    }
+                    
+                    Form1.Form1Instance.addMsg("[" + Task.CurrentId + "]teAll[" + cnt_local + "].val = [" + teAllList[cnt_local].val + "](" + (teAllList[cnt_local].x + 1) + "," + (teAllList[cnt_local].y + 1) + ")" + teAllList[cnt_local].ko.type  + aaa);
 
                     if (score < teAllList[cnt_local].val) score = teAllList[cnt_local].val;
 
@@ -167,7 +174,8 @@ namespace YTSG {
         }
 
 
-        koPos think(int teban, BanInfo ban, int depth, int abscore, int up_score) {
+        List<koPos> think(int teban, BanInfo ban, int depth, int abscore, int up_score) {
+            List<koPos> retList = new List<koPos>();
             int score = -99999;
             koPos kp = null;
             //Form1.Form1Instance.addMsg("think MochiKo= " + ban.OkiKo[teban].Count + ", " + ban.OkiKo[teban].Count + ":" + teban);
@@ -189,7 +197,7 @@ namespace YTSG {
 
                 foreach (koPos pos in poslist) {
                     if (ban.IdouList[teban, pos.x, pos.y] < ban.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, pos.x, pos.y]) {
-                        if ((ban.BanKo[pos.x, pos.y] ==null)||(pos.val < 100)) {
+                        if (ban.BanKo[pos.x, pos.y] ==null) {
                             continue;
                         }
                     }
@@ -215,7 +223,11 @@ namespace YTSG {
             if (depth > 0) {
 
                 foreach (koPos te in teAllList) {
-                    if (te.val > 5000) break;
+                    if (te.val > 5000) {
+                        retList.Clear();
+                        retList.Add(te);
+                        break;
+                    }
                     BanInfo ban_local = new BanInfo(ban);
                     koma ko_local;
                     if (te.ko.x == 9) {
@@ -224,24 +236,30 @@ namespace YTSG {
                         ko_local = ban_local.OkiKo[teban].Find(k => k.x == te.ko.x && k.y == te.ko.y);
                     }
                     ban_local.moveKoma(ko_local, te, te.nari, false);
-                    te.val -= think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, te.val).val;
+                    List<koPos> childList = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, te.val);
+                    //te.val -= think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, te.val).val;
                     //tecount++;
                     //if (tecount> depth*20+10) break;
+                    //if (childList.Count > 1) Form1.Form1Instance.addMsg("[" + childList.Count + "]");
+                    if (childList.Count > 0) {
+                        te.val -= childList[0].val;
+                    }
 
                     if (abscore > up_score - te.val) break;
 
-                    if (score < te.val) {
-                        score = te.val;
-                        kp = te;
-                    }
+                        if (score < te.val) {
+                            score = te.val;
+                            retList = childList;
+                            retList.Insert(0, te);
+                        }
 
                 }
             } else {
                 // 最下層
-                kp = teAllList.Max();
+                retList.Add(teAllList.Max());
             }
 
-            return teAllList.Max();
+            return retList;
         }
 
     }

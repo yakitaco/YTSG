@@ -225,6 +225,7 @@ namespace YTSG {
     {
         // 手数によるパラメータ
         static moveParam mPar = new moveParam();
+        private static System.Timers.Timer aTimer;
 
         static void Main(string[] args)
         {
@@ -295,12 +296,12 @@ namespace YTSG {
 
                     string[] arr = str.Split(' ');
                     int nokori = Convert.ToInt32(myTeban == TEIGI.TEBAN_SENTE ? arr[2] : arr[4]);
-                    
+
                     // タイマー設定
                     //if (nokori > )
-                    
-                    
-                    
+                    aTimer = new System.Timers.Timer(2000);
+
+
                     Form1.Form1Instance.addMsg("[NOKORI]" + nokori);
                     
                     thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
@@ -313,7 +314,7 @@ namespace YTSG {
                     } else if ((tesuu < 40)||(nokori< 150000)) {
                         ret = cpu.thinkMove(myTeban, ban, 4); //コンピュータ思考
                     } else {
-                        ret = cpu.thinkMove(myTeban, ban, 5); //コンピュータ思考
+                        ret = cpu.thinkMove(myTeban, ban, 4); //コンピュータ思考
                     }
 
                     thisProcess.PriorityClass = ProcessPriorityClass.AboveNormal; //優先度普通
