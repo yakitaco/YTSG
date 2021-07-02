@@ -105,7 +105,7 @@ namespace YTSG {
 
 
             // 降順にソート
-            //teAllList.Sort((a, b) => b.val - a.val);
+            teAllList.Sort((a, b) => b.val - a.val);
 
             //thread同時数
             int workMin;
@@ -196,11 +196,11 @@ namespace YTSG {
                 List<koPos> poslist = km.baninfo(ban);
 
                 foreach (koPos pos in poslist) {
-                    if (ban.IdouList[teban, pos.x, pos.y] < ban.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, pos.x, pos.y]) {
-                        if (ban.BanKo[pos.x, pos.y] ==null) {
-                            continue;
-                        }
-                    }
+                    //if (ban.IdouList[teban, pos.x, pos.y] < ban.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, pos.x, pos.y]) {
+                    //    if (ban.BanKo[pos.x, pos.y] ==null) {
+                    //        continue;
+                    //    }
+                    //}
                     teAllList.Add(pos);
                 }
             }
@@ -210,6 +210,9 @@ namespace YTSG {
                     if (ban.MochiKo[teban, i]?.Count > 0) {
                         List<koPos> poslist = ban.MochiKo[teban, i][0].baninfo(ban);
                         foreach (koPos pos in poslist) {
+                            if (i > 0) {//歩以外は移動先に味方or敵がいる所に打つ
+                                List<koPos> tmpMove = new koma(TEIGI.TEBAN_SENTE, KomaType.Ginsyou, 2, 8).baninfo(ban);
+                            }
                             if (ban.IdouList[teban, pos.x, pos.y] >= ban.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, pos.x, pos.y]) teAllList.Add(pos);
                         }
                     }
@@ -218,7 +221,7 @@ namespace YTSG {
             }
 
             // 降順にソート
-            //teAllList.Sort((a, b) => b.val - a.val);
+            teAllList.Sort((a, b) => b.val - a.val);
 
             if (depth > 0) {
 
@@ -245,13 +248,14 @@ namespace YTSG {
                         te.val -= childList[0].val;
                     }
 
-                    if (abscore > up_score - te.val) break;
+                    if (score < te.val) {
+                        score = te.val;
+                        retList = childList;
+                        retList.Insert(0, te);
+                    }
 
-                        if (score < te.val) {
-                            score = te.val;
-                            retList = childList;
-                            retList.Insert(0, te);
-                        }
+                    // ネガα法による足切り
+                    if (abscore > up_score - te.val) break;
 
                 }
             } else {

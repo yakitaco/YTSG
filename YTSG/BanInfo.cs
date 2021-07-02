@@ -248,7 +248,8 @@ namespace YTSG {
         
         //移動可能リスト更新(先手・後手の駒が移動可能場所を加算する)
         public void renewIdouList() {
-            
+            IdouList = new int[2, 9, 9];
+
             //指せる手を全てリスト追加
             foreach (koma km in OkiKo[TEIGI.TEBAN_SENTE]) {
                 List<koPos> poslist = km.baninfo(this);
