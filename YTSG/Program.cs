@@ -101,11 +101,11 @@ namespace YTSG {
     
     // プレイヤー視点ありの位置情報
     class pPos{
-        public int p; //所持プレイヤー (0:先手/1:後手)
-        public int x; //筋 (0-8) [持ち駒:9 / 盤上無い(コマ落ち等): -1]
-        public int y; //段 (0-8) [持ち駒:9 / 盤上無い(コマ落ち等): -1]
+        public int p = 0; //所持プレイヤー (0:先手/1:後手)
+        public int x = 0; //筋 (0-8) [持ち駒:9 / 盤上無い(コマ落ち等): -1]
+        public int y = 0; //段 (0-8) [持ち駒:9 / 盤上無い(コマ落ち等): -1]
     
-        public pPos(int _p, int _x, int _y) {
+        public void set(int _p, int _x, int _y) {
             x = _x;
             y = _y;
             p = _p;
@@ -314,7 +314,7 @@ namespace YTSG {
                     } else if ((tesuu < 40)||(nokori< 150000)) {
                         ret = cpu.thinkMove(myTeban, ban, 4); //コンピュータ思考
                     } else {
-                        ret = cpu.thinkMove(myTeban, ban, 4); //コンピュータ思考
+                        ret = cpu.thinkMove(myTeban, ban, 5); //コンピュータ思考
                     }
 
                     thisProcess.PriorityClass = ProcessPriorityClass.AboveNormal; //優先度普通

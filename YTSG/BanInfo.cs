@@ -12,7 +12,7 @@ namespace YTSG {
         public List<koma>[] OkiKo = new List<koma>[2];                      //置き駒情報 (BanKo[0]:先手 / BanKo[1]:後手)
         public List<koma>[,] MochiKo = new List<koma>[2, 7];                //持ち駒情報 (MochiKo[0,]:先手 / MochiKo[1,]:後手 [,0-7]各駒)
         public int[,,] IdouList = new int[2, 9, 9];                         //駒の移動可能リスト
-        public List<int>[] nifList = new List<int>[2];                      //二歩リスト
+        public int[,] nifList = new int[2, 9];                              //二歩リスト (BanKo[X.Y]:X 0:先手 1:後手, Y=1～9筋)
 
         //平手の盤情報生成(盤情報,置き駒情報,持ち駒情報)
         public BanInfo() {
@@ -22,8 +22,7 @@ namespace YTSG {
                 MochiKo[TEIGI.TEBAN_SENTE, i] = new List<koma>();
                 MochiKo[TEIGI.TEBAN_GOTE, i] = new List<koma>();
             }
-            nifList[TEIGI.TEBAN_SENTE] = new List<int>();
-            nifList[TEIGI.TEBAN_GOTE] = new List<int>();
+
             //王の配置
             this.addKoma(new koma(TEIGI.TEBAN_SENTE, KomaType.Ousyou, 4, 8));
             this.addKoma(new koma(TEIGI.TEBAN_GOTE, KomaType.Ousyou, 4, 0));
@@ -66,6 +65,9 @@ namespace YTSG {
                 this.addKoma(new koma(TEIGI.TEBAN_GOTE, KomaType.Fuhyou, i, 2));
             }
 
+            // 移動リスト新規作成
+            newIdouList();
+
         }
 
         //盤情報作成(指定の場面)
@@ -76,8 +78,6 @@ namespace YTSG {
                 MochiKo[TEIGI.TEBAN_SENTE, i] = new List<koma>();
                 MochiKo[TEIGI.TEBAN_GOTE, i] = new List<koma>();
             }
-            nifList[TEIGI.TEBAN_SENTE] = new List<int>();
-            nifList[TEIGI.TEBAN_GOTE] = new List<int>();
 
             // 場面の設定
             int j = 0;
@@ -97,6 +97,9 @@ namespace YTSG {
                 j++;
             }
 
+            // 移動リスト新規作成
+            newIdouList();
+
             // 持ち駒の設定
             j = 0;
             while ((j < mochi.Length) && (mochi[j] != '-')) {
@@ -107,7 +110,7 @@ namespace YTSG {
                 } else {
                     num = 1;
                 }
-            
+
                 // 持ち駒追加(複数駒ありを考慮)
                 koma k = sfen.toKoma(mochi, ref j, 9, 9);
                 for (int i = 0; i < num; i++) {
@@ -120,6 +123,8 @@ namespace YTSG {
         public BanInfo(BanInfo ban) {
             OkiKo[TEIGI.TEBAN_SENTE] = new List<koma>();
             OkiKo[TEIGI.TEBAN_GOTE] = new List<koma>();
+            ban.IdouList.CopyTo(IdouList, 0); // 移動リストハードコピー
+
             for (int i = 0; i < 7; i++) {
                 MochiKo[TEIGI.TEBAN_SENTE, i] = new List<koma>();
                 foreach (koma km in ban.MochiKo[TEIGI.TEBAN_SENTE, i]) {
@@ -131,8 +136,6 @@ namespace YTSG {
                     MochiKo[TEIGI.TEBAN_GOTE, i].Add(new koma(km));
                 }
             }
-            nifList[TEIGI.TEBAN_SENTE] = new List<int>();
-            nifList[TEIGI.TEBAN_GOTE] = new List<int>();
 
             foreach (koma km in ban.OkiKo[TEIGI.TEBAN_SENTE]) {
                 koma tmp_km = new koma(km);
@@ -162,24 +165,28 @@ namespace YTSG {
 
         //二歩リスト更新
         public void renewNifList(int teban) {
-            nifList[teban].Clear(); //リスト初期化
+            // 二歩リスト初期化
+            Array.Clear(nifList, 0, nifList.Length);
 
-            //if (OkiKo[teban].Count > 0) {
             for (int i = 0; i < TEIGI.SIZE_SUZI; i++) {  //筋(X)
                 if (OkiKo[teban].Exists(k => (k.type == KomaType.Fuhyou && k.x == i)) == true) {  //その筋上に味方の歩があるか
-                    nifList[teban].Add(i);
+                    nifList[teban, i] = 1;
                 }
             }
-            //}
         }
 
 
         //駒の移動(駒指定:[駒情報][移動先位置][成有無][駒移動チェック有無]) (0:移動OK, -1:移動NG(駒が存在しない,移動できない 等))
         //移動先に敵の駒が存在したら取れる
         public int moveKoma(koma ko, koPos dstPos, bool naru, bool chk) {
+            List<koma> IdouListKousinKoma = new List<koma>();  // 移動可能リスト更新対象の駒
+
             if (chk == true) {
                 ko.chkMove(ko, dstPos, this);
             }
+
+            // 駒の移動可能リスト更新(移動前)
+
 
             /* 敵駒を取る(味方駒でも取れる) */
             if (BanKo[dstPos.x, dstPos.y] != null) {
@@ -191,6 +198,9 @@ namespace YTSG {
                 MochiKo[ko.p, (int)toriKo.type - 1].Add(toriKo);
 
                 toriKo.p = ko.p;  //取った駒の手番(一番最後に変更)
+
+                //取られる駒の移動可能情報クリア
+                toriKo.kikiRenew(this, -1);
             }
 
             /* 駒打ち */
@@ -199,6 +209,11 @@ namespace YTSG {
                 OkiKo[ko.p].Add(ko);
             } else {
                 /* 駒移動 */
+
+                //移動前駒の移動可能情報クリア
+                ko.kikiRenew(this, -1);
+                RenewLinking(ko.x, ko.y, -1, IdouListKousinKoma);
+
                 BanKo[ko.x, ko.y] = null;
                 if (naru == true) ko.doKNari(); //駒成り
             }
@@ -245,7 +260,54 @@ namespace YTSG {
         public int delKoma(koma ko) {
             return 0;
         }
-        
+
+        //移動可能リスト生成(先手・後手の駒が移動可能場所を加算する)
+        public void newIdouList() {
+            //指せる手を全てリスト追加
+            foreach (koma km in OkiKo[TEIGI.TEBAN_SENTE]) {
+                km.kikiRenew(this, 1);
+            }
+            foreach (koma km in OkiKo[TEIGI.TEBAN_GOTE]) {
+                km.kikiRenew(this, 1);
+            }
+        }
+
+        public void RenewLinking(int x, int y, int val, List<koma> IdouListKousinKoma) {
+            // 上
+            for (int i = 1 ; x + i < TEIGI.SIZE_DAN ; i++) {
+                if (BanKo[x + i, y] == null) continue;
+                if ((BanKo[x + i, y].type == KomaType.Kyousha) || (BanKo[x + i, y].type == KomaType.Hisya)) BanKo[x + i, y].kikiRenew(this, 1);
+                break;
+            }
+            // 下
+            for (int i = 1 ; x - i >= 0 ; i++) {
+                if (BanKo[x - i, y] == null) continue;
+                if ((BanKo[x - i, y].type == KomaType.Kyousha) || (BanKo[x - i, y].type == KomaType.Hisya)) BanKo[x - i, y].kikiRenew(this, 1);
+                break;
+            }
+            // 右
+            for (int i = 1 ; y + i < TEIGI.SIZE_SUZI ; i++) {
+                if (BanKo[x, y + i] == null) continue;
+                if (BanKo[x, y + i].type == KomaType.Hisya) BanKo[x, y + i].kikiRenew(this, 1);
+                break;
+            }
+            // 左
+            for (int i = 1; y - i >= 0; i++) {
+                if (BanKo[x, y - i] == null) continue;
+                if (BanKo[x, y - i].type == KomaType.Hisya) BanKo[x, y - i].kikiRenew(this, 1);
+                break;
+            }
+            // 上
+            for (int i = 1; (x + i < TEIGI.SIZE_DAN)&&(y + i < TEIGI.SIZE_SUZI); i++) {
+                if (BanKo[x + i, y] == null) continue;
+                if ((BanKo[x + i, y].type == KomaType.Kyousha) || (BanKo[x + i, y].type == KomaType.Hisya)) BanKo[x + i, y].kikiRenew(this, 1);
+                break;
+            }
+
+
+
+        }
+
         //移動可能リスト更新(先手・後手の駒が移動可能場所を加算する)
         public void renewIdouList() {
             IdouList = new int[2, 9, 9];
@@ -265,27 +327,29 @@ namespace YTSG {
                     IdouList[TEIGI.TEBAN_GOTE, pos.x, pos.y]++;
                 }
             }
-            
+
         }
 
-        //移動リスト一覧作成
+        //移動リスト一覧初期生成
         public int[,,] idouList() {
             int[,,] list = new int[2, 9, 9];
 
             //指せる手を全てリスト追加
             foreach (koma km in OkiKo[TEIGI.TEBAN_SENTE]) {
-                List<koPos> poslist = km.baninfo(this);
 
-                foreach (koPos pos in poslist) {
-                    list[TEIGI.TEBAN_SENTE, pos.x, pos.y]++;
-                }
+                //List<koPos> poslist = km.baninfo(this);
+
+
+                //foreach (koPos pos in poslist) {
+                //    list[TEIGI.TEBAN_SENTE, pos.x, pos.y]++;
+                //}
             }
             foreach (koma km in OkiKo[TEIGI.TEBAN_GOTE]) {
-                List<koPos> poslist = km.baninfo(this);
+                //List<koPos> poslist = km.baninfo(this);
 
-                foreach (koPos pos in poslist) {
-                    list[TEIGI.TEBAN_GOTE, pos.x, pos.y]++;
-                }
+                //foreach (koPos pos in poslist) {
+                //    list[TEIGI.TEBAN_GOTE, pos.x, pos.y]++;
+                //}
             }
 
             return list;

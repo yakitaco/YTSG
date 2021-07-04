@@ -3,6 +3,9 @@
 namespace YTSG {
     //駒情報
     class koma {
+
+
+
         //駒の動き情報
         uint[] KoMove =
         {
@@ -11,7 +14,7 @@ namespace YTSG {
             0b0000000001000000,  //香車：7
             0b0000000000100000,  //桂馬：6
             0b0000000000010101,  //銀将：1 + 3 + 5
-            0b0000000011000000,  //飛車：7 + 8
+            0b0000000010000000,  //飛車：8
             0b0000000100000000,  //角行：9
             0b0000000000001111,  //金将：1 + 2 + 3 + 4
             0b0000000000011111,  //王将：1 + 2 + 3 + 4 + 5
@@ -19,7 +22,7 @@ namespace YTSG {
             0b0000000000001111,  //成香：1 + 2 + 3 + 4
             0b0000000000001111,  //成桂：1 + 2 + 3 + 4
             0b0000000000001111,  //成銀：1 + 2 + 3 + 4
-            0b0000000011010100,  //竜王：3 + 5 + 7 + 8
+            0b0000000010010100,  //竜王：3 + 5 + 8
             0b0000000100001011,  //竜馬：1 + 2 + 4 + 9
         };
         // 1:前 2:後 3:斜め前 4:横 5:斜め後ろ 6:桂馬 7:前ずっと 8:右左後ろずっと 9: 斜めずっと
@@ -243,7 +246,7 @@ namespace YTSG {
                     }
                 }
             }
-            if ((KoMove[(uint)this.type] & 64) > 0) { //7 : 飛車前・香車
+            if ((KoMove[(uint)this.type] & 64) > 0) { //7 : 香車(前に敵がいる時しか動かない)
                 for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
                     if ((y + chkSenGo(-i) < 0) || (y + chkSenGo(-i) > 8)) break;
                     teList[p, x, y + chkSenGo(-i)]++;
@@ -252,7 +255,13 @@ namespace YTSG {
                 }
             }
 
-            if ((KoMove[(uint)this.type] & 128) > 0) { //8 : 飛車左右後
+            if ((KoMove[(uint)this.type] & 128) > 0) { //8 : 飛車
+                for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
+                    if ((y + chkSenGo(-i) < 0) || (y + chkSenGo(-i) > 8)) break;
+                    teList[p, x, y + chkSenGo(-i)]++;
+                    if (ban.BanKo[x, y + chkSenGo(-i)] != null) break;
+                    //if (koSet(new koPos(0, -i), ban.BanKo, ref teList) > 0) break;
+                }
                 for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
                     if ((x + chkSenGo(-i) < 0) || (x + chkSenGo(-i) > 8)) break;
                     teList[p, x + chkSenGo(-i), y]++;
@@ -338,11 +347,16 @@ namespace YTSG {
                     {
                         if (this.type == KomaType.Fuhyou) {
                             //TODO: 2歩チェック
-                            if (ban.nifList[this.p].Contains(j)) continue;
+                            if (ban.nifList[this.p, j] == 1) continue;
                         }
 
                         //指定した盤に駒が置いていない場合
                         if (ban.BanKo[j, i] == null) {
+                            // 歩飛角以外の駒で、移動先に敵味方の駒がない場合、無駄なため置かない
+                            if ((this.type != KomaType.Fuhyou) && (this.type != KomaType.Hisya) && (this.type != KomaType.Kakugyou) && (new koma(this.p, this.type, i, j).kikiCheck(ban) == 0)) {
+                                continue;
+                            }
+
                             teList.Add(new koPos(j, i, 0, this, false));
                         }
                     }
@@ -373,40 +387,93 @@ namespace YTSG {
                     koSet(new koPos(-1, -2), ban, ref teList);
                     koSet(new koPos(1, -2), ban, ref teList);
                 }
-                if ((KoMove[(uint)this.type] & 64) > 0) { //7 : 飛車前・香車
+                if ((KoMove[(uint)this.type] & 64) > 0) { //7 : 香車
                     for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
-                        if (koSet(new koPos(0, -i), ban, ref teList) > 0) break;
+                        if (koSet_Kyousya(new koPos(0, -i), ban, ref teList) != 0) break;
+                        //if (koSet(new koPos(0, -i), ban, ref teList) != 0) break;
                     }
                 }
 
-                if ((KoMove[(uint)this.type] & 128) > 0) { //8 : 飛車左右後
-                    for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                        if (koSet(new koPos(-i, 0), ban, ref teList) > 0) break;
+                if ((KoMove[(uint)this.type] & 128) > 0) { //8 : 飛車
+                    for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
+                        if (koSet(new koPos(0, -i), ban, ref teList) != 0) break;
                     }
                     for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                        if (koSet(new koPos(i, 0), ban, ref teList) > 0) break;
+                        if (koSet(new koPos(-i, 0), ban, ref teList) != 0) break;
+                    }
+                    for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                        if (koSet(new koPos(i, 0), ban, ref teList) != 0) break;
                     }
                     for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
-                        if (koSet(new koPos(0, i), ban, ref teList) > 0) break;
+                        if (koSet(new koPos(0, i), ban, ref teList) != 0) break;
                     }
                 }
                 if ((KoMove[(uint)this.type] & 256) > 0) { //9 : 角行
                     for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                        if (koSet(new koPos(-i, -i), ban, ref teList) > 0) break;
+                        if (koSet(new koPos(-i, -i), ban, ref teList) != 0) break;
                     }
                     for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                        if (koSet(new koPos(-i, i), ban, ref teList) > 0) break;
+                        if (koSet(new koPos(-i, i), ban, ref teList) != 0) break;
                     }
                     for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                        if (koSet(new koPos(i, -i), ban, ref teList) > 0) break;
+                        if (koSet(new koPos(i, -i), ban, ref teList) != 0) break;
                     }
                     for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                        if (koSet(new koPos(i, i), ban, ref teList) > 0) break;
+                        if (koSet(new koPos(i, i), ban, ref teList) != 0) break;
                     }
                 }
             }
 
             return teList;
+        }
+
+        //香車専用 移動チェック
+        int koSet_Kyousya(koPos pos, BanInfo ban, ref List<koPos> teList) {
+            if (this.p == TEIGI.TEBAN_GOTE) {
+                pos.x = -pos.x;
+                pos.y = -pos.y;
+            }
+            pPos tmpPpos = new pPos();
+            // 移動先(絶対位置) new削除による高速化
+            tmpPpos.set(this.p, this.x + pos.x, this.y + pos.y);
+
+            // 置き場所が範囲外
+            if ((tmpPpos.y < 0) || (tmpPpos.x < 0) || (tmpPpos.y >= TEIGI.SIZE_SUZI) || (tmpPpos.x >= TEIGI.SIZE_DAN)) return -1;
+
+            // 敵の駒がある
+            if (ban.BanKo[tmpPpos.x, tmpPpos.y] == null) {
+                return 0;
+            } else if (ban.BanKo[tmpPpos.x, tmpPpos.y].p != this.p) {
+                // 移動元(this)or移動先(p)が自分基準位置で奥3段の場合は成り考慮
+                if (((py < 3) || (tmpPpos.py < 3)) && (this.chkNari())) {
+
+                    if (ban.IdouList[this.p, tmpPpos.x, tmpPpos.y] >= ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, tmpPpos.x, tmpPpos.y]) {
+                        teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type] + 50, this, true));
+                    } else {
+                        teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type] + 50 - KoScore[(int)this.type], this, true)); // 劣勢の場所
+                    }
+
+                    // 香(2段まで)は不成もあり
+                    if ((this.type == KomaType.Kyousha) && (tmpPpos.y > 1)) {
+                        if (ban.IdouList[this.p, tmpPpos.x, tmpPpos.y] >= ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, tmpPpos.x, tmpPpos.y]) {
+                            teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type], this, false));
+                        } else {
+                            teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type] - KoScore[(int)this.type], this, false)); // 劣勢の場所
+                        }
+
+                    }
+                } else {
+                    if (ban.IdouList[this.p, tmpPpos.x, tmpPpos.y] >= ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, tmpPpos.x, tmpPpos.y]) {
+                        teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type] + tekouho.GetKouho(this.p, this, new koPos(tmpPpos.x, tmpPpos.y)), this, false));
+                    } else {
+                        teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type] - KoScore[(int)this.type], this, false)); // 劣勢の場所
+                    }
+                }
+                return 2;
+            }
+
+            //駒がない場合はリスト追加しない
+            return 1;
         }
 
         //指定位置に置くことができるかチェック(-1:範囲外で置けない/0:置ける/:1置けない(味方)/2:置ける(敵))
@@ -415,69 +482,69 @@ namespace YTSG {
                 pos.x = -pos.x;
                 pos.y = -pos.y;
             }
-
-            // 移動先(絶対位置)
-            pPos p = new pPos(this.p, this.x + pos.x, this.y + pos.y);
+            pPos tmpPpos = new pPos();
+            // 移動先(絶対位置) new削除による高速化
+            tmpPpos.set(this.p, this.x + pos.x, this.y + pos.y);
 
             // 置き場所が範囲外
-            if ((p.y < 0) || (p.x < 0) || (p.y >= TEIGI.SIZE_SUZI) || (p.x >= TEIGI.SIZE_DAN)) return -1;
+            if ((tmpPpos.y < 0) || (tmpPpos.x < 0) || (tmpPpos.y >= TEIGI.SIZE_SUZI) || (tmpPpos.x >= TEIGI.SIZE_DAN)) return -1;
 
             // 駒が存在しない
-            if (ban.BanKo[p.x, p.y] == null) {
+            if (ban.BanKo[tmpPpos.x, tmpPpos.y] == null) {
 
                 // 移動元(this)or移動先(p)が自分基準位置で奥3段の場合は成り考慮
-                if (((py < 3) || (p.py < 3)) && (this.chkNari())) {
-                    if (ban.IdouList[this.p, p.x, p.y] >= ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, p.x, p.y]) {
-                        teList.Add(new koPos(p.x, p.y, 50, this, true));
+                if (((py < 3) || (tmpPpos.py < 3)) && (this.chkNari())) {
+                    if (ban.IdouList[this.p, tmpPpos.x, tmpPpos.y] >= ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, tmpPpos.x, tmpPpos.y]) {
+                        teList.Add(new koPos(tmpPpos.x, tmpPpos.y, 250, this, true));
                     } else {
-                        teList.Add(new koPos(p.x, p.y, 50 - KoScore[(int)this.type], this, true)); // 劣勢の場所
+                        teList.Add(new koPos(tmpPpos.x, tmpPpos.y, 50 - KoScore[(int)this.type], this, true)); // 劣勢の場所
                     }
 
                     // 銀桂香(2段まで)は不成もあり
-                    if ((this.type == KomaType.Ginsyou) || (((this.type == KomaType.Keima) || (this.type == KomaType.Keima)) && (p.y > 1))) {
+                    if ((this.type == KomaType.Ginsyou) || ((this.type == KomaType.Keima) && (tmpPpos.y > 1))) {
 
-                        if (ban.IdouList[this.p, p.x, p.y] >= ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, p.x, p.y]) {
-                            teList.Add(new koPos(p.x, p.y, 0, this, false));
+                        if (ban.IdouList[this.p, tmpPpos.x, tmpPpos.y] >= ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, tmpPpos.x, tmpPpos.y]) {
+                            teList.Add(new koPos(tmpPpos.x, tmpPpos.y, 0, this, false));
                         } else {
-                            teList.Add(new koPos(p.x, p.y, -KoScore[(int)this.type], this, false)); // 劣勢の場所
+                            teList.Add(new koPos(tmpPpos.x, tmpPpos.y, -KoScore[(int)this.type], this, false)); // 劣勢の場所
                         }
                     }
                 } else {
-                    if (ban.IdouList[this.p, p.x, p.y] >= ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, p.x, p.y]) {
-                        teList.Add(new koPos(p.x, p.y, 0 + tekouho.GetKouho(this.p, this, new koPos(p.x, p.y)), this, false));
+                    if (ban.IdouList[this.p, tmpPpos.x, tmpPpos.y] >= ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, tmpPpos.x, tmpPpos.y]) {
+                        teList.Add(new koPos(tmpPpos.x, tmpPpos.y, 0 + tekouho.GetKouho(this.p, this, new koPos(tmpPpos.x, tmpPpos.y)), this, false));
                     } else {
-                        teList.Add(new koPos(p.x, p.y, -KoScore[(int)this.type], this, false)); // 劣勢の場所
+                        teList.Add(new koPos(tmpPpos.x, tmpPpos.y, -KoScore[(int)this.type], this, false)); // 劣勢の場所
                     }
                 }
 
                 return 0;
 
                 //敵の駒がある
-            } else if (ban.BanKo[p.x, p.y].p != this.p) {
+            } else if (ban.BanKo[tmpPpos.x, tmpPpos.y].p != this.p) {
 
                 // 移動元(this)or移動先(p)が自分基準位置で奥3段の場合は成り考慮
-                if (((py < 3) || (p.py < 3)) && (this.chkNari())) {
+                if (((py < 3) || (tmpPpos.py < 3)) && (this.chkNari())) {
 
-                    if (ban.IdouList[this.p, p.x, p.y] >= ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, p.x, p.y]) {
-                        teList.Add(new koPos(p.x, p.y, KoScore[(int)ban.BanKo[p.x, p.y].type] + 50, this, true));
+                    if (ban.IdouList[this.p, tmpPpos.x, tmpPpos.y] >= ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, tmpPpos.x, tmpPpos.y]) {
+                        teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type] + 150, this, true));
                     } else {
-                        teList.Add(new koPos(p.x, p.y, KoScore[(int)ban.BanKo[p.x, p.y].type] + 50 - KoScore[(int)this.type], this, true)); // 劣勢の場所
+                        teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type] + 50 - KoScore[(int)this.type], this, true)); // 劣勢の場所
                     }
 
                     // 銀桂香(2段まで)は不成もあり
-                    if ((this.type == KomaType.Ginsyou) || (((this.type == KomaType.Keima) || (this.type == KomaType.Keima)) && (p.y > 1))) {
-                        if (ban.IdouList[this.p, p.x, p.y] >= ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, p.x, p.y]) {
-                            teList.Add(new koPos(p.x, p.y, KoScore[(int)ban.BanKo[p.x, p.y].type], this, false));
+                    if ((this.type == KomaType.Ginsyou) || (((this.type == KomaType.Keima) || (this.type == KomaType.Kyousha)) && (tmpPpos.y > 1))) {
+                        if (ban.IdouList[this.p, tmpPpos.x, tmpPpos.y] >= ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, tmpPpos.x, tmpPpos.y]) {
+                            teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type], this, false));
                         } else {
-                            teList.Add(new koPos(p.x, p.y, KoScore[(int)ban.BanKo[p.x, p.y].type] - KoScore[(int)this.type], this, false)); // 劣勢の場所
+                            teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type] - KoScore[(int)this.type], this, false)); // 劣勢の場所
                         }
 
                     }
                 } else {
-                    if (ban.IdouList[this.p, p.x, p.y] >= ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, p.x, p.y]) {
-                        teList.Add(new koPos(p.x, p.y, KoScore[(int)ban.BanKo[p.x, p.y].type] + tekouho.GetKouho(this.p, this, new koPos(p.x, p.y)), this, false));
+                    if (ban.IdouList[this.p, tmpPpos.x, tmpPpos.y] >= ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, tmpPpos.x, tmpPpos.y]) {
+                        teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type] + tekouho.GetKouho(this.p, this, new koPos(tmpPpos.x, tmpPpos.y)), this, false));
                     } else {
-                        teList.Add(new koPos(p.x, p.y, KoScore[(int)ban.BanKo[p.x, p.y].type] - KoScore[(int)this.type], this, false)); // 劣勢の場所
+                        teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type] - KoScore[(int)this.type], this, false)); // 劣勢の場所
                     }
                 }
 
@@ -487,67 +554,160 @@ namespace YTSG {
             return 1;
         }
 
+        //指定位置に敵味方がいるかチェック
+        //(-1:範囲外で置けない/0:置ける/:1味方あり/2:置ける(敵))
+        // 加算値(BanInfo.IdouList反映用)
+        int koCheck(int x, int y, BanInfo ban, int kasan = 0) {
+
+            if (this.p == TEIGI.TEBAN_GOTE) {
+                x = -x;
+                y = -y;
+            }
+
+            pPos tmpPpos = new pPos();
+            // 移動先(絶対位置) new削除による高速化
+            tmpPpos.set(this.p, this.x + x, this.y + y);
+
+            // 置き場所が範囲外
+            if ((tmpPpos.y < 0) || (tmpPpos.x < 0) || (tmpPpos.y >= TEIGI.SIZE_SUZI) || (tmpPpos.x >= TEIGI.SIZE_DAN)) return -1;
+
+            ban.IdouList[p, tmpPpos.x, tmpPpos.y] += kasan; //BanInfo.IdouListに加算(駒有り無し関係ないため)
+
+            if (ban.BanKo[tmpPpos.x, tmpPpos.y] == null) return 0;     // 駒なし
+            if (ban.BanKo[tmpPpos.x, tmpPpos.y].p == this.p) return 1; // 味方駒あり
+
+
+            return 1; // 敵駒あり
+        }
+
         // 自分の駒が別の駒に効いているかチェック
-        // 0:効いていない 1:味方に効いている 2:敵に効いている
+        // 0:効いていない 1:敵味方に効いている
         int kikiCheck(BanInfo ban) {
+            int ret = 0;
+
             //先手基準で計算(前:y-1/右:x-1)
             if ((KoMove[(uint)this.type] & 1) > 0) { //1 : 前
-                
-                if ban.BanKo[] return 0;
+                if (koCheck(0, -1, ban) > 0) return 1;
             }
             if ((KoMove[(uint)this.type] & 2) > 0) { //2 : 後
-                koSet(new koPos(0, 1), ban, ref teList);
+                if (koCheck(0, 1, ban) > 0) return 1;
             }
             if ((KoMove[(uint)this.type] & 4) > 0) { //3 : 左右前
-                koSet(new koPos(-1, -1), ban, ref teList);
-                koSet(new koPos(1, -1), ban, ref teList);
+                if (koCheck(-1, -1, ban) > 0) return 1;
+                if (koCheck(1, -1, ban) > 0) return 1;
             }
             if ((KoMove[(uint)this.type] & 8) > 0) { //4 : 左右横
-                koSet(new koPos(-1, 0), ban, ref teList);
-                koSet(new koPos(1, 0), ban, ref teList);
+                if (koCheck(-1, 0, ban) > 0) return 1;
+                if (koCheck(1, 0, ban) > 0) return 1;
             }
             if ((KoMove[(uint)this.type] & 16) > 0) { //5 : 左右後
-                koSet(new koPos(-1, 1), ban, ref teList);
-                koSet(new koPos(1, 1), ban, ref teList);
+                if (koCheck(-1, 1, ban) > 0) return 1;
+                if (koCheck(1, 1, ban) > 0) return 1;
             }
             if ((KoMove[(uint)this.type] & 32) > 0) { //6 : 桂馬
-                koSet(new koPos(-1, -2), ban, ref teList);
-                koSet(new koPos(1, -2), ban, ref teList);
+                if (koCheck(-1, -2, ban) > 0) return 1;
+                if (koCheck(1, -2, ban) > 0) return 1;
             }
             if ((KoMove[(uint)this.type] & 64) > 0) { //7 : 飛車前・香車
                 for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
-                    if (koSet(new koPos(0, -i), ban, ref teList) > 0) break;
+                    ret = koCheck(0, -i, ban);
+                    if (ret > 0) { return 1; } else if (ret < 0) break;
                 }
             }
 
             if ((KoMove[(uint)this.type] & 128) > 0) { //8 : 飛車左右後
                 for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                    if (koSet(new koPos(-i, 0), ban, ref teList) > 0) break;
+                    ret = koCheck(-i, 0, ban);
+                    if (ret > 0) { return 1; } else if (ret < 0) break;
                 }
                 for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                    if (koSet(new koPos(i, 0), ban, ref teList) > 0) break;
+                    ret = koCheck(i, 0, ban);
+                    if (ret > 0) { return 1; } else if (ret < 0) break;
                 }
                 for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
-                    if (koSet(new koPos(0, i), ban, ref teList) > 0) break;
+                    ret = koCheck(0, i, ban);
+                    if (ret > 0) { return 1; } else if (ret < 0) break;
                 }
             }
             if ((KoMove[(uint)this.type] & 256) > 0) { //9 : 角行
                 for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                    if (koSet(new koPos(-i, -i), ban, ref teList) > 0) break;
+                    ret = koCheck(-i, -i, ban);
+                    if (ret > 0) { return 1; } else if (ret < 0) break;
                 }
                 for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                    if (koSet(new koPos(-i, i), ban, ref teList) > 0) break;
+                    ret = koCheck(-i, i, ban);
+                    if (ret > 0) { return 1; } else if (ret < 0) break;
                 }
                 for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                    if (koSet(new koPos(i, -i), ban, ref teList) > 0) break;
+                    ret = koCheck(i, -i, ban);
+                    if (ret > 0) { return 1; } else if (ret < 0) break;
                 }
                 for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                    if (koSet(new koPos(i, i), ban, ref teList) > 0) break;
+                    ret = koCheck(i, i, ban);
+                    if (ret > 0) { return 1; } else if (ret < 0) break;
                 }
             }
             return 0;
         }
 
+        // 自分の駒が別の駒に効いているかチェック
+        // 加算値(BanInfo.IdouList反映用)
+        public void kikiRenew(BanInfo ban, int kasan) {
+            //先手基準で計算(前:y-1/右:x-1)
+            if ((KoMove[(uint)this.type] & 1) > 0) { //1 : 前
+                koCheck( 0, -1, ban, kasan);
+            }
+            if ((KoMove[(uint)this.type] & 2) > 0) { //2 : 後
+                koCheck( 0, 1, ban, kasan);
+            }
+            if ((KoMove[(uint)this.type] & 4) > 0) { //3 : 左右前
+                koCheck(-1, -1, ban, kasan);
+                koCheck( 1, -1, ban, kasan);
+            }
+            if ((KoMove[(uint)this.type] & 8) > 0) { //4 : 左右横
+                koCheck(-1, 0, ban, kasan);
+                koCheck( 1, 0, ban, kasan);
+            }
+            if ((KoMove[(uint)this.type] & 16) > 0) { //5 : 左右後
+                koCheck(-1, 1, ban, kasan);
+                koCheck( 1, 1, ban, kasan);
+            }
+            if ((KoMove[(uint)this.type] & 32) > 0) { //6 : 桂馬
+                koCheck(-1, -2, ban, kasan);
+                koCheck( 1, -2, ban, kasan);
+            }
+            if ((KoMove[(uint)this.type] & 64) > 0) { //7 : 飛車前・香車
+                for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
+                    if (koCheck( 0, -i, ban, kasan) != 0) break;
+                }
+            }
 
-}
+            if ((KoMove[(uint)this.type] & 128) > 0) { //8 : 飛車左右後
+                for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                    if (koCheck(-i, 0, ban, kasan) != 0) break;
+                }
+                for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                    if (koCheck( i, 0, ban, kasan) != 0) break;
+                }
+                for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
+                    if (koCheck( 0, i, ban, kasan) != 0) break;
+                }
+            }
+            if ((KoMove[(uint)this.type] & 256) > 0) { //9 : 角行
+                for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                    if (koCheck(-i, -i, ban, kasan) != 0) break;
+                }
+                for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                    if (koCheck(-i,  i, ban, kasan) != 0) break;
+                }
+                for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                    if (koCheck( i, -i, ban, kasan) != 0) break;
+                }
+                for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                    if (koCheck( i,  i, ban, kasan) != 0) break;
+                }
+            }
+        }
+
+    }
 }

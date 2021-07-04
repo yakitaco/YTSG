@@ -180,7 +180,8 @@ namespace YTSG {
             koPos kp = null;
             //Form1.Form1Instance.addMsg("think MochiKo= " + ban.OkiKo[teban].Count + ", " + ban.OkiKo[teban].Count + ":" + teban);
             List<koPos> teAllList = new List<koPos>();
-            
+
+            ban.renewNifList(teban);  //二歩リスト更新
             ban.renewIdouList();
 
             //int tecount = 0;
@@ -210,9 +211,6 @@ namespace YTSG {
                     if (ban.MochiKo[teban, i]?.Count > 0) {
                         List<koPos> poslist = ban.MochiKo[teban, i][0].baninfo(ban);
                         foreach (koPos pos in poslist) {
-                            if (i > 0) {//歩以外は移動先に味方or敵がいる所に打つ
-                                List<koPos> tmpMove = new koma(TEIGI.TEBAN_SENTE, KomaType.Ginsyou, 2, 8).baninfo(ban);
-                            }
                             if (ban.IdouList[teban, pos.x, pos.y] >= ban.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, pos.x, pos.y]) teAllList.Add(pos);
                         }
                     }
