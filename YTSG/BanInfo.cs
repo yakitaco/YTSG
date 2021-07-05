@@ -123,7 +123,8 @@ namespace YTSG {
         public BanInfo(BanInfo ban) {
             OkiKo[TEIGI.TEBAN_SENTE] = new List<koma>();
             OkiKo[TEIGI.TEBAN_GOTE] = new List<koma>();
-            ban.IdouList.CopyTo(IdouList, 0); // 移動リストハードコピー
+            //ban.IdouList.CopyTo(IdouList, 0); // 移動リストハードコピー
+            Array.Copy(ban.IdouList, IdouList, IdouList.Length);
 
             for (int i = 0; i < 7; i++) {
                 MochiKo[TEIGI.TEBAN_SENTE, i] = new List<koma>();
@@ -191,6 +192,13 @@ namespace YTSG {
             /* 敵駒を取る(味方駒でも取れる) */
             if (BanKo[dstPos.x, dstPos.y] != null) {
                 koma toriKo = BanKo[dstPos.x, dstPos.y];  //取る駒
+
+                //取られる駒の移動可能情報クリア
+                if (!IdouListKousinKoma.Contains(toriKo)) {
+                    toriKo.kikiRenew(this, -1);
+                    IdouListKousinKoma.Add(toriKo);
+                }
+
                 toriKo.x = 9;  //持ち駒状態
                 toriKo.y = 9;  //持ち駒状態
                 toriKo.doKModori();  //成り状態を戻す
@@ -199,20 +207,26 @@ namespace YTSG {
 
                 toriKo.p = ko.p;  //取った駒の手番(一番最後に変更)
 
-                //取られる駒の移動可能情報クリア
-                toriKo.kikiRenew(this, -1);
+            } else {
+                RenewLinking(dstPos.x, dstPos.y, -1, ref IdouListKousinKoma);
             }
 
             /* 駒打ち */
             if (ko.x == 9) {
                 MochiKo[ko.p, (int)ko.type - 1].Remove(ko);
                 OkiKo[ko.p].Add(ko);
+
+                IdouListKousinKoma.Add(ko);
+                RenewLinking(dstPos.x, dstPos.y, -1, ref IdouListKousinKoma);
             } else {
                 /* 駒移動 */
 
                 //移動前駒の移動可能情報クリア
-                ko.kikiRenew(this, -1);
-                RenewLinking(ko.x, ko.y, -1, IdouListKousinKoma);
+                if (!IdouListKousinKoma.Contains(ko)) {
+                    ko.kikiRenew(this, -1);
+                    IdouListKousinKoma.Add(ko);
+                }
+                RenewLinking(ko.x, ko.y, -1, ref IdouListKousinKoma);
 
                 BanKo[ko.x, ko.y] = null;
                 if (naru == true) ko.doKNari(); //駒成り
@@ -221,6 +235,11 @@ namespace YTSG {
             BanKo[dstPos.x, dstPos.y] = ko;
             ko.x = dstPos.x;
             ko.y = dstPos.y;
+
+            //移動・打った駒の移動可能情報追加
+            foreach (var k in IdouListKousinKoma) {
+                k.kikiRenew(this, 1);
+            }
 
             return 0;
         }
@@ -272,35 +291,93 @@ namespace YTSG {
             }
         }
 
-        public void RenewLinking(int x, int y, int val, List<koma> IdouListKousinKoma) {
-            // 上
-            for (int i = 1 ; x + i < TEIGI.SIZE_DAN ; i++) {
-                if (BanKo[x + i, y] == null) continue;
-                if ((BanKo[x + i, y].type == KomaType.Kyousha) || (BanKo[x + i, y].type == KomaType.Hisya)) BanKo[x + i, y].kikiRenew(this, 1);
-                break;
-            }
-            // 下
-            for (int i = 1 ; x - i >= 0 ; i++) {
-                if (BanKo[x - i, y] == null) continue;
-                if ((BanKo[x - i, y].type == KomaType.Kyousha) || (BanKo[x - i, y].type == KomaType.Hisya)) BanKo[x - i, y].kikiRenew(this, 1);
-                break;
-            }
+        public void RenewLinking(int x, int y, int val, ref List<koma> IdouListKousinKoma) {
             // 右
-            for (int i = 1 ; y + i < TEIGI.SIZE_SUZI ; i++) {
-                if (BanKo[x, y + i] == null) continue;
-                if (BanKo[x, y + i].type == KomaType.Hisya) BanKo[x, y + i].kikiRenew(this, 1);
+            for (int i = 1; x + i < TEIGI.SIZE_DAN; i++) {
+                if (BanKo[x + i, y] == null) continue;
+                if ((BanKo[x + i, y].type == KomaType.Hisya) || (BanKo[x + i, y].type == KomaType.Ryuuou)) {
+                    if (!IdouListKousinKoma.Contains(BanKo[x + i, y])) {
+                        BanKo[x + i, y].kikiRenew(this, val);
+                        IdouListKousinKoma.Add(BanKo[x + i, y]);
+                    }
+                }
                 break;
             }
             // 左
-            for (int i = 1; y - i >= 0; i++) {
-                if (BanKo[x, y - i] == null) continue;
-                if (BanKo[x, y - i].type == KomaType.Hisya) BanKo[x, y - i].kikiRenew(this, 1);
+            for (int i = 1; x - i >= 0; i++) {
+                if (BanKo[x - i, y] == null) continue;
+                if ((BanKo[x - i, y].type == KomaType.Hisya) || (BanKo[x - i, y].type == KomaType.Ryuuou)) {
+                    if (!IdouListKousinKoma.Contains(BanKo[x - i, y])) {
+                        BanKo[x - i, y].kikiRenew(this, val);
+                        IdouListKousinKoma.Add(BanKo[x - i, y]);
+                    }
+                }
                 break;
             }
             // 上
-            for (int i = 1; (x + i < TEIGI.SIZE_DAN)&&(y + i < TEIGI.SIZE_SUZI); i++) {
-                if (BanKo[x + i, y] == null) continue;
-                if ((BanKo[x + i, y].type == KomaType.Kyousha) || (BanKo[x + i, y].type == KomaType.Hisya)) BanKo[x + i, y].kikiRenew(this, 1);
+            for (int i = 1; y + i < TEIGI.SIZE_SUZI; i++) {
+                if (BanKo[x, y + i] == null) continue;
+                if ((BanKo[x, y + i].type == KomaType.Kyousha) || (BanKo[x, y + i].type == KomaType.Hisya) || (BanKo[x, y + i].type == KomaType.Ryuuou)) {
+                    if (!IdouListKousinKoma.Contains(BanKo[x, y + i])) {
+                        BanKo[x, y + i].kikiRenew(this, val);
+                        IdouListKousinKoma.Add(BanKo[x, y + i]);
+                    }
+                }
+                break;
+            }
+            // 下
+            for (int i = 1; y - i >= 0; i++) {
+                if (BanKo[x, y - i] == null) continue;
+                if ((BanKo[x, y - i].type == KomaType.Kyousha) || (BanKo[x, y - i].type == KomaType.Hisya) || (BanKo[x, y - i].type == KomaType.Ryuuou)) {
+                    if (!IdouListKousinKoma.Contains(BanKo[x, y - i])) {
+                        BanKo[x, y - i].kikiRenew(this, val);
+                        IdouListKousinKoma.Add(BanKo[x, y - i]);
+                    }
+                }
+                break;
+            }
+            // 右斜め上
+            for (int i = 1; (x + i < TEIGI.SIZE_DAN) && (y + i < TEIGI.SIZE_SUZI); i++) {
+                if (BanKo[x + i, y + i] == null) continue;
+                if ((BanKo[x + i, y + i].type == KomaType.Kakugyou) || (BanKo[x + i, y + i].type == KomaType.Ryuuma)) {
+                    if (!IdouListKousinKoma.Contains(BanKo[x + i, y + i])) {
+                        BanKo[x + i, y + i].kikiRenew(this, val);
+                        IdouListKousinKoma.Add(BanKo[x + i, y + i]);
+                    }
+                }
+                break;
+            }
+            // 左斜め上
+            for (int i = 1; (x - i >= 0) && (y + i < TEIGI.SIZE_SUZI); i++) {
+                if (BanKo[x - i, y + i] == null) continue;
+                if ((BanKo[x - i, y + i].type == KomaType.Kakugyou) || (BanKo[x - i, y + i].type == KomaType.Ryuuma)) {
+                    if (!IdouListKousinKoma.Contains(BanKo[x - i, y + i])) {
+                        BanKo[x - i, y + i].kikiRenew(this, val);
+                        IdouListKousinKoma.Add(BanKo[x - i, y + i]);
+                    }
+                }
+                break;
+            }
+            // 右斜め上
+            for (int i = 1; (x + i < TEIGI.SIZE_DAN) && (y - i >= 0); i++) {
+                if (BanKo[x + i, y - i] == null) continue;
+                if ((BanKo[x + i, y - i].type == KomaType.Kakugyou) || (BanKo[x + i, y - i].type == KomaType.Ryuuma)) {
+                    if (!IdouListKousinKoma.Contains(BanKo[x + i, y - i])) {
+                        BanKo[x + i, y - i].kikiRenew(this, val);
+                        IdouListKousinKoma.Add(BanKo[x + i, y - i]);
+                    }
+                }
+                break;
+            }
+            // 右斜め上
+            for (int i = 1; (x - i >= 0) && (y - i >= 0); i++) {
+                if (BanKo[x - i, y - i] == null) continue;
+                if ((BanKo[x - i, y - i].type == KomaType.Kakugyou) || (BanKo[x - i, y - i].type == KomaType.Ryuuma)) {
+                    if (!IdouListKousinKoma.Contains(BanKo[x - i, y - i])) {
+                        BanKo[x - i, y - i].kikiRenew(this, val);
+                        IdouListKousinKoma.Add(BanKo[x - i, y - i]);
+                    }
+                }
                 break;
             }
 
@@ -480,6 +557,15 @@ namespace YTSG {
 
 
                 }
+
+                str += "    ";
+
+                // 移動可能リスト
+                for (int i = TEIGI.SIZE_SUZI - 1; i >= 0; i--) {
+                    str += IdouList[TEIGI.TEBAN_SENTE, i, j] + "" + IdouList[TEIGI.TEBAN_GOTE, i, j] + "|";
+
+                }
+
                 // 改行
                 str += Environment.NewLine;
 

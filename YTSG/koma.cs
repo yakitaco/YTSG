@@ -616,6 +616,10 @@ namespace YTSG {
             }
 
             if ((KoMove[(uint)this.type] & 128) > 0) { //8 : 飛車左右後
+                for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
+                    ret = koCheck(0, -i, ban);
+                    if (ret > 0) { return 1; } else if (ret < 0) break;
+                }
                 for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
                     ret = koCheck(-i, 0, ban);
                     if (ret > 0) { return 1; } else if (ret < 0) break;
@@ -653,44 +657,50 @@ namespace YTSG {
         // 自分の駒が別の駒に効いているかチェック
         // 加算値(BanInfo.IdouList反映用)
         public void kikiRenew(BanInfo ban, int kasan) {
+
+            if (x == 9) return; // 持ち駒は対象外
+
             //先手基準で計算(前:y-1/右:x-1)
             if ((KoMove[(uint)this.type] & 1) > 0) { //1 : 前
-                koCheck( 0, -1, ban, kasan);
+                koCheck(0, -1, ban, kasan);
             }
             if ((KoMove[(uint)this.type] & 2) > 0) { //2 : 後
-                koCheck( 0, 1, ban, kasan);
+                koCheck(0, 1, ban, kasan);
             }
             if ((KoMove[(uint)this.type] & 4) > 0) { //3 : 左右前
                 koCheck(-1, -1, ban, kasan);
-                koCheck( 1, -1, ban, kasan);
+                koCheck(1, -1, ban, kasan);
             }
             if ((KoMove[(uint)this.type] & 8) > 0) { //4 : 左右横
                 koCheck(-1, 0, ban, kasan);
-                koCheck( 1, 0, ban, kasan);
+                koCheck(1, 0, ban, kasan);
             }
             if ((KoMove[(uint)this.type] & 16) > 0) { //5 : 左右後
                 koCheck(-1, 1, ban, kasan);
-                koCheck( 1, 1, ban, kasan);
+                koCheck(1, 1, ban, kasan);
             }
             if ((KoMove[(uint)this.type] & 32) > 0) { //6 : 桂馬
                 koCheck(-1, -2, ban, kasan);
-                koCheck( 1, -2, ban, kasan);
+                koCheck(1, -2, ban, kasan);
             }
             if ((KoMove[(uint)this.type] & 64) > 0) { //7 : 飛車前・香車
                 for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
-                    if (koCheck( 0, -i, ban, kasan) != 0) break;
+                    if (koCheck(0, -i, ban, kasan) != 0) break;
                 }
             }
 
             if ((KoMove[(uint)this.type] & 128) > 0) { //8 : 飛車左右後
+                for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
+                    if (koCheck(0, -i, ban, kasan) != 0) break;
+                }
                 for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
                     if (koCheck(-i, 0, ban, kasan) != 0) break;
                 }
                 for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                    if (koCheck( i, 0, ban, kasan) != 0) break;
+                    if (koCheck(i, 0, ban, kasan) != 0) break;
                 }
                 for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
-                    if (koCheck( 0, i, ban, kasan) != 0) break;
+                    if (koCheck(0, i, ban, kasan) != 0) break;
                 }
             }
             if ((KoMove[(uint)this.type] & 256) > 0) { //9 : 角行
@@ -698,13 +708,13 @@ namespace YTSG {
                     if (koCheck(-i, -i, ban, kasan) != 0) break;
                 }
                 for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                    if (koCheck(-i,  i, ban, kasan) != 0) break;
+                    if (koCheck(-i, i, ban, kasan) != 0) break;
                 }
                 for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                    if (koCheck( i, -i, ban, kasan) != 0) break;
+                    if (koCheck(i, -i, ban, kasan) != 0) break;
                 }
                 for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                    if (koCheck( i,  i, ban, kasan) != 0) break;
+                    if (koCheck(i, i, ban, kasan) != 0) break;
                 }
             }
         }
