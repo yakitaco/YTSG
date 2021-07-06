@@ -389,8 +389,12 @@ namespace YTSG {
                 }
                 if ((KoMove[(uint)this.type] & 64) > 0) { //7 : 香車
                     for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
-                        if (koSet_Kyousya(new koPos(0, -i), ban, ref teList) != 0) break;
-                        //if (koSet(new koPos(0, -i), ban, ref teList) != 0) break;
+                        // 敵の移動先になっていない
+                        if (ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE,this.x, this.y] == 0) {
+                            if (koSet_Kyousya(new koPos(0, -i), ban, ref teList) != 0) break;
+                        } else {
+                            if (koSet(new koPos(0, -i), ban, ref teList) != 0) break;
+                        }
                     }
                 }
 

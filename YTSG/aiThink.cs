@@ -122,6 +122,7 @@ namespace YTSG {
                     koma ko_local;
                     int score = -99999;
                     int cnt_local;
+                    List<koPos> nexTe;
 
                     lock (lockObj) {
                         if (teAllList.Count <= teCnt) break;
@@ -135,19 +136,32 @@ namespace YTSG {
                         ko_local = ban_local.OkiKo[teban].Find(k => k.x == teAllList[cnt_local].ko.x && k.y == teAllList[cnt_local].ko.y);
                     }
 
-                    //1手動かしてみる
+                    // 1手動かしてみる
                     ban_local.moveKoma(ko_local, teAllList[cnt_local], teAllList[cnt_local].nari, false);
 
-                    List<koPos> nexTe = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, teAllList[cnt_local].val);
-                    if (nexTe.Count > 0) {
-                        teAllList[cnt_local].val -= nexTe[0].val;
-                    }
-                    
 
-                    //詰み発見のため残り処理スキップ
-                    if (teAllList[cnt_local].val > 90000) {
-                        lock (lockObj) {
-                            teCnt = 999;
+                    // 王手は即スキップ
+                    koma koKing = ban_local.OkiKo[teban].Find(k => k.type == KomaType.Ousyou);
+                    if (ban_local.IdouList[koKing.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, koKing.x, koKing.y] > 0) {
+                        teAllList[cnt_local].val = -99999;
+                        nexTe = new List<koPos>();  // 未使用
+                    } else {
+                        if ((cnt_local > 50) && (depth > 4)) {  // 優先度低は深く調べない
+                            nexTe = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, teAllList[cnt_local].val);
+                        } else {
+                            nexTe = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, teAllList[cnt_local].val);
+                        }
+
+                        if (nexTe.Count > 0) {
+                            teAllList[cnt_local].val -= nexTe[0].val;
+                        }
+
+
+                        //詰み発見のため残り処理スキップ
+                        if (teAllList[cnt_local].val > 90000) {
+                            lock (lockObj) {
+                                teCnt = 999;
+                            }
                         }
                     }
                     string aaa = "";
@@ -205,7 +219,7 @@ namespace YTSG {
                     teAllList.Add(pos);
                 }
             }
-            if (depth > 1) {  //最下層+1では無視
+            if (depth > 2) {  //最下層+1では無視
 
                 for (int i = 0; i < 7; i++) {
                     if (ban.MochiKo[teban, i]?.Count > 0) {
@@ -237,6 +251,13 @@ namespace YTSG {
                         ko_local = ban_local.OkiKo[teban].Find(k => k.x == te.ko.x && k.y == te.ko.y);
                     }
                     ban_local.moveKoma(ko_local, te, te.nari, false);
+
+                    // 王手は即スキップ
+                    koma koKing = ban_local.OkiKo[teban].Find(k => k.type == KomaType.Ousyou);
+                    if (ban_local.IdouList[koKing.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, koKing.x, koKing.y] > 0) {
+                        continue;
+                    }
+
                     List<koPos> childList = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, te.val);
                     //te.val -= think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, te.val).val;
                     //tecount++;
