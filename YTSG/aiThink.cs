@@ -147,9 +147,9 @@ namespace YTSG {
                         nexTe = new List<koPos>();  // 未使用
                     } else {
                         if ((cnt_local > 50) && (depth > 4)) {  // 優先度低は深く調べない
-                            nexTe = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, teAllList[cnt_local].val);
+                            nexTe = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, teAllList[cnt_local].val, teAllList[cnt_local].ko.type, teAllList[cnt_local].x, teAllList[cnt_local].y);
                         } else {
-                            nexTe = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, teAllList[cnt_local].val);
+                            nexTe = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, teAllList[cnt_local].val, teAllList[cnt_local].ko.type, teAllList[cnt_local].x, teAllList[cnt_local].y);
                         }
 
                         if (nexTe.Count > 0) {
@@ -187,8 +187,8 @@ namespace YTSG {
             //return teAllList;
         }
 
-
-        List<koPos> think(int teban, BanInfo ban, int depth, int abscore, int up_score) {
+        // x y ひとつ前の移動先位置
+        List<koPos> think(int teban, BanInfo ban, int depth, int abscore, int up_score, KomaType pre_type, int pre_x, int pre_y) {
             List<koPos> retList = new List<koPos>();
             int score = -99999;
             koPos kp = null;
@@ -219,7 +219,7 @@ namespace YTSG {
                     teAllList.Add(pos);
                 }
             }
-            if (depth > 2) {  //最下層+1では無視
+            if (depth > 1) {  //最下層+1では無視
 
                 for (int i = 0; i < 7; i++) {
                     if (ban.MochiKo[teban, i]?.Count > 0) {
@@ -243,6 +243,15 @@ namespace YTSG {
                         retList.Add(te);
                         break;
                     }
+
+                    if ((maxDepth - depth > 2) && (pre_type != KomaType.Hisya) && (pre_type != KomaType.Kakugyou) && (pre_type != KomaType.Ryuuma) && (pre_type != KomaType.Ryuuou) && (pre_type != KomaType.Kyousha)) {
+                        if ((te.ko.type != KomaType.Hisya) && (te.ko.type != KomaType.Kakugyou) && (te.ko.type != KomaType.Ryuuma) && (te.ko.type != KomaType.Ryuuou) && (te.ko.type != KomaType.Kyousha)) {
+                        if (((te.x - pre_x > 2) || (te.x - pre_x < -2) || (te.y - pre_y > 2) || (te.y - pre_y < -2))&&(ban.IdouList[te.ko.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, te.x, te.y] == 0)) {
+                                continue;
+                            }
+                        }
+                    }
+
                     BanInfo ban_local = new BanInfo(ban);
                     koma ko_local;
                     if (te.ko.x == 9) {
@@ -258,7 +267,7 @@ namespace YTSG {
                         continue;
                     }
 
-                    List<koPos> childList = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, te.val);
+                    List<koPos> childList = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, te.val, te.ko.type , te.x, te.y);
                     //te.val -= think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, te.val).val;
                     //tecount++;
                     //if (tecount> depth*20+10) break;

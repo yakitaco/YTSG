@@ -353,7 +353,7 @@ namespace YTSG {
                         //指定した盤に駒が置いていない場合
                         if (ban.BanKo[j, i] == null) {
                             // 歩飛角以外の駒で、移動先に敵味方の駒がない場合、無駄なため置かない
-                            if ((this.type != KomaType.Fuhyou) && (this.type != KomaType.Hisya) && (this.type != KomaType.Kakugyou) && (new koma(this.p, this.type, i, j).kikiCheck(ban) == 0)) {
+                            if ((this.type != KomaType.Fuhyou) && (this.type != KomaType.Hisya) && (this.type != KomaType.Kakugyou) && (new koma(this.p, this.type, j, i).kikiCheck(ban) == 0)) {
                                 continue;
                             }
 

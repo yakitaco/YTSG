@@ -310,10 +310,13 @@ namespace YTSG {
 
                     koPos ret;
                     if ((tesuu < 20)||(nokori< 60000)) {
+                        cpu.maxDepth = 3;
                         ret = cpu.thinkMove(myTeban, ban, 3); //コンピュータ思考
                     } else if ((tesuu < 40)||(nokori< 300000)) {
+                        cpu.maxDepth = 4;
                         ret = cpu.thinkMove(myTeban, ban, 4); //コンピュータ思考
                     } else {
+                        cpu.maxDepth = 5;
                         ret = cpu.thinkMove(myTeban, ban, 5); //コンピュータ思考
                     }
 
