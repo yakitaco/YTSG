@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,6 +8,15 @@ namespace YTSG {
 
     // AI思考部分メイン
     class aiThink {
+
+        // thread同時数
+        static int workMin;
+        static int ioMin;
+
+        static aiThink(){
+            // thread同時数取得
+            ThreadPool.GetMinThreads(out workMin, out ioMin);
+        }
 
         System.Random r = new System.Random();
         public int maxDepth; // 最大読み深さ
@@ -108,9 +116,6 @@ namespace YTSG {
             teAllList.Sort((a, b) => b.val - a.val);
 
             //thread同時数
-            int workMin;
-            int ioMin;
-            ThreadPool.GetMinThreads(out workMin, out ioMin);
             Form1.Form1Instance.addMsg("MinThreads work= " + workMin + ", i/o= " + ioMin + ", teAllList=" + teAllList.Count);
 
             // 並行処理
@@ -168,8 +173,8 @@ namespace YTSG {
                     foreach (var n in nexTe) {
                         aaa += "->[" + n.val + "](" + (n.x + 1) + "," + (n.y + 1) + ")" + n.ko.type;
                     }
-                    
-                    Form1.Form1Instance.addMsg("[" + Task.CurrentId + "]teAll[" + cnt_local + "].val = [" + teAllList[cnt_local].val + "](" + (teAllList[cnt_local].x + 1) + "," + (teAllList[cnt_local].y + 1) + ")" + teAllList[cnt_local].ko.type  + aaa);
+
+                    Form1.Form1Instance.addMsg("[" + Task.CurrentId + "]teAll[" + cnt_local + "].val = [" + teAllList[cnt_local].val + "](" + (teAllList[cnt_local].x + 1) + "," + (teAllList[cnt_local].y + 1) + ")" + teAllList[cnt_local].ko.type + aaa);
 
                     if (score < teAllList[cnt_local].val) score = teAllList[cnt_local].val;
 
@@ -246,7 +251,7 @@ namespace YTSG {
 
                     if ((maxDepth - depth > 2) && (pre_type != KomaType.Hisya) && (pre_type != KomaType.Kakugyou) && (pre_type != KomaType.Ryuuma) && (pre_type != KomaType.Ryuuou) && (pre_type != KomaType.Kyousha)) {
                         if ((te.ko.type != KomaType.Hisya) && (te.ko.type != KomaType.Kakugyou) && (te.ko.type != KomaType.Ryuuma) && (te.ko.type != KomaType.Ryuuou) && (te.ko.type != KomaType.Kyousha)) {
-                        if (((te.x - pre_x > 2) || (te.x - pre_x < -2) || (te.y - pre_y > 2) || (te.y - pre_y < -2))&&(ban.IdouList[te.ko.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, te.x, te.y] == 0)) {
+                            if (((te.x - pre_x > 2) || (te.x - pre_x < -2) || (te.y - pre_y > 2) || (te.y - pre_y < -2)) && (ban.IdouList[te.ko.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, te.x, te.y] == 0)) {
                                 continue;
                             }
                         }
@@ -267,7 +272,7 @@ namespace YTSG {
                         continue;
                     }
 
-                    List<koPos> childList = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, te.val, te.ko.type , te.x, te.y);
+                    List<koPos> childList = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, te.val, te.ko.type, te.x, te.y);
                     //te.val -= think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, te.val).val;
                     //tecount++;
                     //if (tecount> depth*20+10) break;
@@ -292,6 +297,49 @@ namespace YTSG {
             }
 
             return retList;
+        }
+
+        public int thinkMate(int teban, BanInfo ban, int depth) {
+            List<koPos> teAllList = new List<koPos>();
+            int teCnt = 0; //手の進捗
+            Object lockObj = new Object();
+            ban.renewNifList(teban);  //二歩リスト更新
+
+
+            koma koKing = ban.OkiKo[teban].Find(k => k.type == KomaType.Ousyou);
+
+            //王手を指せる手を全てリスト追加
+            foreach (koma km in ban.OkiKo[teban]) {
+                teAllList.AddRange(km.baninfoPos(ban, koKing.x, koKing.y));
+
+            }
+
+            //thread同時数
+            Form1.Form1Instance.addMsg("MinThreads work= " + workMin + ", i/o= " + ioMin + ", teAllList=" + teAllList.Count);
+
+            // 並行処理
+            Parallel.For(0, workMin, id => {
+                while (true) {
+                    int cnt_local;
+                    BanInfo ban_local = new BanInfo(ban);
+
+                    lock (lockObj) {
+                        if (teAllList.Count <= teCnt) break;
+                        cnt_local = teCnt;
+                        teCnt++;
+                    }
+
+                    // 一手動かす
+                    //王手を逃がす手をすべてリスト追加
+                    if (ban.IdouList[koKing.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, koKing.x, koKing.y] == 0) {
+                        //thinkMate(int teban, BanInfo ban, int depth);
+                    }
+
+                }
+            });
+
+
+            return 0;
         }
 
     }

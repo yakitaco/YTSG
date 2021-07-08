@@ -85,8 +85,8 @@ namespace YTSG {
                 int suzi = TEIGI.SIZE_SUZI - 1;
                 while (suzi > -1) {
                     // 数字(空白の数)
-                    if (int.TryParse(oki.Substring(j, 1), out var num)) {
-                        suzi -= num;
+                    if (int.TryParse(oki.Substring(j, 1), out var n)) {
+                        suzi -= n;
                         j++;
                     } else {
                         // 駒配置
@@ -102,20 +102,22 @@ namespace YTSG {
 
             // 持ち駒の設定
             j = 0;
+            int num = 0;
             while ((j < mochi.Length) && (mochi[j] != '-')) {
-                // 数字(駒の数) ★2桁もアリ(未実装)
-                int num = 0;
-                if (int.TryParse(mochi.Substring(j, 1), out num)) {
+                // 数字(駒の数) ★2桁もアリ
+                if (int.TryParse(mochi.Substring(j, 1), out var tmp)) {
                     j++;
-                } else {
-                    num = 1;
+                    num = num * 10 + tmp;
+                        } else {
+                    if (num == 0) num = 1;
+                    // 持ち駒追加(複数駒ありを考慮)
+                    koma k = sfen.toKoma(mochi, ref j, 9, 9);
+                    for (int i = 0; i < num; i++) {
+                        this.addKoma(new koma(k.p, k.type, 9, 9));
+                    }
+                    num = 0;
                 }
 
-                // 持ち駒追加(複数駒ありを考慮)
-                koma k = sfen.toKoma(mochi, ref j, 9, 9);
-                for (int i = 0; i < num; i++) {
-                    this.addKoma(new koma(k.p, k.type, 9, 9));
-                }
             }
         }
 

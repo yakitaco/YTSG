@@ -196,10 +196,10 @@ namespace YTSG {
             IdouList[1, 8, 7] = -50; //香
             IdouList[6, 6, 7] = 120; //金
             IdouList[6, 6, 6] = 181; //金
-            IdouList[7, 5, 8] = 1; //王
-            IdouList[7, 6, 8] = 2; //王
-            IdouList[7, 7, 6] = 3; //王
-            IdouList[7, 8, 8] = 4; //王
+            IdouList[7, 5, 8] = 10; //王
+            IdouList[7, 6, 8] = 20; //王
+            IdouList[7, 7, 6] = 30; //王
+            IdouList[7, 8, 8] = 40; //王
             IdouList[5, 6, 6] = 20; //角
             IdouList[5, 7, 5] = -70; //角
             IdouList[5, 6, 8] = 30; //角
@@ -291,72 +291,82 @@ namespace YTSG {
                     Form1.Form1Instance.addMsg("[SEND]readyok");
 
                 } else if ((str.Length > 1) && (str.Substring(0, 2) == "go")) {
+
                     Form1.Form1Instance.addMsg("[RECV]" + str);
                     //cpu.RandomeMove(myTeban, ref ban);
 
                     string[] arr = str.Split(' ');
-                    int nokori = Convert.ToInt32(myTeban == TEIGI.TEBAN_SENTE ? arr[2] : arr[4]);
 
-                    // タイマー設定
-                    //if (nokori > )
-                    aTimer = new System.Timers.Timer(2000);
+                    //通常読み
+                    if (arr[1] == "btime") {
+
+                        int nokori = Convert.ToInt32(myTeban == TEIGI.TEBAN_SENTE ? arr[2] : arr[4]);
+
+                        // タイマー設定
+                        //if (nokori > )
+                        aTimer = new System.Timers.Timer(2000);
 
 
-                    Form1.Form1Instance.addMsg("[NOKORI]" + nokori);
-                    
-                    thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
+                        Form1.Form1Instance.addMsg("[NOKORI]" + nokori);
 
-                    if (tesuu == 30) tekouho.ResetJoseki();
+                        thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
 
-                    koPos ret;
-                    if ((tesuu < 20)||(nokori< 60000)) {
-                        cpu.maxDepth = 3;
-                        ret = cpu.thinkMove(myTeban, ban, 3); //コンピュータ思考
-                    } else if ((tesuu < 40)||(nokori< 300000)) {
-                        cpu.maxDepth = 4;
-                        ret = cpu.thinkMove(myTeban, ban, 4); //コンピュータ思考
-                    } else {
-                        cpu.maxDepth = 5;
-                        ret = cpu.thinkMove(myTeban, ban, 5); //コンピュータ思考
-                    }
+                        if (tesuu == 30) tekouho.ResetJoseki();
 
-                    thisProcess.PriorityClass = ProcessPriorityClass.AboveNormal; //優先度普通
+                        koPos ret;
+                        if ((tesuu < 20) || (nokori < 60000)) {
+                            cpu.maxDepth = 3;
+                            ret = cpu.thinkMove(myTeban, ban, 3); //コンピュータ思考
+                        } else if ((tesuu < 40) || (nokori < 300000)) {
+                            cpu.maxDepth = 4;
+                            ret = cpu.thinkMove(myTeban, ban, 4); //コンピュータ思考
+                        } else {
+                            cpu.maxDepth = 5;
+                            ret = cpu.thinkMove(myTeban, ban, 5); //コンピュータ思考
+                        }
 
-                    tesuu++;
+                        thisProcess.PriorityClass = ProcessPriorityClass.AboveNormal; //優先度普通
 
-                    if (ret.val < -5000)
-                    { //投了
-                        Console.WriteLine("bestmove resign");
+                        tesuu++;
 
-                    }
-                    else
-                    {
-                        Console.WriteLine("bestmove " + usio.pos2usi(ret.ko, ret));  //標準出力
-                        Form1.Form1Instance.addMsg("[SEND]MOVE:" + ret.ko.type + ":(" + (ret.ko.x + 1) + "," + (ret.ko.y + 1) + ")->(" + (ret.x + 1) + "," + (ret.y + 1) + ")" + (ret.nari == true ? "<NARI>" : "") + "\n");
-                        ban.moveKoma(ret.ko, ret, ret.nari, false);  //動かす
-                        teban = (teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE);
+                        if (ret.val < -5000) { //投了
+                            Console.WriteLine("bestmove resign");
 
-                        //foreach (koma km in ban.OkiKo[0])
-                        //{
-                        //    Form1.Form1Instance.addMsg("OkiKo[0] :" + km.p + ":" + km.type + " (" + (km.x + 1) + "," + (km.y + 1) + ")");
-                        //}
-                        //foreach (koma km in ban.OkiKo[1])
-                        //{
-                        //    Form1.Form1Instance.addMsg("OkiKo[1] :" + km.p + ":" + km.type + " (" + (km.x + 1) + "," + (km.y + 1) + ")");
-                        //}
-                        //for (int i =0; i < 7; i++) {
-                        //    foreach (koma km in ban.MochiKo[0,i])
-                        //    {
-                        //        Form1.Form1Instance.addMsg("MochiKo[0]:" + km.p + ":" + km.type + " (" + (km.x + 1) + "," + (km.y + 1) + ")");
-                        //    }
-                        //}
-                        //for (int i = 0; i < 7; i++)
-                        //{
-                        //    foreach (koma km in ban.MochiKo[1,i])
-                        //    {
-                        //        Form1.Form1Instance.addMsg("MochiKo[1]:" + km.p + ":" + km.type + " (" + (km.x + 1) + "," + (km.y + 1) + ")");
-                        //    }
-                        //}
+                        } else {
+                            Console.WriteLine("bestmove " + usio.pos2usi(ret.ko, ret));  //標準出力
+                            Form1.Form1Instance.addMsg("[SEND]MOVE:" + ret.ko.type + ":(" + (ret.ko.x + 1) + "," + (ret.ko.y + 1) + ")->(" + (ret.x + 1) + "," + (ret.y + 1) + ")" + (ret.nari == true ? "<NARI>" : "") + "\n");
+                            ban.moveKoma(ret.ko, ret, ret.nari, false);  //動かす
+                            teban = (teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE);
+
+                            //foreach (koma km in ban.OkiKo[0])
+                            //{
+                            //    Form1.Form1Instance.addMsg("OkiKo[0] :" + km.p + ":" + km.type + " (" + (km.x + 1) + "," + (km.y + 1) + ")");
+                            //}
+                            //foreach (koma km in ban.OkiKo[1])
+                            //{
+                            //    Form1.Form1Instance.addMsg("OkiKo[1] :" + km.p + ":" + km.type + " (" + (km.x + 1) + "," + (km.y + 1) + ")");
+                            //}
+                            //for (int i =0; i < 7; i++) {
+                            //    foreach (koma km in ban.MochiKo[0,i])
+                            //    {
+                            //        Form1.Form1Instance.addMsg("MochiKo[0]:" + km.p + ":" + km.type + " (" + (km.x + 1) + "," + (km.y + 1) + ")");
+                            //    }
+                            //}
+                            //for (int i = 0; i < 7; i++)
+                            //{
+                            //    foreach (koma km in ban.MochiKo[1,i])
+                            //    {
+                            //        Form1.Form1Instance.addMsg("MochiKo[1]:" + km.p + ":" + km.type + " (" + (km.x + 1) + "," + (km.y + 1) + ")");
+                            //    }
+                            //}
+                        }
+                    // 詰将棋
+                    } else if (arr[1] == "mate") {
+                        Console.WriteLine("checkmate notimplemented");
+                        int ret = 0;
+
+                        ret = cpu.thinkMate(myTeban, ban, 3);
+
                     }
 
                 } else if ((str.Length > 7)&&(str.Substring(0, 8) == "position")) {

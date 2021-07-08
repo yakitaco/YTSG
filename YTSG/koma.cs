@@ -4,10 +4,8 @@ namespace YTSG {
     //駒情報
     class koma {
 
-
-
         //駒の動き情報
-        uint[] KoMove =
+        static uint[] KoMove =
         {
             0b0000000000000000,	 //なし：0
             0b0000000000000001,	 //歩兵：1
@@ -27,7 +25,7 @@ namespace YTSG {
         };
         // 1:前 2:後 3:斜め前 4:横 5:斜め後ろ 6:桂馬 7:前ずっと 8:右左後ろずっと 9: 斜めずっと
 
-        int[] KoScore =
+        static int[] KoScore =
         {
             0,	 //なし：0
             100,	 //歩兵：1
@@ -45,6 +43,14 @@ namespace YTSG {
             1800,  //竜王：1 + 2 + 3 + 4 + 5 + 7 + 8
             1400,  //竜馬：1 + 2 + 3 + 4 + 5 + 9
         };
+
+        static List<mateMval>[] mateMove = new List<mateMval>[15];
+
+        class mateMval {
+            int x;
+            int y;
+
+        }
 
         public int p; //所持プレイヤー (0:先手/1:後手)
         public KomaType type;
@@ -71,7 +77,13 @@ namespace YTSG {
             }
         }
 
+        // 初期化関数
+        static koma() {
+            for (int i = 0 ; i < 15 ; i++) {
+                mateMove[i] = new List<mateMval>();
+            }
 
+        }
 
 
         //駒が成れるか
@@ -391,6 +403,118 @@ namespace YTSG {
                     for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
                         // 敵の移動先になっていない
                         if (ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE,this.x, this.y] == 0) {
+                            if (koSet_Kyousya(new koPos(0, -i), ban, ref teList) != 0) break;
+                        } else {
+                            if (koSet(new koPos(0, -i), ban, ref teList) != 0) break;
+                        }
+                    }
+                }
+
+                if ((KoMove[(uint)this.type] & 128) > 0) { //8 : 飛車
+                    for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
+                        if (koSet(new koPos(0, -i), ban, ref teList) != 0) break;
+                    }
+                    for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                        if (koSet(new koPos(-i, 0), ban, ref teList) != 0) break;
+                    }
+                    for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                        if (koSet(new koPos(i, 0), ban, ref teList) != 0) break;
+                    }
+                    for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
+                        if (koSet(new koPos(0, i), ban, ref teList) != 0) break;
+                    }
+                }
+                if ((KoMove[(uint)this.type] & 256) > 0) { //9 : 角行
+                    for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                        if (koSet(new koPos(-i, -i), ban, ref teList) != 0) break;
+                    }
+                    for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                        if (koSet(new koPos(-i, i), ban, ref teList) != 0) break;
+                    }
+                    for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                        if (koSet(new koPos(i, -i), ban, ref teList) != 0) break;
+                    }
+                    for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                        if (koSet(new koPos(i, i), ban, ref teList) != 0) break;
+                    }
+                }
+            }
+
+            return teList;
+        }
+
+        // 指定位置へ次の手で移動可能な駒の移動リスト
+        public List<koPos> baninfoPos(BanInfo ban,int x,int y) {
+            //次の手の位置リスト
+            List<koPos> teList = new List<koPos>();
+
+            /* 持ち駒の場合 */
+            if (this.x == 9) {
+
+                for (int i = 0; i < TEIGI.SIZE_DAN; i++) {　　//段(Y)
+                    if ((this.type == KomaType.Fuhyou) || (this.type == KomaType.Kyousha))  //歩or香
+                    {
+                        if (((this.p == TEIGI.TEBAN_SENTE) && (i == 0)) || ((this.p == TEIGI.TEBAN_GOTE) && (i == TEIGI.SIZE_DAN - 1)))  //先手で1段目 or 後手で9段目
+                        {
+                            continue;
+                        }
+
+                    } else if (this.type == KomaType.Keima)  //桂
+                      {
+                        if (((this.p == TEIGI.TEBAN_SENTE) && (i < 2)) || ((this.p == TEIGI.TEBAN_GOTE) && (i >= TEIGI.SIZE_DAN - 2)))  //先手で<3段目 or 後手で>7段目
+                        {
+                            continue;
+                        }
+                    }
+
+                    for (int j = 0; j < TEIGI.SIZE_SUZI; j++)　　//筋(X)
+                    {
+                        if (this.type == KomaType.Fuhyou) {
+                            //TODO: 2歩チェック
+                            if (ban.nifList[this.p, j] == 1) continue;
+                        }
+
+                        //指定した盤に駒が置いていない場合
+                        if (ban.BanKo[j, i] == null) {
+                            // 歩飛角以外の駒で、移動先に敵味方の駒がない場合、無駄なため置かない
+                            if ((this.type != KomaType.Fuhyou) && (this.type != KomaType.Hisya) && (this.type != KomaType.Kakugyou) && (new koma(this.p, this.type, j, i).kikiCheck(ban) == 0)) {
+                                continue;
+                            }
+
+                            teList.Add(new koPos(j, i, 0, this, false));
+                        }
+                    }
+                }
+                //盤上の場合
+            } else {
+                //先手基準で計算(前:y-1/右:x-1)
+                if ((KoMove[(uint)this.type] & 1) > 0) { //1 : 前
+                    //teList.Add(new koPos(this.x, this.y, 0, this, false));
+                    koSet(new koPos(0, -1), ban, ref teList);
+                }
+                if ((KoMove[(uint)this.type] & 2) > 0) { //2 : 後
+                    koSet(new koPos(0, 1), ban, ref teList);
+                }
+                if ((KoMove[(uint)this.type] & 4) > 0) { //3 : 左右前
+                    koSet(new koPos(-1, -1), ban, ref teList);
+                    koSet(new koPos(1, -1), ban, ref teList);
+                }
+                if ((KoMove[(uint)this.type] & 8) > 0) { //4 : 左右横
+                    koSet(new koPos(-1, 0), ban, ref teList);
+                    koSet(new koPos(1, 0), ban, ref teList);
+                }
+                if ((KoMove[(uint)this.type] & 16) > 0) { //5 : 左右後
+                    koSet(new koPos(-1, 1), ban, ref teList);
+                    koSet(new koPos(1, 1), ban, ref teList);
+                }
+                if ((KoMove[(uint)this.type] & 32) > 0) { //6 : 桂馬
+                    koSet(new koPos(-1, -2), ban, ref teList);
+                    koSet(new koPos(1, -2), ban, ref teList);
+                }
+                if ((KoMove[(uint)this.type] & 64) > 0) { //7 : 香車
+                    for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
+                        // 敵の移動先になっていない
+                        if (ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, this.x, this.y] == 0) {
                             if (koSet_Kyousya(new koPos(0, -i), ban, ref teList) != 0) break;
                         } else {
                             if (koSet(new koPos(0, -i), ban, ref teList) != 0) break;
