@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace YTSG {
 
@@ -11,6 +12,7 @@ namespace YTSG {
         public koma[,] BanKo = new koma[TEIGI.SIZE_SUZI, TEIGI.SIZE_DAN];   //盤上情報
         public List<koma>[] OkiKo = new List<koma>[2];                      //置き駒情報 (BanKo[0]:先手 / BanKo[1]:後手)
         public List<koma>[,] MochiKo = new List<koma>[2, 7];                //持ち駒情報 (MochiKo[0,]:先手 / MochiKo[1,]:後手 [,0-7]各駒)
+        public koma[] KingKo = new koma[2];                                 //王の駒情報 (Kingko[0]:先手 / Kingko[1]:後手)
         public int[,,] IdouList = new int[2, 9, 9];                         //駒の移動可能リスト
         public int[,] nifList = new int[2, 9];                              //二歩リスト (BanKo[X.Y]:X 0:先手 1:後手, Y=1～9筋)
 
@@ -68,6 +70,10 @@ namespace YTSG {
             // 移動リスト新規作成
             newIdouList();
 
+            //王将の情報登録
+            for (int i = 0; i < 2; i++) {
+                KingKo[i] = this.OkiKo[i].FirstOrDefault(k => k.type == KomaType.Ousyou);
+            }
         }
 
         //盤情報作成(指定の場面)
@@ -99,6 +105,11 @@ namespace YTSG {
 
             // 移動リスト新規作成
             newIdouList();
+
+            //王将の情報登録
+            for (int i = 0; i < 2; i++) {
+                KingKo[i] = this.OkiKo[i].FirstOrDefault(k => k.type == KomaType.Ousyou);
+            }
 
             // 持ち駒の設定
             j = 0;
@@ -150,6 +161,15 @@ namespace YTSG {
                 koma tmp_km = new koma(km);
                 OkiKo[TEIGI.TEBAN_GOTE].Add(tmp_km);
                 BanKo[km.x, km.y] = tmp_km;
+            }
+
+            //王将の情報登録
+            for (int i = 0; i < 2; i++) {
+                if (ban.KingKo[i] != null) {
+                    this.KingKo[i] = this.BanKo[ban.KingKo[i].x, ban.KingKo[i].y];
+                } else {
+                    this.KingKo[i] = null;
+                }
             }
 
         }

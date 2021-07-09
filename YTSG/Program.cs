@@ -365,7 +365,7 @@ namespace YTSG {
                         Console.WriteLine("checkmate notimplemented");
                         int ret = 0;
 
-                        ret = cpu.thinkMate(myTeban, ban, 3);
+                        ret = cpu.thinkMateMove(myTeban, ban, 999);
 
                     }
 

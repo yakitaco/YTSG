@@ -13,7 +13,7 @@ namespace YTSG {
         static int workMin;
         static int ioMin;
 
-        static aiThink(){
+        static aiThink() {
             // thread同時数取得
             ThreadPool.GetMinThreads(out workMin, out ioMin);
         }
@@ -136,9 +136,9 @@ namespace YTSG {
                     }
 
                     if (teAllList[cnt_local].ko.x == 9) {
-                        ko_local = ban_local.MochiKo[teban, (int)teAllList[cnt_local].ko.type - 1].Find(k => k.type == teAllList[cnt_local].ko.type);
+                        ko_local = ban_local.MochiKo[teban, (int)teAllList[cnt_local].ko.type - 1][0];
                     } else {
-                        ko_local = ban_local.OkiKo[teban].Find(k => k.x == teAllList[cnt_local].ko.x && k.y == teAllList[cnt_local].ko.y);
+                        ko_local = ban_local.BanKo[teAllList[cnt_local].ko.x, teAllList[cnt_local].ko.y];
                     }
 
                     // 1手動かしてみる
@@ -146,8 +146,7 @@ namespace YTSG {
 
 
                     // 王手は即スキップ
-                    koma koKing = ban_local.OkiKo[teban].Find(k => k.type == KomaType.Ousyou);
-                    if (ban_local.IdouList[koKing.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, koKing.x, koKing.y] > 0) {
+                    if (ban_local.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local.KingKo[teban].x, ban_local.KingKo[teban].y] > 0) {
                         teAllList[cnt_local].val = -99999;
                         nexTe = new List<koPos>();  // 未使用
                     } else {
@@ -260,15 +259,14 @@ namespace YTSG {
                     BanInfo ban_local = new BanInfo(ban);
                     koma ko_local;
                     if (te.ko.x == 9) {
-                        ko_local = ban_local.MochiKo[teban, (int)te.ko.type - 1].Find(k => k.type == te.ko.type);
+                        ko_local = ban_local.MochiKo[teban, (int)te.ko.type - 1][0];
                     } else {
-                        ko_local = ban_local.OkiKo[teban].Find(k => k.x == te.ko.x && k.y == te.ko.y);
+                        ko_local = ban_local.BanKo[te.ko.x, te.ko.y];
                     }
                     ban_local.moveKoma(ko_local, te, te.nari, false);
 
                     // 王手は即スキップ
-                    koma koKing = ban_local.OkiKo[teban].Find(k => k.type == KomaType.Ousyou);
-                    if (ban_local.IdouList[koKing.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, koKing.x, koKing.y] > 0) {
+                    if (ban_local.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local.KingKo[teban].x, ban_local.KingKo[teban].y] > 0) {
                         continue;
                     }
 
@@ -299,19 +297,21 @@ namespace YTSG {
             return retList;
         }
 
-        public int thinkMate(int teban, BanInfo ban, int depth) {
+        // 簡易詰将棋アルゴリズムメイン
+        // ★空き王手や中合いを考慮しない
+        public int thinkMateMove(int teban, BanInfo ban, int depth) {
             List<koPos> teAllList = new List<koPos>();
             int teCnt = 0; //手の進捗
             Object lockObj = new Object();
             ban.renewNifList(teban);  //二歩リスト更新
 
-
-            koma koKing = ban.OkiKo[teban].Find(k => k.type == KomaType.Ousyou);
-
-            //王手を指せる手を全てリスト追加
+            //[攻め方]王手を指せる手を全てリスト追加
             foreach (koma km in ban.OkiKo[teban]) {
-                teAllList.AddRange(km.baninfoPos(ban, koKing.x, koKing.y));
+                teAllList.AddRange(km.baninfoPos(ban, ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].x, ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].y));
 
+            }
+            for (int i = 0; i < 7; i++) {
+                if (ban.MochiKo[teban, i]?.Count > 0) teAllList.AddRange(ban.MochiKo[teban, i][0].baninfo(ban));
             }
 
             //thread同時数
@@ -322,6 +322,7 @@ namespace YTSG {
                 while (true) {
                     int cnt_local;
                     BanInfo ban_local = new BanInfo(ban);
+                    koma ko_local;
 
                     lock (lockObj) {
                         if (teAllList.Count <= teCnt) break;
@@ -329,17 +330,52 @@ namespace YTSG {
                         teCnt++;
                     }
 
+                    if (teAllList[cnt_local].ko.x == 9) {
+                        ko_local = ban_local.MochiKo[teban, (int)teAllList[cnt_local].ko.type - 1][0];
+                    } else {
+                        ko_local = ban_local.BanKo[teAllList[cnt_local].ko.x, teAllList[cnt_local].ko.y];
+                    }
+
+                    // 1手動かしてみる
+                    ban_local.moveKoma(ko_local, teAllList[cnt_local], teAllList[cnt_local].nari, false);
+
+                    thinkMatedef(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1);
+
+                    //[守り方]指せる手を全てリスト追加
+                    //foreach (koma km in ban.OkiKo[teban]) {
+                    //    teAllList.AddRange(km.baninfo(ban));
+                    //}
+                    //for (int i = 0; i < 7; i++) {
+                    //    if (ban.MochiKo[teban, i]?.Count > 0) teAllList.AddRange(ban.MochiKo[teban, i][0].baninfo(ban));
+                    //}
+
                     // 一手動かす
                     //王手を逃がす手をすべてリスト追加
-                    if (ban.IdouList[koKing.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, koKing.x, koKing.y] == 0) {
-                        //thinkMate(int teban, BanInfo ban, int depth);
-                    }
+                    //if (ban.IdouList[koKing.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, koKing.x, koKing.y] == 0) {
+                    //    //thinkMate(int teban, BanInfo ban, int depth);
+                    //}
 
                 }
             });
 
 
             return 0;
+        }
+
+        //[守り方]詰将棋1手移動
+        List<koPos> thinkMatedef(int teban, BanInfo ban, int depth) {
+
+            
+
+            return null;
+        }
+
+        //[攻め方]詰将棋1手移動
+        List<koPos> thinkMateatk(int teban, BanInfo ban, int depth, int abscore, int up_score, KomaType pre_type, int pre_x, int pre_y) {
+
+
+
+            return null;
         }
 
     }
