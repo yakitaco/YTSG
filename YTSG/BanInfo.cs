@@ -407,61 +407,61 @@ namespace YTSG {
 
         }
 
-        //移動可能リスト更新(先手・後手の駒が移動可能場所を加算する)
-        public void renewIdouList() {
-            IdouList = new int[2, 9, 9];
-
-            //指せる手を全てリスト追加
-            foreach (koma km in OkiKo[TEIGI.TEBAN_SENTE]) {
-                List<koPos> poslist = km.baninfo(this);
-
-                foreach (koPos pos in poslist) {
-                    IdouList[TEIGI.TEBAN_SENTE, pos.x, pos.y]++;
-                }
-            }
-            foreach (koma km in OkiKo[TEIGI.TEBAN_GOTE]) {
-                List<koPos> poslist = km.baninfo(this);
-
-                foreach (koPos pos in poslist) {
-                    IdouList[TEIGI.TEBAN_GOTE, pos.x, pos.y]++;
-                }
-            }
-
-        }
+        ////移動可能リスト更新(先手・後手の駒が移動可能場所を加算する)
+        //public void renewIdouList() {
+        //    IdouList = new int[2, 9, 9];
+        //
+        //    //指せる手を全てリスト追加
+        //    foreach (koma km in OkiKo[TEIGI.TEBAN_SENTE]) {
+        //        List<koPos> poslist = km.baninfo(this);
+        //
+        //        foreach (koPos pos in poslist) {
+        //            IdouList[TEIGI.TEBAN_SENTE, pos.x, pos.y]++;
+        //        }
+        //    }
+        //    foreach (koma km in OkiKo[TEIGI.TEBAN_GOTE]) {
+        //        List<koPos> poslist = km.baninfo(this);
+        //
+        //        foreach (koPos pos in poslist) {
+        //            IdouList[TEIGI.TEBAN_GOTE, pos.x, pos.y]++;
+        //        }
+        //    }
+        //
+        //}
 
         //移動リスト一覧初期生成
-        public int[,,] idouList() {
-            int[,,] list = new int[2, 9, 9];
+        //public int[,,] idouList() {
+        //    int[,,] list = new int[2, 9, 9];
+        //
+        //    //指せる手を全てリスト追加
+        //    foreach (koma km in OkiKo[TEIGI.TEBAN_SENTE]) {
+        //
+        //        //List<koPos> poslist = km.baninfo(this);
+        //
+        //
+        //        //foreach (koPos pos in poslist) {
+        //        //    list[TEIGI.TEBAN_SENTE, pos.x, pos.y]++;
+        //        //}
+        //    }
+        //    foreach (koma km in OkiKo[TEIGI.TEBAN_GOTE]) {
+        //        //List<koPos> poslist = km.baninfo(this);
+        //
+        //        //foreach (koPos pos in poslist) {
+        //        //    list[TEIGI.TEBAN_GOTE, pos.x, pos.y]++;
+        //        //}
+        //    }
+        //
+        //    return list;
+        //}
 
-            //指せる手を全てリスト追加
-            foreach (koma km in OkiKo[TEIGI.TEBAN_SENTE]) {
-
-                //List<koPos> poslist = km.baninfo(this);
-
-
-                //foreach (koPos pos in poslist) {
-                //    list[TEIGI.TEBAN_SENTE, pos.x, pos.y]++;
-                //}
-            }
-            foreach (koma km in OkiKo[TEIGI.TEBAN_GOTE]) {
-                //List<koPos> poslist = km.baninfo(this);
-
-                //foreach (koPos pos in poslist) {
-                //    list[TEIGI.TEBAN_GOTE, pos.x, pos.y]++;
-                //}
-            }
-
-            return list;
-        }
-
-        public void kikiList() {
-            foreach (koma km in OkiKo[TEIGI.TEBAN_SENTE]) {
-                km.checkKomaKiki(this);
-            }
-            foreach (koma km in OkiKo[TEIGI.TEBAN_GOTE]) {
-                km.checkKomaKiki(this);
-            }
-        }
+        //public void kikiList() {
+        //    foreach (koma km in OkiKo[TEIGI.TEBAN_SENTE]) {
+        //        km.checkKomaKiki(this);
+        //    }
+        //    foreach (koma km in OkiKo[TEIGI.TEBAN_GOTE]) {
+        //        km.checkKomaKiki(this);
+        //    }
+        //}
 
         //現在の盤情報をASCIIで表示
         public string showBanInfo() {

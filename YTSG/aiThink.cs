@@ -157,16 +157,16 @@ namespace YTSG {
                         }
 
                         if (nexTe.Count > 0) {
-                            teAllList[cnt_local].val -= nexTe[0].val;
+                            teAllList[cnt_local].val -= nexTe[0].val;// - tekouho.GetKouho(teAllList[cnt_local]);
                         }
 
 
                         //詰み発見のため残り処理スキップ
-                        if (teAllList[cnt_local].val > 90000) {
-                            lock (lockObj) {
-                                teCnt = 999;
-                            }
-                        }
+                        //if (teAllList[cnt_local].val > 90000) {
+                        //    lock (lockObj) {
+                        //        teCnt = 999;
+                        //    }
+                        //}
                     }
                     string aaa = "";
                     foreach (var n in nexTe) {
@@ -198,29 +198,14 @@ namespace YTSG {
             koPos kp = null;
             //Form1.Form1Instance.addMsg("think MochiKo= " + ban.OkiKo[teban].Count + ", " + ban.OkiKo[teban].Count + ":" + teban);
             List<koPos> teAllList = new List<koPos>();
-
             ban.renewNifList(teban);  //二歩リスト更新
-            ban.renewIdouList();
-
-            //int tecount = 0;
-
-            //int[,,] IdouList = ban.idouList();
-
-            //if (depth < 1) {
-            //    ban.kikiList();
-            //}
 
             //指せる手を全てリスト追加
             foreach (koma km in ban.OkiKo[teban]) {
-                List<koPos> poslist = km.baninfo(ban);
-
-                foreach (koPos pos in poslist) {
-                    //if (ban.IdouList[teban, pos.x, pos.y] < ban.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, pos.x, pos.y]) {
-                    //    if (ban.BanKo[pos.x, pos.y] ==null) {
-                    //        continue;
-                    //    }
-                    //}
-                    teAllList.Add(pos);
+                if (depth > 0) { 
+                    teAllList.AddRange(km.baninfo(ban));
+            } else {
+                    teAllList.AddRange(km.baninfo(ban, false));
                 }
             }
             if (depth > 1) {  //最下層+1では無視
@@ -267,7 +252,12 @@ namespace YTSG {
 
                     // 王手は即スキップ
                     if (ban_local.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local.KingKo[teban].x, ban_local.KingKo[teban].y] > 0) {
-                        continue;
+                        if (score == -99999) {
+                            retList.Clear();
+                            retList.Add(te);
+                            te.val = -99999;
+                        }
+                            continue;
                     }
 
                     List<koPos> childList = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, te.val, te.ko.type, te.x, te.y);
