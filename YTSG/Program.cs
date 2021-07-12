@@ -141,13 +141,40 @@ namespace YTSG {
             Array.Clear(IdouList, 0, IdouList.Length);
         }
 
-        public static void ReadJoseki(string file) {
-            IdouList[0, 6, 5] = 100;
-            IdouList[0, 1, 5] = 90;
-            IdouList[0, 5, 5] = 100;
-            IdouList[0, 1, 4] = 150;
-            IdouList[0, 1, 3] = 160;
-            IdouList[0, 4, 5] = 50;
+        public static void ReadJoseki00(string file) {
+            Array.Clear(IdouList, 0, IdouList.Length);
+            IdouList[0, 6, 5] = 100; // (76歩)
+            IdouList[0, 5, 5] = 90; // (66歩) 
+            IdouList[3, 5, 7] = 60; // (68銀)
+            IdouList[3, 6, 6] = 90; // (77銀)
+        }
+
+        public static void ReadJoseki03(string file) {
+            Array.Clear(IdouList, 0, IdouList.Length);
+            IdouList[0, 6, 5] = 50; // (76歩)
+            IdouList[0, 5, 5] = 50; // (66歩) 
+            IdouList[0, 1, 5] = 110; // (26歩)
+            IdouList[3, 5, 7] = 10; // (68銀)
+            IdouList[3, 6, 6] = 50; // (77銀)
+            IdouList[3, 7, 5] = 10; // (86銀)
+            IdouList[3, 6, 4] = 30; // (75銀)
+            IdouList[3, 4, 4] = 30; // (55銀)
+            IdouList[6, 6, 7] = 70; // (78金)
+            IdouList[6, 5, 6] = 140; // (67金)
+            IdouList[6, 4, 6] = 130; // (67金)
+            IdouList[0, 1, 4] = 170; // (25歩)
+            IdouList[0, 1, 3] = 30; // (24歩)
+
+
+            IdouList[0, 4, 5] = 50; // (56歩)
+            IdouList[7, 5, 7] = 40;  //王
+            IdouList[7, 5, 8] = 50;  //王
+            IdouList[7, 6, 7] = 80;  //王
+            IdouList[7, 6, 8] = 90;  //王
+            IdouList[7, 7, 7] = 160; //王
+            IdouList[7, 8, 8] = 200; //王
+
+            IdouList[6, 4, 8] = 50; // (59金)
 
             for (int i = 0; i < 9; i++) {
                 for (int j = 0; j < 3; j++) {
@@ -159,41 +186,26 @@ namespace YTSG {
                     IdouList[5, i, j] = (3 - j) * 100 + 100;
                 }
             }
-            IdouList[0, 8, 5] = 10;
-            IdouList[0, 0, 5] = 10;
-            IdouList[0, 8, 5] = 5;
-            IdouList[0, 0, 5] = 5;
+            IdouList[0, 8, 5] = 10; //(左端歩)
+            IdouList[0, 0, 5] = 10; //(右端歩)
             IdouList[0, 2, 4] = -50;
-            IdouList[0, 2, 5] = 10;
+            IdouList[0, 2, 5] = 30; //(右桂上の歩)
             IdouList[0, 7, 5] = -50;
-            IdouList[2, 2, 6] = 50; //桂
-            IdouList[2, 8, 6] = -50; //桂
+            IdouList[2, 2, 6] = 50;  //右桂
+            IdouList[2, 8, 6] = -50; //左桂
 
-            IdouList[3, 2, 7] = 40; //銀
-            IdouList[3, 1, 6] = 70; //銀
-            IdouList[3, 2, 6] = 70; //銀
-            IdouList[3, 0, 5] = 80; //銀
-            IdouList[3, 1, 5] = 80; //銀
-            IdouList[3, 5, 7] = 50; //銀
-            IdouList[3, 5, 6] = 80; //銀
-            IdouList[3, 6, 6] = 100; //銀
-            IdouList[3, 6, 6] = 10; //銀
-            IdouList[1, 0, 7] = -50; //香
-            IdouList[1, 8, 7] = -50; //香
-            IdouList[6, 6, 7] = 120; //金
-            IdouList[6, 6, 6] = 181; //金
-            IdouList[7, 5, 8] = 10; //王
-            IdouList[7, 6, 8] = 20; //王
-            IdouList[7, 7, 6] = 30; //王
-            IdouList[7, 8, 8] = 40; //王
-            IdouList[5, 6, 6] = 20; //角
+            IdouList[3, 2, 7] = 40;  //右銀
+            IdouList[3, 1, 6] = 80;  //右銀
+            IdouList[3, 2, 6] = 80;  //右銀
+            IdouList[3, 0, 5] = 120; //右銀
+            IdouList[3, 1, 5] = 120; //右銀
+
+            IdouList[5, 6, 6] = 10;  //角
             IdouList[5, 7, 5] = -70; //角
             IdouList[5, 8, 4] = -70; //角
-            IdouList[5, 6, 8] = 30; //角
-            IdouList[5, 5, 7] = 90; //角
+            IdouList[5, 6, 8] = 30;  //角
+            IdouList[5, 5, 7] = 70;  //角
 
-            //IdouList[7, 8, 8] = 2; //王
-            //IdouList[7, 8, 8] = 2; //王
         }
 
         public static int GetKouho(koPos dstPos) {
@@ -208,7 +220,7 @@ namespace YTSG {
             //移動前と移動後の差分
             return IdouList[(int)dstPos.ko.type - 1, dX, dY] - IdouList[(int)dstPos.ko.type - 1, sX, sY];
         }
-        public static int GetKouho(koma ko, int x,int y) {
+        public static int GetKouho(koma ko, int x, int y) {
             if (ko.x == 9) return 0;  //　駒打ちは対象外
 
             //後手は逆
@@ -281,7 +293,7 @@ namespace YTSG {
                     Form1.Form1Instance.addMsg("[RECV]" + str);
 
                     /* (再)初期化処理 */
-                    tekouho.ReadJoseki("");
+                    tekouho.ReadJoseki00("");
                     tesuu = 0;
                     initFlg = true;
 
@@ -310,13 +322,14 @@ namespace YTSG {
 
                         thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
 
+                        if (tesuu == 9) tekouho.ReadJoseki03("");
                         if (tesuu == 40) tekouho.ResetJoseki();
 
                         koPos ret;
                         if ((tesuu < 20) || (nokori < 60000)) {
                             cpu.maxDepth = 3;
                             ret = cpu.thinkMove(myTeban, ban, 3); //コンピュータ思考
-                        } else if ((tesuu < 40) || (nokori < 300000)) {
+                        } else if ((tesuu < 50) || (nokori < 300000)) {
                             cpu.maxDepth = 4;
                             ret = cpu.thinkMove(myTeban, ban, 4); //コンピュータ思考
                         } else {
@@ -464,7 +477,7 @@ namespace YTSG {
                     SaveLog.saveNewFile(Form1.Form1Instance.getText(), myTeban);
                     Form1.Form1Instance.resetMsg();
 
-                // アプリケーションの終了
+                    // アプリケーションの終了
                 } else if ((str.Length > 8) && (str.Substring(0, 4) == "quit")) {
                     Form1.Form1Instance.addMsg("[RECV]" + str);
                     //ファイル保存
