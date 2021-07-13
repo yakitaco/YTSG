@@ -575,7 +575,7 @@ namespace YTSG {
                 // 移動元(this)or移動先(p)が自分基準位置で奥3段の場合は成り考慮
                 if (((py < 3) || (tmpPpos.py < 3)) && (this.chkNari())) {
 
-                    if ((cont) ||(ban.IdouList[this.p, tmpPpos.x, tmpPpos.y] >= ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, tmpPpos.x, tmpPpos.y])) {
+                    if ((cont) ||(ban.IdouList[this.p, tmpPpos.x, tmpPpos.y] > ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, tmpPpos.x, tmpPpos.y])) {
                         teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type] + 50, this, true));
                     } else {
                         teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type] + 50 - KoScore[(int)this.type], this, true)); // 劣勢の場所
@@ -583,7 +583,7 @@ namespace YTSG {
 
                     // 香(2段まで)は不成もあり
                     if ((this.type == KomaType.Kyousha) && (tmpPpos.y > 1)) {
-                        if ((cont) || (ban.IdouList[this.p, tmpPpos.x, tmpPpos.y] >= ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, tmpPpos.x, tmpPpos.y])) {
+                        if ((cont) || (ban.IdouList[this.p, tmpPpos.x, tmpPpos.y] > ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, tmpPpos.x, tmpPpos.y])) {
                             teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type], this, false));
                         } else {
                             teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type] - KoScore[(int)this.type], this, false)); // 劣勢の場所
@@ -591,8 +591,8 @@ namespace YTSG {
 
                     }
                 } else {
-                    if ((cont) || (ban.IdouList[this.p, tmpPpos.x, tmpPpos.y] >= ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, tmpPpos.x, tmpPpos.y])) {
-                        teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type] + tekouho.GetKouho(this, tmpPpos.x, tmpPpos.y), this, false));
+                    if ((cont) || (ban.IdouList[this.p, tmpPpos.x, tmpPpos.y] > ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, tmpPpos.x, tmpPpos.y])) {
+                        teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type] /* + tekouho.GetKouho(this, tmpPpos.x, tmpPpos.y) */, this, false));
                     } else {
                         teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type] - KoScore[(int)this.type], this, false)); // 劣勢の場所
                     }
@@ -639,7 +639,7 @@ namespace YTSG {
                     }
                 } else {
                     if ((cont) || (ban.IdouList[this.p, tmpPpos.x, tmpPpos.y] >= ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, tmpPpos.x, tmpPpos.y])) {
-                        teList.Add(new koPos(tmpPpos.x, tmpPpos.y, 0 + tekouho.GetKouho(this, tmpPpos.x, tmpPpos.y), this, false));
+                        teList.Add(new koPos(tmpPpos.x, tmpPpos.y, 0 /* + tekouho.GetKouho(this, tmpPpos.x, tmpPpos.y) */, this, false));
                     } else {
                         teList.Add(new koPos(tmpPpos.x, tmpPpos.y, -KoScore[(int)this.type], this, false)); // 劣勢の場所
                     }
@@ -670,7 +670,7 @@ namespace YTSG {
                     }
                 } else {
                     if ((cont) || (ban.IdouList[this.p, tmpPpos.x, tmpPpos.y] >= ban.IdouList[this.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, tmpPpos.x, tmpPpos.y])) {
-                        teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type] + tekouho.GetKouho(this, tmpPpos.x, tmpPpos.y), this, false));
+                        teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type] /* + tekouho.GetKouho(this, tmpPpos.x, tmpPpos.y) */, this, false) );
                     } else {
                         teList.Add(new koPos(tmpPpos.x, tmpPpos.y, KoScore[(int)ban.BanKo[tmpPpos.x, tmpPpos.y].type] - KoScore[(int)this.type], this, false)); // 劣勢の場所
                     }

@@ -73,42 +73,30 @@ namespace YTSG {
 
             ban.renewNifList(teban);  //二歩リスト更新
 
-
-            //int[,,] IdouList = ban.idouList();
-            //ban.kikiList();
-            //Form1.Form1Instance.addMsg("[SENTE]");
-            //for (int i = 0; i < 9; i++)
-            //{
-            //    Form1.Form1Instance.addMsg("[" + ban.IdouList[0,8,i] + "," + ban.IdouList[0, 7, i] + "," + ban.IdouList[0, 6, i] + "," + ban.IdouList[0, 5, i] + "," + ban.IdouList[0, 4, i] + "," + ban.IdouList[0, 3, i] + "," + ban.IdouList[0, 2, i] + "," + ban.IdouList[0, 1, i] + "," + ban.IdouList[0, 0, i] + "]");
-            //}
-            //Form1.Form1Instance.addMsg("[GOTE]");
-            //for (int i = 0; i < 9; i++)
-            //{
-            //    Form1.Form1Instance.addMsg("[" + ban.IdouList[1, 8, i] + "," + ban.IdouList[1, 7, i] + "," + ban.IdouList[1, 6, i] + "," + ban.IdouList[1, 5, i] + "," + ban.IdouList[1, 4, i] + "," + ban.IdouList[1, 3, i] + "," + ban.IdouList[1, 2, i] + "," + ban.IdouList[1, 1, i] + "," + ban.IdouList[1, 0, i] + "]");
-            //}
-
-
             //指せる手を全てリスト追加
             foreach (koma km in ban.OkiKo[teban]) {
-                teAllList.AddRange(km.baninfo(ban));
-                //List<koPos> poslist = km.baninfo(ban);
-                //
-                //foreach (koPos pos in poslist)
-                //{
-                //    if (IdouList[teban, pos.x,pos.y]>= IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, pos.x, pos.y]) teAllList.Add(pos);
-                //}
+                //teAllList.AddRange(km.baninfo(ban));
+                List<koPos> poslist = km.baninfo(ban);
+                
+                foreach (koPos pos in poslist)
+                {
+                    if (ban.BanKo[pos.x, pos.y]==null) pos.val += tekouho.GetKouho(pos);
+                }
+                teAllList.AddRange(poslist);
             }
 
             for (int i = 0; i < 7; i++) {
-                if (ban.MochiKo[teban, i]?.Count > 0) teAllList.AddRange(ban.MochiKo[teban, i][0].baninfo(ban));
-                //if (ban.MochiKo[teban, i]?.Count > 0)
-                //{
-                //    List<koPos> poslist = ban.MochiKo[teban, i][0].baninfo(ban);
-                //    foreach (koPos pos in poslist)
-                //    {
-                //        if (IdouList[teban, pos.x, pos.y] >= IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, pos.x, pos.y]) teAllList.Add(pos);
-                //    }
-                //}
+                if (ban.MochiKo[teban, i]?.Count > 0) {
+                    List<koPos> poslist = ban.MochiKo[teban, i][0].baninfo(ban);
+                    foreach (koPos pos in poslist) {
+                        if (ban.IdouList[teban, pos.x, pos.y] == 0) {
+                            pos.val -= 100;  // 味方連携無し
+                        } else {
+                            pos.val -= 20;  // 味方連携有り
+                        }
+                    }
+                    teAllList.AddRange(poslist);
+                }
             }
 
 

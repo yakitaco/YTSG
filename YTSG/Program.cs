@@ -322,8 +322,8 @@ namespace YTSG {
 
                         thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
 
-                        if (tesuu == 9) tekouho.ReadJoseki03("");
-                        if (tesuu == 40) tekouho.ResetJoseki();
+                        if ((tesuu == 9) || (tesuu == 10)) tekouho.ReadJoseki03("");
+                        if ((tesuu == 39)||(tesuu == 40)) tekouho.ResetJoseki();
 
                         koPos ret;
                         if ((tesuu < 20) || (nokori < 60000)) {
