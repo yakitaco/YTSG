@@ -188,6 +188,12 @@ namespace YTSG {
             List<koPos> teAllList = new List<koPos>();
             ban.renewNifList(teban);  //二歩リスト更新
 
+            ///* 盤情報表示 */
+            //if (maxDepth - depth < 2) {
+            //    string bb = ban.showBanInfo();
+            //    Form1.Form1Instance.addMsg("" + bb);
+            //}
+
             //指せる手を全てリスト追加
             foreach (koma km in ban.OkiKo[teban]) {
                 if (depth > 0) { 
@@ -196,7 +202,7 @@ namespace YTSG {
                     teAllList.AddRange(km.baninfo(ban, false));
                 }
             }
-            if (depth > 1) {  //最下層+1では無視
+            if (depth > 0) {  //最下層+1では無視
 
                 for (int i = 0; i < 7; i++) {
                     if (ban.MochiKo[teban, i]?.Count > 0) {
@@ -257,6 +263,16 @@ namespace YTSG {
                     if (childList.Count > 0) {
                         te.val -= childList[0].val;
                     }
+
+                    //if (maxDepth - depth < 2) {
+                    //    string aaa = "";
+                    //    foreach (var n in childList) {
+                    //        aaa += "->[" + n.val + "](" + (n.x + 1) + "," + (n.y + 1) + ")" + n.ko.type;
+                    //    }
+                    //
+                    //    Form1.Form1Instance.addMsg("*" + pre_x + "," + pre_y + "/" + pre_type + ":" + +te.val + "](" + (te.x + 1) + "," + (te.y + 1) + ")" + te.ko.type + aaa);
+                    //    Thread.Sleep(10);
+                    //}
 
                     if (score < te.val) {
                         score = te.val;

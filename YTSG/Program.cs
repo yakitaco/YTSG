@@ -146,7 +146,8 @@ namespace YTSG {
             IdouList[0, 6, 5] = 100; // (76歩)
             IdouList[0, 5, 5] = 90; // (66歩) 
             IdouList[3, 5, 7] = 60; // (68銀)
-            IdouList[3, 6, 6] = 90; // (77銀)
+            IdouList[3, 6, 6] = 150; // (77銀)
+            IdouList[5, 1, 1] = -500; // (22角)
         }
 
         public static void ReadJoseki03(string file) {
@@ -320,7 +321,8 @@ namespace YTSG {
 
                         Form1.Form1Instance.addMsg("[NOKORI]" + nokori);
 
-                        thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
+                        //thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
+                        thisProcess.PriorityClass = ProcessPriorityClass.BelowNormal; //優先度普通
 
                         if ((tesuu == 9) || (tesuu == 10)) tekouho.ReadJoseki03("");
                         if ((tesuu == 39)||(tesuu == 40)) tekouho.ResetJoseki();
