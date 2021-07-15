@@ -59,6 +59,18 @@ namespace YTSG {
             y = _y;
             val = _val;
         }
+        
+        public koPos(koma _ko) {
+            x = _ko.x;
+            y = _ko.y;
+            ko = _ko;
+        }
+        
+        public koPos(koma _ko, int _x, int _y) {
+            ko = _ko;
+            x  = _x;
+            y  = _y;
+        }
 
         public koPos(int _x, int _y, int _val, koma _ko, bool _nari) {
             x = _x;
@@ -66,6 +78,41 @@ namespace YTSG {
             val = _val;
             ko = _ko;
             nari = _nari;
+        }
+        
+        //先手後手目線での現位置から相対移動(Relative Move)
+        public koPos rMV(int _x, int _y){
+            if (ko==null){
+                return this;
+            }
+            if (ko.p == TEIGI.TEBAN_SENTE) {
+                x += _x;
+                y += _y;
+            } else {
+                x -= _x;
+                y -= _y;
+            }
+            return this;
+        }
+        
+        // プレイヤーから見た位置(0,0 左上)
+        public int px {
+            get {
+                if ((x < 9) && (x > -1)) {
+                    return ko.p == TEIGI.TEBAN_SENTE ? x : TEIGI.SIZE_SUZI - x - 1;
+                } else {
+                    return x;
+                }
+            }
+        }
+        public int py {
+            get {
+                if ((y < 9) && (y > -1)) {
+                    return ko.p == TEIGI.TEBAN_SENTE ? y : TEIGI.SIZE_DAN - y - 1;
+                } else {
+                    return y;
+                }
+            }
         }
 
         // 比較用の処理
@@ -87,8 +134,22 @@ namespace YTSG {
             }
             return -1;
         }
-
+        
+        // 移動先の評価値を設定
+        public koPos setVal(int _val){
+            val = _val;
+            return this;
+        }
+        
+        public koPos setNari(bool _nari){
+            nari = _nari;
+            return this;
+        }
+        
     }
+
+
+
 
     // プレイヤー視点ありの位置情報
     class pPos {

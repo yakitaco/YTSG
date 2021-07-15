@@ -184,6 +184,7 @@ namespace YTSG {
             List<koPos> retList = new List<koPos>();
             int score = -99999;
             koPos kp = null;
+            bool check = false; // 王手フラグ
             //Form1.Form1Instance.addMsg("think MochiKo= " + ban.OkiKo[teban].Count + ", " + ban.OkiKo[teban].Count + ":" + teban);
             List<koPos> teAllList = new List<koPos>();
             ban.renewNifList(teban);  //二歩リスト更新
@@ -194,16 +195,22 @@ namespace YTSG {
             //    Form1.Form1Instance.addMsg("" + bb);
             //}
 
-            //指せる手を全てリスト追加
-            foreach (koma km in ban.OkiKo[teban]) {
+            // 王手
+            if (ban.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban.KingKo[teban].x, ban.KingKo[teban].y] > 0) {
+                check = true;
+            }
+
+
+                //指せる手を全てリスト追加
+                foreach (koma km in ban.OkiKo[teban]) {
                 if (depth > 0) { 
                     teAllList.AddRange(km.baninfo(ban));
             } else {
                     teAllList.AddRange(km.baninfo(ban, false));
                 }
             }
-            if (depth > 0) {  //最下層+1では無視
-
+            //最下層または王手でない場合は駒打ちを無視
+            if ((depth > 0)|| (check == true)) {
                 for (int i = 0; i < 7; i++) {
                     if (ban.MochiKo[teban, i]?.Count > 0) {
                         List<koPos> poslist = ban.MochiKo[teban, i][0].baninfo(ban);
@@ -218,7 +225,7 @@ namespace YTSG {
             // 降順にソート
             teAllList.Sort((a, b) => b.val - a.val);
 
-            if (depth > 0) {
+            if ((depth > 0)||(check==true)) {
 
                 foreach (koPos te in teAllList) {
                     if (te.val > 5000) {
@@ -228,7 +235,7 @@ namespace YTSG {
                     }
                     
                     // 駒移動の対象を前回移動した駒の前後左右2マス以内に限定
-                    //if ((maxDepth - depth > 2) && (pre_type != KomaType.Hisya) && (pre_type != KomaType.Kakugyou) && (pre_type != KomaType.Ryuuma) && (pre_type != KomaType.Ryuuou) && (pre_type != KomaType.Kyousha)) {
+                    //if ((maxDepth - depth > 4) && (pre_type != KomaType.Hisya) && (pre_type != KomaType.Kakugyou) && (pre_type != KomaType.Ryuuma) && (pre_type != KomaType.Ryuuou) && (pre_type != KomaType.Kyousha)) {
                     //    if ((te.ko.type != KomaType.Hisya) && (te.ko.type != KomaType.Kakugyou) && (te.ko.type != KomaType.Ryuuma) && (te.ko.type != KomaType.Ryuuou) && (te.ko.type != KomaType.Kyousha)) {
                     //        if (((te.x - pre_x > 2) || (te.x - pre_x < -2) || (te.y - pre_y > 2) || (te.y - pre_y < -2)) && (ban.IdouList[te.ko.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, te.x, te.y] == 0)) {
                     //            continue;
