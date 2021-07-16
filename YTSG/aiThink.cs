@@ -366,16 +366,74 @@ namespace YTSG {
 
         //[守り方]詰将棋1手移動
         List<koPos> thinkMatedef(int teban, BanInfo ban, int depth) {
-
+            List<koPos> retList = new List<koPos>();
+            int score = 99999;
             
+            List<koPos> teAllList = new List<koPos>();
+            ban.renewNifList(teban);  //二歩リスト更新
+
+            //指せる手を全てリスト追加
+            foreach (koma km in ban.OkiKo[teban]) {
+                teAllList.AddRange(km.baninfo(ban));
+            }
+
+            for (int i = 0; i < 7; i++) {
+                if (ban.MochiKo[teban, i]?.Count > 0) {
+                    teAllList.AddRange(ban.MochiKo[teban, i][0].baninfo(ban));
+                }
+            }
+
+            foreach (koPos te in teAllList) {
+            
+                BanInfo ban_local = new BanInfo(ban);
+                koma ko_local;
+                if (te.ko.x == 9) {
+                    ko_local = ban_local.MochiKo[teban, (int)te.ko.type - 1][0];
+                } else {
+                    ko_local = ban_local.BanKo[te.ko.x, te.ko.y];
+                }
+                ban_local.moveKoma(ko_local, te, te.nari, false);
+
+                // 王手は即スキップ
+                if (ban_local.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local.KingKo[teban].x, ban_local.KingKo[teban].y] > 0) {
+                    continue;
+                }
+            
+            if (depth > 0) {
+
+                    List<koPos> childList = thinkMateatk(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1);
+                    
+                    // 攻撃側の手が無い -> 詰みはない
+                    if (childList.Count == 0) {
+                        score = -1;
+                        score = te.val;
+                        retList = childList;
+                        retList.Insert(0, te);
+                    }
+
+                }
+            }
 
             return null;
         }
 
         //[攻め方]詰将棋1手移動
-        List<koPos> thinkMateatk(int teban, BanInfo ban, int depth, int abscore, int up_score, KomaType pre_type, int pre_x, int pre_y) {
+        List<koPos> thinkMateatk(int teban, BanInfo ban, int depth) {
+            List<koPos> teAllList = new List<koPos>();
 
+            //[攻め方]王手を指せる手を全てリスト追加
+            foreach (koma km in ban.OkiKo[teban]) {
+                teAllList.AddRange(km.baninfoPos(ban, ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].x, ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].y));
 
+            }
+            for (int i = 0; i < 7; i++) {
+                if (ban.MochiKo[teban, i]?.Count > 0) teAllList.AddRange(ban.MochiKo[teban, i][0].baninfo(ban));
+            }
+            
+            foreach (koPos te in teAllList) {
+            
+            
+            }
 
             return null;
         }

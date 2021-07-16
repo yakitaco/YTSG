@@ -382,8 +382,8 @@ namespace YTSG {
 
                         Form1.Form1Instance.addMsg("[NOKORI]" + nokori);
 
-                        //thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
-                        thisProcess.PriorityClass = ProcessPriorityClass.BelowNormal; //優先度普通
+                        thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
+                        //thisProcess.PriorityClass = ProcessPriorityClass.BelowNormal; //優先度普通
 
                         if ((tesuu == 9) || (tesuu == 10)) tekouho.ReadJoseki03("");
                         if ((tesuu == 39)||(tesuu == 40)) tekouho.ResetJoseki();
