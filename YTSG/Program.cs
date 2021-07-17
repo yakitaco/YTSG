@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -59,17 +60,17 @@ namespace YTSG {
             y = _y;
             val = _val;
         }
-        
+
         public koPos(koma _ko) {
             x = _ko.x;
             y = _ko.y;
             ko = _ko;
         }
-        
+
         public koPos(koma _ko, int _x, int _y) {
             ko = _ko;
-            x  = _x;
-            y  = _y;
+            x = _x;
+            y = _y;
         }
 
         public koPos(int _x, int _y, int _val, koma _ko, bool _nari) {
@@ -79,10 +80,10 @@ namespace YTSG {
             ko = _ko;
             nari = _nari;
         }
-        
+
         //先手後手目線での現位置から相対移動(Relative Move)
-        public koPos rMV(int _x, int _y){
-            if (ko==null){
+        public koPos rMV(int _x, int _y) {
+            if (ko == null) {
                 return this;
             }
             if (ko.p == TEIGI.TEBAN_SENTE) {
@@ -94,7 +95,7 @@ namespace YTSG {
             }
             return this;
         }
-        
+
         // プレイヤーから見た位置(0,0 左上)
         public int px {
             get {
@@ -134,18 +135,18 @@ namespace YTSG {
             }
             return -1;
         }
-        
+
         // 移動先の評価値を設定
-        public koPos setVal(int _val){
+        public koPos setVal(int _val) {
             val = _val;
             return this;
         }
-        
-        public koPos setNari(bool _nari){
+
+        public koPos setNari(bool _nari) {
             nari = _nari;
             return this;
         }
-        
+
     }
 
 
@@ -301,12 +302,12 @@ namespace YTSG {
         // 手数によるパラメータ
         static moveParam mPar = new moveParam();
         private static System.Timers.Timer aTimer;
-
         static void Main(string[] args) {
             int myTeban = TEIGI.TEBAN_SENTE;
             aiThink cpu = new aiThink();
             bool initFlg = true; //初期フラグ
             int tesuu = 0;
+            Task<List<koPos>> aiTaskMain;
 
             int rets = mPar.readParam("");
             rets = mPar.prm[0];
@@ -386,55 +387,65 @@ namespace YTSG {
                         //thisProcess.PriorityClass = ProcessPriorityClass.BelowNormal; //優先度普通
 
                         if ((tesuu == 9) || (tesuu == 10)) tekouho.ReadJoseki03("");
-                        if ((tesuu == 39)||(tesuu == 40)) tekouho.ResetJoseki();
+                        if ((tesuu == 39) || (tesuu == 40)) tekouho.ResetJoseki();
 
-                        koPos ret;
+                        List<koPos> retList;
                         if ((tesuu < 20) || (nokori < 60000)) {
                             cpu.maxDepth = 3;
-                            ret = cpu.thinkMove(myTeban, ban, 3); //コンピュータ思考
+                            //ret = cpu.thinkMove(myTeban, ban, 3)[0]; //コンピュータ思考
+
+                            aiTaskMain = Task.Run(() => {
+                                return cpu.thinkMove(myTeban, ban, 4);
+                            });
+
                         } else if ((tesuu < 50) || (nokori < 300000)) {
                             cpu.maxDepth = 4;
-                            ret = cpu.thinkMove(myTeban, ban, 4); //コンピュータ思考
+                            //ret = cpu.thinkMove(myTeban, ban, 4)[0]; //コンピュータ思考
+
+                            aiTaskMain = Task.Run(() => {
+                                return cpu.thinkMove(myTeban, ban, 4);
+                            });
+
                         } else {
                             cpu.maxDepth = 5;
-                            ret = cpu.thinkMove(myTeban, ban, 5); //コンピュータ思考
+                            //ret = cpu.thinkMove(myTeban, ban, 5)[0]; //コンピュータ思考
+
+                            aiTaskMain = Task.Run(() => {
+                                return cpu.thinkMove(myTeban, ban, 5);
+                            });
+
                         }
+
+                        //Thread.Sleep(2000);
+                        //Form1.Form1Instance.addMsg("TESTTESTETEST");
+
+                        retList = aiTaskMain.Result;
 
                         thisProcess.PriorityClass = ProcessPriorityClass.AboveNormal; //優先度普通
 
                         tesuu++;
 
-                        if (ret.val < -5000) { //投了
+                        if (retList[0].val < -5000) { //投了
                             Console.WriteLine("bestmove resign");
 
                         } else {
-                            Console.WriteLine("bestmove " + usio.pos2usi(ret.ko, ret));  //標準出力
-                            Form1.Form1Instance.addMsg("[SEND]MOVE:" + ret.ko.type + ":(" + (ret.ko.x + 1) + "," + (ret.ko.y + 1) + ")->(" + (ret.x + 1) + "," + (ret.y + 1) + ")" + (ret.nari == true ? "<NARI>" : "") + "\n");
-                            ban.moveKoma(ret.ko, ret, ret.nari, false);  //動かす
+                            if (retList.Count > 1) {
+                                Console.WriteLine("bestmove " + usio.pos2usi(retList[0].ko, retList[0]) + " ponder " + usio.pos2usi(retList[1].ko, retList[1]));  //標準出力
+                                //Console.WriteLine("bestmove " + usio.pos2usi(retList[0].ko, retList[0]));  //標準出力
+
+                            } else {
+                                Console.WriteLine("bestmove " + usio.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                            }
+                            Form1.Form1Instance.addMsg("[SEND]MOVE:" + retList[0].ko.type + ":(" + (retList[0].ko.x + 1) + "," + (retList[0].ko.y + 1) + ")->(" + (retList[0].x + 1) + "," + (retList[0].y + 1) + ")" + (retList[0].nari == true ? "<NARI>" : "") + "\n");
+                            ban.moveKoma(retList[0].ko, retList[0], retList[0].nari, false);  //動かす
                             teban = (teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE);
 
-                            //foreach (koma km in ban.OkiKo[0])
-                            //{
-                            //    Form1.Form1Instance.addMsg("OkiKo[0] :" + km.p + ":" + km.type + " (" + (km.x + 1) + "," + (km.y + 1) + ")");
-                            //}
-                            //foreach (koma km in ban.OkiKo[1])
-                            //{
-                            //    Form1.Form1Instance.addMsg("OkiKo[1] :" + km.p + ":" + km.type + " (" + (km.x + 1) + "," + (km.y + 1) + ")");
-                            //}
-                            //for (int i =0; i < 7; i++) {
-                            //    foreach (koma km in ban.MochiKo[0,i])
-                            //    {
-                            //        Form1.Form1Instance.addMsg("MochiKo[0]:" + km.p + ":" + km.type + " (" + (km.x + 1) + "," + (km.y + 1) + ")");
-                            //    }
-                            //}
-                            //for (int i = 0; i < 7; i++)
-                            //{
-                            //    foreach (koma km in ban.MochiKo[1,i])
-                            //    {
-                            //        Form1.Form1Instance.addMsg("MochiKo[1]:" + km.p + ":" + km.type + " (" + (km.x + 1) + "," + (km.y + 1) + ")");
-                            //    }
-                            //}
                         }
+
+                        // 先読み
+                    } else if (arr[1] == "ponder") {
+
+
                         // 詰将棋
                     } else if (arr[1] == "mate") {
                         Console.WriteLine("checkmate notimplemented");
@@ -444,58 +455,44 @@ namespace YTSG {
 
                     }
 
+                } else if ((str.Length > 8) && (str.Substring(0, 9) == "ponderhit")) {
+
+
+
+
                 } else if ((str.Length > 7) && (str.Substring(0, 8) == "position")) {
                     string[] arr = str.Split(' ');
 
-                    //初期処理
-                    if (initFlg) {
-                        teban = TEIGI.TEBAN_SENTE;
-                        if (arr[1] == "startpos") {
-                            //平手の対応
-                            if (arr.Length == 4) {
-                                myTeban = TEIGI.TEBAN_GOTE;
-                                Form1.Form1Instance.addMsg("GOTE");
-                            } else {
-                                myTeban = TEIGI.TEBAN_SENTE;
-                                Form1.Form1Instance.addMsg("SENTE");
-                            }
+                    teban = TEIGI.TEBAN_SENTE;
+                    if (arr[1] == "startpos") {
 
-                            ban = new BanInfo();
-                            startStrPos = 3;
+                        ban = new BanInfo();
+                        startStrPos = 3;
 
-                            // 駒落ち or 途中盤面
-                        } else if (arr[1] == "sfen") {
-                            Form1.Form1Instance.addMsg("[RECV]" + str);
+                        // 駒落ち or 途中盤面
+                    } else if (arr[1] == "sfen") {
 
-                            ban = new BanInfo(arr[2], arr[4]);
-                            startStrPos = 7;
+                        ban = new BanInfo(arr[2], arr[4]);
+                        startStrPos = 7;
 
-                            if (arr[3] == "b") {
-                                teban = TEIGI.TEBAN_SENTE;
-                            } else {
-                                teban = TEIGI.TEBAN_GOTE;
-                            }
-
-                            /* 盤情報表示 */
-                            string b = ban.showBanInfo();
-                            Form1.Form1Instance.addMsg("" + b);
-                            Thread.Sleep(10000);
+                        if (arr[3] == "b") {
+                            teban = TEIGI.TEBAN_SENTE;
+                        } else {
+                            teban = TEIGI.TEBAN_GOTE;
                         }
-
-                        initFlg = false;
 
                     }
 
                     // 手を更新(差分のみ)
-                    for (int i = tesuu + startStrPos; i < arr.Length; i++, tesuu++) {
+                    for (tesuu = 0; tesuu + startStrPos < arr.Length; tesuu++) {
 
                         KomaType type;
                         koPos src = new koPos(0, 0);
                         koPos dst = new koPos(0, 0);
                         bool nari = false;
 
-                        usio.usi2pos(arr[i], out src, out dst, out type, out nari);
-                        Form1.Form1Instance.addMsg("[RECV]AITE:" + arr[i]);
+                        usio.usi2pos(arr[tesuu + startStrPos], out src, out dst, out type, out nari);
+                        Form1.Form1Instance.addMsg("[RECV]AITE:" + arr[tesuu + startStrPos]);
                         //駒打ち
                         if (type != KomaType.None) {
                             ban.moveKoma(teban, type, dst, false);
@@ -505,12 +502,16 @@ namespace YTSG {
                         }
                         teban = (teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE);
 
-                        /* 盤情報表示 */
-                        string b = ban.showBanInfo();
-                        Form1.Form1Instance.addMsg("" + b);
-
                     }
                     myTeban = teban;
+
+                    /* 盤情報表示 */
+                    string b = ban.showBanInfo();
+                    Form1.Form1Instance.addMsg("" + b);
+
+                } else if ((str.Length == 4) && (str.Substring(0, 4) == "stop")) {
+                    cpu.stopFlg = true;
+
 
 
                 } else if ((str.Length > 8) && (str.Substring(0, 8) == "gameover")) {
@@ -541,7 +542,7 @@ namespace YTSG {
                     Form1.Form1Instance.resetMsg();
 
                     // アプリケーションの終了
-                } else if ((str.Length > 8) && (str.Substring(0, 4) == "quit")) {
+                } else if ((str.Length == 4) && (str.Substring(0, 4) == "quit")) {
                     Form1.Form1Instance.addMsg("[RECV]" + str);
                     //ファイル保存
                     SaveLog.saveNewFile(Form1.Form1Instance.getText(), myTeban);
