@@ -81,10 +81,9 @@ namespace YTSG {
             foreach (koma km in ban.OkiKo[teban]) {
                 //teAllList.AddRange(km.baninfo(ban));
                 List<koPos> poslist = km.baninfo(ban);
-                
-                foreach (koPos pos in poslist)
-                {
-                    if (ban.BanKo[pos.x, pos.y]==null) pos.val += tekouho.GetKouho(pos);
+
+                foreach (koPos pos in poslist) {
+                    if (ban.BanKo[pos.x, pos.y] == null) pos.val += tekouho.GetKouho(pos);
                 }
                 teAllList.AddRange(poslist);
             }
@@ -149,7 +148,7 @@ namespace YTSG {
                             nexTe = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, maxScore, teAllList[cnt_local].val, teAllList[cnt_local].ko.type, teAllList[cnt_local].x, teAllList[cnt_local].y);
                         }
 
-                        if (nexTe.Count > 0) {
+                        if (nexTe?.Count > 0) {
                             teAllList[cnt_local].val -= nexTe[0].val;// - tekouho.GetKouho(teAllList[cnt_local]);
                         }
 
@@ -162,7 +161,7 @@ namespace YTSG {
                         //}
                     }
                     string aaa = "";
-                    foreach (var n in nexTe) {
+                    foreach (var n in nexTe ?? new List<koPos>()) {
                         aaa += "->[" + n.val + "](" + (n.x + 1) + "," + (n.y + 1) + ")" + n.ko.type;
                     }
 
@@ -199,7 +198,7 @@ namespace YTSG {
             List<koPos> teAllList = new List<koPos>();
             ban.renewNifList(teban);  //二歩リスト更新
 
-            if (stopFlg) return null;
+            if (stopFlg) return retList;
 
             ///* 盤情報表示 */
             //if (maxDepth - depth < 2) {
@@ -213,16 +212,16 @@ namespace YTSG {
             }
 
 
-                //指せる手を全てリスト追加
-                foreach (koma km in ban.OkiKo[teban]) {
-                if (depth > 0) { 
+            //指せる手を全てリスト追加
+            foreach (koma km in ban.OkiKo[teban]) {
+                if (depth > 0) {
                     teAllList.AddRange(km.baninfo(ban));
-            } else {
+                } else {
                     teAllList.AddRange(km.baninfo(ban, false));
                 }
             }
             //最下層または王手でない場合は駒打ちを無視
-            if ((depth > 0)|| (check == true)) {
+            if ((depth > 0) || (check == true)) {
                 for (int i = 0; i < 7; i++) {
                     if (ban.MochiKo[teban, i]?.Count > 0) {
                         List<koPos> poslist = ban.MochiKo[teban, i][0].baninfo(ban);
@@ -237,7 +236,7 @@ namespace YTSG {
             // 降順にソート
             teAllList.Sort((a, b) => b.val - a.val);
 
-            if ((depth > 0)||(check==true)) {
+            if ((depth > 0) || (check == true)) {
 
                 foreach (koPos te in teAllList) {
                     if (te.val > 5000) {
@@ -245,7 +244,7 @@ namespace YTSG {
                         retList.Add(te);
                         break;
                     }
-                    
+
                     // 駒移動の対象を前回移動した駒の前後左右2マス以内に限定
                     //if ((maxDepth - depth > 4) && (pre_type != KomaType.Hisya) && (pre_type != KomaType.Kakugyou) && (pre_type != KomaType.Ryuuma) && (pre_type != KomaType.Ryuuou) && (pre_type != KomaType.Kyousha)) {
                     //    if ((te.ko.type != KomaType.Hisya) && (te.ko.type != KomaType.Kakugyou) && (te.ko.type != KomaType.Ryuuma) && (te.ko.type != KomaType.Ryuuou) && (te.ko.type != KomaType.Kyousha)) {
@@ -271,7 +270,7 @@ namespace YTSG {
                             retList.Add(te);
                             te.val = -99999;
                         }
-                            continue;
+                        continue;
                     }
 
                     List<koPos> childList = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, te.val, te.ko.type, te.x, te.y);
@@ -279,7 +278,7 @@ namespace YTSG {
                     //tecount++;
                     //if (tecount> depth*20+10) break;
                     //if (childList.Count > 1) Form1.Form1Instance.addMsg("[" + childList.Count + "]");
-                    if (childList.Count > 0) {
+                    if (childList?.Count > 0) {
                         te.val -= childList[0].val;
                     }
 
@@ -380,7 +379,7 @@ namespace YTSG {
         List<koPos> thinkMatedef(int teban, BanInfo ban, int depth) {
             List<koPos> retList = new List<koPos>();
             int score = 99999;
-            
+
             List<koPos> teAllList = new List<koPos>();
             ban.renewNifList(teban);  //二歩リスト更新
 
@@ -396,7 +395,7 @@ namespace YTSG {
             }
 
             foreach (koPos te in teAllList) {
-            
+
                 BanInfo ban_local = new BanInfo(ban);
                 koma ko_local;
                 if (te.ko.x == 9) {
@@ -410,11 +409,11 @@ namespace YTSG {
                 if (ban_local.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local.KingKo[teban].x, ban_local.KingKo[teban].y] > 0) {
                     continue;
                 }
-            
-            if (depth > 0) {
+
+                if (depth > 0) {
 
                     List<koPos> childList = thinkMateatk(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1);
-                    
+
                     // 攻撃側の手が無い -> 詰みはない
                     if (childList.Count == 0) {
                         score = -1;
@@ -441,10 +440,10 @@ namespace YTSG {
             for (int i = 0; i < 7; i++) {
                 if (ban.MochiKo[teban, i]?.Count > 0) teAllList.AddRange(ban.MochiKo[teban, i][0].baninfo(ban));
             }
-            
+
             foreach (koPos te in teAllList) {
-            
-            
+
+
             }
 
             return null;

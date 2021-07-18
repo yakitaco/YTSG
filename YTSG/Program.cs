@@ -233,7 +233,7 @@ namespace YTSG {
             IdouList[7, 5, 7] = 40;  //王
             IdouList[7, 5, 8] = 50;  //王
             IdouList[7, 6, 7] = 80;  //王
-            IdouList[7, 6, 8] = 90;  //王
+            IdouList[7, 6, 8] = 70;  //王
             IdouList[7, 7, 7] = 160; //王
             IdouList[7, 8, 8] = 200; //王
 
@@ -307,7 +307,7 @@ namespace YTSG {
             aiThink cpu = new aiThink();
             bool initFlg = true; //初期フラグ
             int tesuu = 0;
-            Task<List<koPos>> aiTaskMain;
+            Task<List<koPos>> aiTaskMain = null;
 
             int rets = mPar.readParam("");
             rets = mPar.prm[0];
@@ -389,7 +389,6 @@ namespace YTSG {
                         if ((tesuu == 9) || (tesuu == 10)) tekouho.ReadJoseki03("");
                         if ((tesuu == 39) || (tesuu == 40)) tekouho.ResetJoseki();
 
-                        List<koPos> retList;
                         if ((tesuu < 20) || (nokori < 60000)) {
                             cpu.maxDepth = 3;
                             //ret = cpu.thinkMove(myTeban, ban, 3)[0]; //コンピュータ思考
@@ -419,6 +418,7 @@ namespace YTSG {
                         //Thread.Sleep(2000);
                         //Form1.Form1Instance.addMsg("TESTTESTETEST");
 
+                        List<koPos> retList;
                         retList = aiTaskMain.Result;
 
                         thisProcess.PriorityClass = ProcessPriorityClass.AboveNormal; //優先度普通
@@ -445,6 +445,39 @@ namespace YTSG {
                         // 先読み
                     } else if (arr[1] == "ponder") {
 
+                        Form1.Form1Instance.addMsg("Think Ponder.");
+
+                        thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
+                        int nokori = Convert.ToInt32(myTeban == TEIGI.TEBAN_SENTE ? arr[3] : arr[5]);
+
+                        if ((tesuu == 9) || (tesuu == 10)) tekouho.ReadJoseki03("");
+                        if ((tesuu == 39) || (tesuu == 40)) tekouho.ResetJoseki();
+
+                        if ((tesuu < 20) || (nokori < 60000)) {
+                            cpu.maxDepth = 3;
+                            //ret = cpu.thinkMove(myTeban, ban, 3)[0]; //コンピュータ思考
+
+                            aiTaskMain = Task.Run(() => {
+                                return cpu.thinkMove(myTeban, ban, 4);
+                            });
+
+                        } else if ((tesuu < 50) || (nokori < 300000)) {
+                            cpu.maxDepth = 4;
+                            //ret = cpu.thinkMove(myTeban, ban, 4)[0]; //コンピュータ思考
+
+                            aiTaskMain = Task.Run(() => {
+                                return cpu.thinkMove(myTeban, ban, 4);
+                            });
+
+                        } else {
+                            cpu.maxDepth = 5;
+                            //ret = cpu.thinkMove(myTeban, ban, 5)[0]; //コンピュータ思考
+
+                            aiTaskMain = Task.Run(() => {
+                                return cpu.thinkMove(myTeban, ban, 5);
+                            });
+
+                        }
 
                         // 詰将棋
                     } else if (arr[1] == "mate") {
@@ -457,8 +490,27 @@ namespace YTSG {
 
                 } else if ((str.Length > 8) && (str.Substring(0, 9) == "ponderhit")) {
 
+                    Form1.Form1Instance.addMsg("ponder hit!!");
 
+                    List <koPos> retList;
+                    retList = aiTaskMain.Result;
 
+                    if (retList[0].val < -5000) { //投了
+                        Console.WriteLine("bestmove resign");
+
+                    } else {
+                        if (retList.Count > 1) {
+                            Console.WriteLine("bestmove " + usio.pos2usi(retList[0].ko, retList[0]) + " ponder " + usio.pos2usi(retList[1].ko, retList[1]));  //標準出力
+                                                                                                                                                              //Console.WriteLine("bestmove " + usio.pos2usi(retList[0].ko, retList[0]));  //標準出力
+
+                        } else {
+                            Console.WriteLine("bestmove " + usio.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                        }
+                        Form1.Form1Instance.addMsg("[SEND]MOVE:" + retList[0].ko.type + ":(" + (retList[0].ko.x + 1) + "," + (retList[0].ko.y + 1) + ")->(" + (retList[0].x + 1) + "," + (retList[0].y + 1) + ")" + (retList[0].nari == true ? "<NARI>" : "") + "\n");
+                        ban.moveKoma(retList[0].ko, retList[0], retList[0].nari, false);  //動かす
+                        teban = (teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE);
+
+                    }
 
                 } else if ((str.Length > 7) && (str.Substring(0, 8) == "position")) {
                     string[] arr = str.Split(' ');
@@ -510,9 +562,16 @@ namespace YTSG {
                     Form1.Form1Instance.addMsg("" + b);
 
                 } else if ((str.Length == 4) && (str.Substring(0, 4) == "stop")) {
+                    Form1.Form1Instance.addMsg("ponder miss...");
+
                     cpu.stopFlg = true;
 
+                    List<koPos> retList;
+                    retList = aiTaskMain.Result;
 
+                    Console.WriteLine("bestmove 4a3b");  //標準出力
+
+                    cpu.stopFlg = false;
 
                 } else if ((str.Length > 8) && (str.Substring(0, 8) == "gameover")) {
                     Form1.Form1Instance.addMsg("[RECV]" + str + "\n");
@@ -540,13 +599,16 @@ namespace YTSG {
                     //ファイル保存
                     SaveLog.saveNewFile(Form1.Form1Instance.getText(), myTeban);
                     Form1.Form1Instance.resetMsg();
+                    tesuu = 0;
 
                     // アプリケーションの終了
                 } else if ((str.Length == 4) && (str.Substring(0, 4) == "quit")) {
                     Form1.Form1Instance.addMsg("[RECV]" + str);
                     //ファイル保存
-                    SaveLog.saveNewFile(Form1.Form1Instance.getText(), myTeban);
-                    Form1.Form1Instance.resetMsg();
+                    if (tesuu > 0) {
+                        SaveLog.saveNewFile(Form1.Form1Instance.getText(), myTeban);
+                        Form1.Form1Instance.resetMsg();
+                    }
 
                     Application.Exit();
 
