@@ -102,6 +102,8 @@ namespace YTSG {
                 }
             }
 
+            //リストをランダムに並べ替える
+            teAllList = teAllList.OrderBy(a => Guid.NewGuid()).ToList();
 
             // 降順にソート
             teAllList.Sort((a, b) => b.val - a.val);
@@ -191,7 +193,7 @@ namespace YTSG {
         // x y ひとつ前の移動先位置
         List<koPos> think(int teban, BanInfo ban, int depth, int abscore, int up_score, KomaType pre_type, int pre_x, int pre_y) {
             List<koPos> retList = new List<koPos>();
-            int score = -99999;
+            int score = -999999;
             koPos kp = null;
             bool check = false; // 王手フラグ
             //Form1.Form1Instance.addMsg("think MochiKo= " + ban.OkiKo[teban].Count + ", " + ban.OkiKo[teban].Count + ":" + teban);
@@ -210,7 +212,6 @@ namespace YTSG {
             if (ban.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban.KingKo[teban].x, ban.KingKo[teban].y] > 0) {
                 check = true;
             }
-
 
             //指せる手を全てリスト追加
             foreach (koma km in ban.OkiKo[teban]) {
@@ -265,10 +266,10 @@ namespace YTSG {
 
                     // 王手は即スキップ
                     if (ban_local.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local.KingKo[teban].x, ban_local.KingKo[teban].y] > 0) {
-                        if (score == -99999) {
+                        if (score < -999999 + (maxDepth - depth) * 10000 ) {
                             retList.Clear();
                             retList.Add(te);
-                            te.val = -99999;
+                            te.val = -999999 + (maxDepth - depth) * 10000;
                         }
                         continue;
                     }

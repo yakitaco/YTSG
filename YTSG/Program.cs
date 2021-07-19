@@ -308,6 +308,7 @@ namespace YTSG {
             bool initFlg = true; //初期フラグ
             int tesuu = 0;
             Task<List<koPos>> aiTaskMain = null;
+            List<koPos> mateMove; // 詰みの手筋
 
             int rets = mPar.readParam("");
             rets = mPar.prm[0];
@@ -425,7 +426,7 @@ namespace YTSG {
 
                         tesuu++;
 
-                        if (retList[0].val < -5000) { //投了
+                        if ((retList?.Count == 0)||(retList[0].val < -5000)) { //投了
                             Console.WriteLine("bestmove resign");
 
                         } else {
@@ -439,6 +440,13 @@ namespace YTSG {
                             Form1.Form1Instance.addMsg("[SEND]MOVE:" + retList[0].ko.type + ":(" + (retList[0].ko.x + 1) + "," + (retList[0].ko.y + 1) + ")->(" + (retList[0].x + 1) + "," + (retList[0].y + 1) + ")" + (retList[0].nari == true ? "<NARI>" : "") + "\n");
                             ban.moveKoma(retList[0].ko, retList[0], retList[0].nari, false);  //動かす
                             teban = (teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE);
+
+                            // 詰みの手筋が見えている(先頭2手は削除)
+                            if (retList[0].val > 5000) {
+                                mateMove = retList;
+                                mateMove.RemoveAt(0);
+                                mateMove.RemoveAt(0);
+                            }
 
                         }
 
@@ -495,7 +503,7 @@ namespace YTSG {
                     List <koPos> retList;
                     retList = aiTaskMain.Result;
 
-                    if (retList[0].val < -5000) { //投了
+                    if ((retList?.Count == 0) || (retList[0].val < -5000)) { //投了
                         Console.WriteLine("bestmove resign");
 
                     } else {
@@ -610,7 +618,7 @@ namespace YTSG {
                         Form1.Form1Instance.resetMsg();
                     }
 
-                    Application.Exit();
+                    //Application.Exit();
 
                 } else {
                     Form1.Form1Instance.addMsg("[RECV]" + str);
