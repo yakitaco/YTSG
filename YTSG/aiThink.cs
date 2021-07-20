@@ -266,7 +266,7 @@ namespace YTSG {
 
                     // 王手は即スキップ
                     if (ban_local.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local.KingKo[teban].x, ban_local.KingKo[teban].y] > 0) {
-                        if (score < -999999 + (maxDepth - depth) * 10000 ) {
+                        if (score < -999999 + (maxDepth - depth) * 10000) {
                             retList.Clear();
                             retList.Add(te);
                             te.val = -999999 + (maxDepth - depth) * 10000;
@@ -408,6 +408,11 @@ namespace YTSG {
 
                 // 王手は即スキップ
                 if (ban_local.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local.KingKo[teban].x, ban_local.KingKo[teban].y] > 0) {
+                    if (score < -999999 + (maxDepth - depth) * 10000) {
+                        retList.Clear();
+                        retList.Add(te);
+                        te.val = -999999 + (maxDepth - depth) * 10000;
+                    }
                     continue;
                 }
 
@@ -415,8 +420,12 @@ namespace YTSG {
 
                     List<koPos> childList = thinkMateatk(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1);
 
-                    // 攻撃側の手が無い -> 詰みはない
-                    if (childList.Count == 0) {
+                    //詰みがある
+                    if (childList?.Count > 0) {
+                        te.val -= childList[0].val;
+                    
+                    //詰みはない
+                    } else if (childList.Count == 0) {
                         score = -1;
                         score = te.val;
                         retList = childList;
@@ -432,6 +441,10 @@ namespace YTSG {
         //[攻め方]詰将棋1手移動
         List<koPos> thinkMateatk(int teban, BanInfo ban, int depth) {
             List<koPos> teAllList = new List<koPos>();
+            List<koPos> retList = new List<koPos>();
+
+            int score = -999999;
+            ban.renewNifList(teban);  //二歩リスト更新
 
             //[攻め方]王手を指せる手を全てリスト追加
             foreach (koma km in ban.OkiKo[teban]) {
@@ -444,10 +457,41 @@ namespace YTSG {
 
             foreach (koPos te in teAllList) {
 
+                BanInfo ban_local = new BanInfo(ban);
+                koma ko_local;
+
+                // 王手は即スキップ
+                if (ban_local.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local.KingKo[teban].x, ban_local.KingKo[teban].y] > 0) {
+                    if (score < -999999 + (maxDepth - depth) * 10000) {
+                        retList.Clear();
+                        retList.Add(te);
+                        te.val = -999999 + (maxDepth - depth) * 10000;
+                    }
+                    continue;
+                }
+
+                if (te.ko.x == 9) {
+                    ko_local = ban_local.MochiKo[teban, (int)te.ko.type - 1][0];
+                } else {
+                    ko_local = ban_local.BanKo[te.ko.x, te.ko.y];
+                }
+
+                ban_local.moveKoma(ko_local, te, te.nari, false);
+                List<koPos> childList = thinkMatedef(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1);
+
+                if (childList?.Count > 0) {
+                    te.val -= childList[0].val;
+                }
+
+                if (score < te.val) {
+                    score = te.val;
+                    retList = childList;
+                    retList.Insert(0, te);
+                }
 
             }
 
-            return null;
+            return retList;
         }
 
     }
