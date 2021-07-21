@@ -147,6 +147,10 @@ namespace YTSG {
             return this;
         }
 
+        public koPos Copy() {
+            return (koPos)MemberwiseClone();
+        }
+
     }
 
 
@@ -351,10 +355,11 @@ namespace YTSG {
             //Application.Run(form1);
             while (true) {
                 str = Console.ReadLine();
+                Form1.Form1Instance.addMsg("[RECV]" + str);
 
                 // isready 対局開始前
                 if ((str.Length == 7) && (str.Substring(0, 7) == "isready")) {
-                    Form1.Form1Instance.addMsg("[RECV]" + str);
+                    //Form1.Form1Instance.addMsg("[RECV]" + str);
 
                     /* (再)初期化処理 */
                     tekouho.ReadJoseki00("");
@@ -367,7 +372,7 @@ namespace YTSG {
 
                 } else if ((str.Length > 1) && (str.Substring(0, 2) == "go")) {
 
-                    Form1.Form1Instance.addMsg("[RECV]" + str);
+                    //Form1.Form1Instance.addMsg("[RECV]" + str);
                     //cpu.RandomeMove(myTeban, ref ban);
 
                     string[] arr = str.Split(' ');
@@ -462,7 +467,7 @@ namespace YTSG {
                         if ((tesuu == 39) || (tesuu == 40)) tekouho.ResetJoseki();
 
                         if ((tesuu < 20) || (nokori < 60000)) {
-                            cpu.maxDepth = 3;
+                            cpu.maxDepth = 4;
                             //ret = cpu.thinkMove(myTeban, ban, 3)[0]; //コンピュータ思考
 
                             aiTaskMain = Task.Run(() => {
@@ -489,11 +494,23 @@ namespace YTSG {
 
                         // 詰将棋
                     } else if (arr[1] == "mate") {
-                        Console.WriteLine("checkmate notimplemented");
-                        int ret = 0;
+                        List<koPos> retList;
 
-                        ret = cpu.thinkMateMove(myTeban, ban, 999);
+                        cpu.maxDepth = 999;
+                        retList = cpu.thinkMateMove(myTeban, ban, 999);
 
+                        if (retList?.Count > 0) {
+                            string aaa = "";
+                            foreach (var n in retList ?? new List<koPos>()) {
+                                aaa += " " + usio.pos2usi(n.ko, n);
+                            }
+                            Console.WriteLine("checkmate" + aaa);
+
+                        // 詰みなし
+                        } else {
+
+                            Console.WriteLine("checkmate nomate");
+                        }
                     }
 
                 } else if ((str.Length > 8) && (str.Substring(0, 9) == "ponderhit")) {

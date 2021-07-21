@@ -595,59 +595,59 @@ namespace YTSG {
                 foreach (koPos te in tmpList) {
                     //先手基準で計算(前:y-1/右:x-1)
                     if ((KoMove[(uint)this.type] & 1) > 0) { //1 : 前
-                        if (koSetPosPos(new koPos(this).rMV(0, -1), ban, ref teList, tgt_x, tgt_y) == 3) continue;
+                        if (koSetPosPos(te,0, -1, ban, ref teList, tgt_x, tgt_y) == 3) continue;
                     }
                     if ((KoMove[(uint)this.type] & 2) > 0) { //2 : 後
-                        if (koSetPosPos(new koPos(this).rMV(0, 1), ban, ref teList, tgt_x, tgt_y) == 3) continue;
+                        if (koSetPosPos(te,0, 1, ban, ref teList, tgt_x, tgt_y) == 3) continue;
                     }
                     if ((KoMove[(uint)this.type] & 4) > 0) { //3 : 左右前
-                        if (koSetPosPos(new koPos(this).rMV(-1, -1), ban, ref teList, tgt_x, tgt_y) == 3) continue;
-                        if (koSetPosPos(new koPos(this).rMV(1, -1), ban, ref teList, tgt_x, tgt_y) == 3) continue;
+                        if (koSetPosPos(te,-1, -1, ban, ref teList, tgt_x, tgt_y) == 3) continue;
+                        if (koSetPosPos(te,1, -1, ban, ref teList, tgt_x, tgt_y) == 3) continue;
                     }
                     if ((KoMove[(uint)this.type] & 8) > 0) { //4 : 左右横
-                        if (koSetPosPos(new koPos(this).rMV(-1, 0), ban, ref teList, tgt_x, tgt_y) == 3) continue;
-                        if (koSetPosPos(new koPos(this).rMV(1, 0), ban, ref teList, tgt_x, tgt_y) == 3) continue;
+                        if (koSetPosPos(te,-1, 0, ban, ref teList, tgt_x, tgt_y) == 3) continue;
+                        if (koSetPosPos(te, 1, 0, ban, ref teList, tgt_x, tgt_y) == 3) continue;
                     }
                     if ((KoMove[(uint)this.type] & 16) > 0) { //5 : 左右後
-                        if (koSetPosPos(new koPos(this).rMV(-1, 1), ban, ref teList, tgt_x, tgt_y) == 3) continue;
-                        if (koSetPosPos(new koPos(this).rMV(1, 1), ban, ref teList, tgt_x, tgt_y) == 3) continue;
+                        if (koSetPosPos(te, -1, 1, ban, ref teList, tgt_x, tgt_y) == 3) continue;
+                        if (koSetPosPos(te, 1, 1, ban, ref teList, tgt_x, tgt_y) == 3) continue;
                     }
                     if ((KoMove[(uint)this.type] & 32) > 0) { //6 : 桂馬
-                        if (koSetPosPos(new koPos(this).rMV(-1, -2), ban, ref teList, tgt_x, tgt_y) == 3) continue;
-                        if (koSetPosPos(new koPos(this).rMV(1, -2), ban, ref teList, tgt_x, tgt_y) == 3) continue;
+                        if (koSetPosPos(te, -1, -2, ban, ref teList, tgt_x, tgt_y) == 3) continue;
+                        if (koSetPosPos(te, 1, -2, ban, ref teList, tgt_x, tgt_y) == 3) continue;
                     }
                     if ((KoMove[(uint)this.type] & 64) > 0) { //7 : 香車
                         for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
-                            if (koSetPosPos(new koPos(this).rMV(0, -i), ban, ref teList, tgt_x, tgt_y) != 0) break;
+                            if (koSetPosPos(te, 0, -i, ban, ref teList, tgt_x, tgt_y) != 0) break;
                         }
                     }
 
                     if ((KoMove[(uint)this.type] & 128) > 0) { //8 : 飛車
                         for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
-                            if (koSetPosPos(new koPos(this).rMV(0, -i), ban, ref teList, tgt_x, tgt_y) != 0) break;
+                            if (koSetPosPos(te, 0, -i, ban, ref teList, tgt_x, tgt_y) != 0) break;
                         }
                         for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                            if (koSetPosPos(new koPos(this).rMV(-i, 0), ban, ref teList, tgt_x, tgt_y) != 0) break;
+                            if (koSetPosPos(te, -i, 0, ban, ref teList, tgt_x, tgt_y) != 0) break;
                         }
                         for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                            if (koSetPosPos(new koPos(this).rMV(i, 0), ban, ref teList, tgt_x, tgt_y) != 0) break;
+                            if (koSetPosPos(te, i, 0, ban, ref teList, tgt_x, tgt_y) != 0) break;
                         }
                         for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
-                            if (koSetPosPos(new koPos(this).rMV(0, i), ban, ref teList, tgt_x, tgt_y) != 0) break;
+                            if (koSetPosPos(te, 0, i, ban, ref teList, tgt_x, tgt_y) != 0) break;
                         }
                     }
                     if ((KoMove[(uint)this.type] & 256) > 0) { //9 : 角行
                         for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                            if (koSetPosPos(new koPos(this).rMV(-i, -i), ban, ref teList, tgt_x, tgt_y) != 0) break;
+                            if (koSetPosPos(te, -i, -i, ban, ref teList, tgt_x, tgt_y) != 0) break;
                         }
                         for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                            if (koSetPosPos(new koPos(this).rMV(-i, i), ban, ref teList, tgt_x, tgt_y) != 0) break;
+                            if (koSetPosPos(te, -i, i, ban, ref teList, tgt_x, tgt_y) != 0) break;
                         }
                         for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                            if (koSetPosPos(new koPos(this).rMV(i, -i), ban, ref teList, tgt_x, tgt_y) != 0) break;
+                            if (koSetPosPos(te, i, -i, ban, ref teList, tgt_x, tgt_y) != 0) break;
                         }
                         for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                            if (koSetPosPos(new koPos(this).rMV(i, i), ban, ref teList, tgt_x, tgt_y) != 0) break;
+                            if (koSetPosPos(te, i, i, ban, ref teList, tgt_x, tgt_y) != 0) break;
                         }
                     }
                 }
@@ -658,10 +658,11 @@ namespace YTSG {
         }
 
         //posがtgtかチェック
-        int koSetPosPos(koPos pos, BanInfo ban, ref List<koPos> teList, int tgt_x, int tgt_y) {
+        int koSetPosPos(koPos pos, int mv_x, int mv_y, BanInfo ban, ref List<koPos> teList, int tgt_x, int tgt_y) {
             List<koPos> a = new List<koPos>();
-            int ret = koSetPos(pos, ban, ref a, 0);
-            if ((pos.x == tgt_x) && (pos.y == tgt_y)) {
+            koPos poss = pos.Copy().rMV(mv_x, mv_y);
+            int ret = koSetPos(poss, ban, ref a, 0);
+            if ((poss.x == tgt_x) && (poss.y == tgt_y)) {
                 teList.Add(pos);
             }
             return ret;
