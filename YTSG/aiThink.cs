@@ -325,7 +325,12 @@ namespace YTSG {
             foreach (koma km in ban.OkiKo[teban]) {
                 teAllList.AddRange(km.baninfoPos(ban, ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].x, ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].y));
 
+                if ((km.type == KomaType.Hisya) || (km.type == KomaType.Ryuuou) || (km.type == KomaType.Kakugyou) || (km.type == KomaType.Ryuuma) || (km.type == KomaType.Kyousha)) {
+                    //空き王手
+                    teAllList.AddRange(km.discoverCheck());
+                }
             }
+
             for (int i = 0; i < 7; i++) {
                 if (ban.MochiKo[teban, i]?.Count > 0) teAllList.AddRange(ban.MochiKo[teban, i][0].baninfoPos(ban, ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].x, ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].y));
             }
@@ -336,7 +341,7 @@ namespace YTSG {
 
             //thread同時数
             Form1.Form1Instance.addMsg("MinThreads work= " + workMin + ", i/o= " + ioMin + ", teAllList=" + teAllList.Count);
-            //Thread.Sleep(20000);
+            Thread.Sleep(2000);
             // 並行処理
             Parallel.For(0, workMin, id => {
                 while (true) {
@@ -359,7 +364,10 @@ namespace YTSG {
                     // 1手動かしてみる
                     ban_local.moveKoma(ko_local, teAllList[cnt_local], teAllList[cnt_local].nari, false);
 
-                    
+                    if (ban_local.KingKo[teban] != null) {
+                        if (ban_local.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local.KingKo[teban].x, ban_local.KingKo[teban].y] > 0) continue;
+                    }
+
                     List<koPos> nexTe = new List<koPos>();  // 未使用
                     nexTe = thinkMatedef(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1);
 
@@ -385,7 +393,7 @@ namespace YTSG {
                     Form1.Form1Instance.addMsg("[" + Task.CurrentId + "]teAll[" + cnt_local + "].val = [" + teAllList[cnt_local].val + "](" + (teAllList[cnt_local].x + 1) + "," + (teAllList[cnt_local].y + 1) + ")" + teAllList[cnt_local].ko.type + aaa);
 
                     lock (lockObj) {
-                        if (maxScore < teAllList[cnt_local].val) {
+                        if ((nexTe?.Count > 0) && (maxScore < teAllList[cnt_local].val)) {
                             maxScore = teAllList[cnt_local].val;
                             retList = nexTe;
                             retList.Insert(0, teAllList[cnt_local]);
@@ -406,7 +414,7 @@ namespace YTSG {
         //[守り方]詰将棋1手移動
         List<koPos> thinkMatedef(int teban, BanInfo ban, int depth) {
             List<koPos> retList = new List<koPos>();
-            int score = 99999;
+            int score = -9999999;
 
             List<koPos> teAllList = new List<koPos>();
             ban.renewNifList(teban);  //二歩リスト更新
@@ -416,11 +424,14 @@ namespace YTSG {
                 teAllList.AddRange(km.baninfo(ban));
             }
 
-            for (int i = 0; i < 7; i++) {
-                if (ban.MochiKo[teban, i]?.Count > 0) {
-                    teAllList.AddRange(ban.MochiKo[teban, i][0].baninfo(ban));
-                }
-            }
+            //for (int i = 0; i < 7; i++) {
+            //    if (ban.MochiKo[teban, i]?.Count > 0) {
+            //        teAllList.AddRange(ban.MochiKo[teban, i][0].baninfo(ban));
+            //    }
+            //}
+
+            // 降順にソート
+            teAllList.Sort((a, b) => b.val - a.val);
 
             foreach (koPos te in teAllList) {
 
@@ -450,19 +461,21 @@ namespace YTSG {
                     //詰みがある
                     if (childList?.Count > 0) {
                         te.val -= childList[0].val;
-
+                        if (score < te.val) {
+                            score = te.val;
+                            retList = childList;
+                            retList.Insert(0, te);
+                        }
                         //詰みはない
-                    } else if (childList.Count == 0) {
-                        score = -1;
-                        score = te.val;
-                        retList = childList;
-                        retList.Insert(0, te);
+                    } else {
+                        retList = null;
+                        break;
                     }
 
                 }
             }
 
-            return null;
+            return retList;
         }
 
         //[攻め方]詰将棋1手移動
@@ -470,7 +483,9 @@ namespace YTSG {
             List<koPos> teAllList = new List<koPos>();
             List<koPos> retList = new List<koPos>();
 
-            int score = -999999;
+
+
+            int score = -9999999;
             ban.renewNifList(teban);  //二歩リスト更新
 
             //[攻め方]王手を指せる手を全てリスト追加
@@ -479,25 +494,18 @@ namespace YTSG {
 
             }
             for (int i = 0; i < 7; i++) {
-                if (ban.MochiKo[teban, i]?.Count > 0) teAllList.AddRange(ban.MochiKo[teban, i][0].baninfo(ban));
+                if (ban.MochiKo[teban, i]?.Count > 0) teAllList.AddRange(ban.MochiKo[teban, i][0].baninfoPos(ban, ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].x, ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].y));
             }
+
+            //foreach (var n in teAllList) {
+            //    Form1.Form1Instance.addMsg("<" + depth + ">[" + n.val + "](" + (n.ko.x + 1) + "," + (n.ko.y + 1) + ")->(" + (n.x + 1) + "," + (n.y + 1) + ")" + n.ko.type);
+            //}
 
             foreach (koPos te in teAllList) {
 
                 BanInfo ban_local = new BanInfo(ban);
                 koma ko_local;
 
-                // 王手は即スキップ
-                if (ban_local.KingKo[teban] != null) {
-                    if (ban_local.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local.KingKo[teban].x, ban_local.KingKo[teban].y] > 0) {
-                        if (score < -999999 + (maxDepth - depth) * 10000) {
-                            retList.Clear();
-                            retList.Add(te);
-                            te.val = -999999 + (maxDepth - depth) * 10000;
-                        }
-                        continue;
-                    }
-                }
 
                 if (te.ko.x == 9) {
                     ko_local = ban_local.MochiKo[teban, (int)te.ko.type - 1][0];
@@ -506,6 +514,19 @@ namespace YTSG {
                 }
 
                 ban_local.moveKoma(ko_local, te, te.nari, false);
+
+                // 王手は即スキップ
+                if (ban_local.KingKo[teban] != null) {
+                    if (ban_local.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local.KingKo[teban].x, ban_local.KingKo[teban].y] > 0) {
+                        //if (score < -999999 + (maxDepth - depth) * 10000) {
+                        //    retList.Clear();
+                        //    retList.Add(te);
+                        //    te.val = -999999 + (maxDepth - depth) * 10000;
+                        //}
+                        continue;
+                    }
+                }
+
                 List<koPos> childList = thinkMatedef(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1);
 
                 if (childList?.Count > 0) {

@@ -225,6 +225,9 @@ namespace YTSG {
                 toriKo.y = 9;  //持ち駒状態
                 toriKo.doKModori();  //成り状態を戻す
                 OkiKo[toriKo.p].Remove(toriKo);
+                if (toriKo.type == KomaType.Ousyou) {
+                    toriKo.type = KomaType.Fuhyou;
+                }
                 MochiKo[ko.p, (int)toriKo.type - 1].Add(toriKo);
 
                 toriKo.p = ko.p;  //取った駒の手番(一番最後に変更)
@@ -462,6 +465,7 @@ namespace YTSG {
         //        km.checkKomaKiki(this);
         //    }
         //}
+
 
         //現在の盤情報をASCIIで表示
         public string showBanInfo() {

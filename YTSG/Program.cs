@@ -497,9 +497,10 @@ namespace YTSG {
                         List<koPos> retList;
 
                         cpu.maxDepth = 999;
-                        retList = cpu.thinkMateMove(myTeban, ban, 999);
+                        retList = cpu.thinkMateMove(myTeban, ban, 10);
 
                         if (retList?.Count > 0) {
+                            retList.RemoveAt(retList.Count-1);
                             string aaa = "";
                             foreach (var n in retList ?? new List<koPos>()) {
                                 aaa += " " + usio.pos2usi(n.ko, n);
