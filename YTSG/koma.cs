@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace YTSG {
     //駒情報
@@ -593,23 +594,23 @@ namespace YTSG {
 
                 // 一時移動リストから次の手で指定位置へ移動可能かチェック
                 foreach (koPos te in tmpList) {
-                    
+
                     koma tmpKo = new koma(te.ko);
                     if (te.nari == true) tmpKo.doKNari();
 
                     //先手基準で計算(前:y-1/右:x-1)
                     if ((KoMove[(uint)tmpKo.type] & 1) > 0) { //1 : 前
-                        if (koSetPosPos(te,0, -1, ban, ref teList, tgt_x, tgt_y) == 3) continue;
+                        if (koSetPosPos(te, 0, -1, ban, ref teList, tgt_x, tgt_y) == 3) continue;
                     }
                     if ((KoMove[(uint)tmpKo.type] & 2) > 0) { //2 : 後
-                        if (koSetPosPos(te,0, 1, ban, ref teList, tgt_x, tgt_y) == 3) continue;
+                        if (koSetPosPos(te, 0, 1, ban, ref teList, tgt_x, tgt_y) == 3) continue;
                     }
                     if ((KoMove[(uint)tmpKo.type] & 4) > 0) { //3 : 左右前
-                        if (koSetPosPos(te,-1, -1, ban, ref teList, tgt_x, tgt_y) == 3) continue;
-                        if (koSetPosPos(te,1, -1, ban, ref teList, tgt_x, tgt_y) == 3) continue;
+                        if (koSetPosPos(te, -1, -1, ban, ref teList, tgt_x, tgt_y) == 3) continue;
+                        if (koSetPosPos(te, 1, -1, ban, ref teList, tgt_x, tgt_y) == 3) continue;
                     }
                     if ((KoMove[(uint)tmpKo.type] & 8) > 0) { //4 : 左右横
-                        if (koSetPosPos(te,-1, 0, ban, ref teList, tgt_x, tgt_y) == 3) continue;
+                        if (koSetPosPos(te, -1, 0, ban, ref teList, tgt_x, tgt_y) == 3) continue;
                         if (koSetPosPos(te, 1, 0, ban, ref teList, tgt_x, tgt_y) == 3) continue;
                     }
                     if ((KoMove[(uint)tmpKo.type] & 16) > 0) { //5 : 左右後
@@ -991,8 +992,102 @@ namespace YTSG {
             }
         }
 
-        public List<koPos> discoverCheck() {
-            return null;
+        public List<koPos> discoverCheck_hisya(BanInfo ban) {
+            List<koPos> retList = new List<koPos>();
+            koma tmp_koma = null;
+            if (ban.KingKo[this.ap].x == this.x) {
+                if (ban.KingKo[this.ap].y > this.y) {
+                    for (int tmp_y = this.y + 1; tmp_y < ban.KingKo[this.ap].y; tmp_y++) {
+                        // 味方が一人だけいる場合のみ
+                        if (ban.BanKo[this.x, tmp_y] != null) {
+                            if (ban.BanKo[this.x, tmp_y]?.p == this.p) {
+                                if (tmp_koma == null) {
+                                    tmp_koma = ban.BanKo[this.x, tmp_y];
+                                } else {
+                                    tmp_koma = null;
+                                    break;
+                                }
+                            } else if (ban.BanKo[this.x, tmp_y]?.p != this.p) {
+                                tmp_koma = null;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    for (int tmp_y = ban.KingKo[this.ap].y + 1; tmp_y < this.y; tmp_y++) {
+                        // 味方が一人だけいる場合のみ
+                        if (ban.BanKo[this.x, tmp_y] != null) {
+                            if (ban.BanKo[this.x, tmp_y]?.p == this.p) {
+                                if (tmp_koma == null) {
+                                    tmp_koma = ban.BanKo[this.x, tmp_y];
+                                } else {
+                                    tmp_koma = null;
+                                    break;
+                                }
+                            } else if (ban.BanKo[this.x, tmp_y]?.p != this.p) {
+                                tmp_koma = null;
+                                break;
+                            }
+                        }
+                    }
+
+                }
+                if (tmp_koma != null) {
+                    retList = tmp_koma.baninfo(ban);
+                    retList = retList.Where(o => o.x != this.x).ToList(); //さえぎる場所は削除
+                }
+            } else if (ban.KingKo[this.ap].y == this.y) {
+                if (ban.KingKo[this.ap].x > this.x) {
+                    for (int tmp_x = this.x + 1; tmp_x < ban.KingKo[this.ap].x; tmp_x++) {
+                        // 味方が一人だけいる場合のみ
+                        if (ban.BanKo[tmp_x, this.y] != null) {
+                            if (ban.BanKo[tmp_x, this.y]?.p == this.p) {
+                                if (tmp_koma == null) {
+                                    tmp_koma = ban.BanKo[tmp_x, this.y];
+                                } else {
+                                    tmp_koma = null;
+                                    break;
+                                }
+                            } else if (ban.BanKo[tmp_x, this.y]?.p != this.p) {
+                                tmp_koma = null;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    for (int tmp_x = ban.KingKo[this.ap].x + 1; tmp_x < this.x; tmp_x++) {
+                        // 味方が一人だけいる場合のみ
+                        if (ban.BanKo[tmp_x, this.y] != null) {
+                            if (ban.BanKo[tmp_x, this.y]?.p == this.p) {
+                                if (tmp_koma == null) {
+                                    tmp_koma = ban.BanKo[tmp_x, this.y];
+                                } else {
+                                    tmp_koma = null;
+                                    break;
+                                }
+                            } else if (ban.BanKo[tmp_x, this.y]?.p != this.p) {
+                                tmp_koma = null;
+                                break;
+                            }
+                        }
+                    }
+
+                }
+                if (tmp_koma != null) {
+                    retList = tmp_koma.baninfo(ban);
+                    retList = retList.Where(o => o.y != this.y).ToList(); //さえぎる場所は削除
+                }
+            }
+
+            return retList;
+        }
+        public List<koPos> discoverCheck_Kakugyou(BanInfo ban) {
+
+            return new List<koPos>();
+        }
+        public List<koPos> discoverCheck_Kyousya(BanInfo ban) {
+
+            return new List<koPos>();
         }
 
     }

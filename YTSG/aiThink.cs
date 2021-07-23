@@ -325,10 +325,15 @@ namespace YTSG {
             foreach (koma km in ban.OkiKo[teban]) {
                 teAllList.AddRange(km.baninfoPos(ban, ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].x, ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].y));
 
-                if ((km.type == KomaType.Hisya) || (km.type == KomaType.Ryuuou) || (km.type == KomaType.Kakugyou) || (km.type == KomaType.Ryuuma) || (km.type == KomaType.Kyousha)) {
-                    //空き王手
-                    teAllList.AddRange(km.discoverCheck());
+                //空き王手チェック
+                if ((km.type == KomaType.Hisya) || (km.type == KomaType.Ryuuou)) {
+                    teAllList.AddRange(km.discoverCheck_hisya(ban));
+                } else if ((km.type == KomaType.Kakugyou) || (km.type == KomaType.Ryuuma)) {
+                    teAllList.AddRange(km.discoverCheck_Kakugyou(ban));
+                } else if (km.type == KomaType.Kyousha) {
+                    teAllList.AddRange(km.discoverCheck_Kyousya(ban));
                 }
+
             }
 
             for (int i = 0; i < 7; i++) {
@@ -491,6 +496,15 @@ namespace YTSG {
             //[攻め方]王手を指せる手を全てリスト追加
             foreach (koma km in ban.OkiKo[teban]) {
                 teAllList.AddRange(km.baninfoPos(ban, ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].x, ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].y));
+
+                //空き王手チェック
+                if ((km.type == KomaType.Hisya) || (km.type == KomaType.Ryuuou)) {
+                    teAllList.AddRange(km.discoverCheck_hisya(ban));
+                } else if ((km.type == KomaType.Kakugyou) || (km.type == KomaType.Ryuuma)) {
+                    teAllList.AddRange(km.discoverCheck_Kakugyou(ban));
+                } else if (km.type == KomaType.Kyousha) {
+                    teAllList.AddRange(km.discoverCheck_Kyousya(ban));
+                }
 
             }
             for (int i = 0; i < 7; i++) {
