@@ -682,11 +682,13 @@ namespace YTSG {
             if (ban.BanKo[pos.x, pos.y] == null) {
                 // 駒成り
                 if ((type == 0) && ((py < 3) || (pos.py < 3)) && (this.chkNari())) {
-                    teList.Add(pos.setNari(true));
-                    // 銀桂香(2段まで)は不成もあり
+
+                    // 銀桂香(2段まで)は不成もあり(そのまま入れると次で成になってしまうためコピー)
                     if ((this.type == KomaType.Ginsyou) || (((this.type == KomaType.Keima) || (this.type == KomaType.Kyousha)) && (pos.py > 1))) {
-                        teList.Add(pos);
+                        teList.Add(pos.Copy());
                     }
+
+                    teList.Add(pos.setNari(true));
 
                 } else {
                     teList.Add(pos);
@@ -728,21 +730,22 @@ namespace YTSG {
                 // 移動元(this)or移動先(p)が自分基準位置で奥3段の場合は成り考慮
                 if (((py < 3) || (pos.py < 3)) && (this.chkNari())) {
 
+                    // 香(2段まで)は不成もあり
+                    if ((this.type == KomaType.Kyousha) && (pos.py > 1)) {
+                        if ((cont) || (ban.IdouList[this.p, pos.x, pos.y] > ban.IdouList[this.ap, pos.x, pos.y])) {
+                            teList.Add(pos.Copy().setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type]));
+                        } else {
+                            teList.Add(pos.Copy().setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] - KoScore[(int)this.type])); // 劣勢の場所
+                        }
+
+                    }
+
                     if ((cont) || (ban.IdouList[this.p, pos.x, pos.y] > ban.IdouList[this.ap, pos.x, pos.y])) {
                         teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] + 50).setNari(true));
                     } else {
                         teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] + 50 - KoScore[(int)this.type]).setNari(true)); // 劣勢の場所
                     }
 
-                    // 香(2段まで)は不成もあり
-                    if ((this.type == KomaType.Kyousha) && (pos.py > 1)) {
-                        if ((cont) || (ban.IdouList[this.p, pos.x, pos.y] > ban.IdouList[this.ap, pos.x, pos.y])) {
-                            teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type]));
-                        } else {
-                            teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] - KoScore[(int)this.type])); // 劣勢の場所
-                        }
-
-                    }
                 } else {
                     if ((cont) || (ban.IdouList[this.p, pos.x, pos.y] > ban.IdouList[this.ap, pos.x, pos.y])) {
                         teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] /* + tekouho.GetKouho(this, pos.x, pos.y) */));
@@ -768,21 +771,24 @@ namespace YTSG {
 
                 // 移動元(this)or移動先(p)が自分基準位置で奥3段の場合は成り考慮
                 if (((py < 3) || (pos.py < 3)) && (this.chkNari())) {
+
+
+                    // 銀桂香(2段まで)は不成もあり(そのまま入れると次で成になってしまうためコピー)
+                    if ((this.type == KomaType.Ginsyou) || ((this.type == KomaType.Keima) && (pos.py > 1))) {
+
+                        if ((cont) || (ban.IdouList[this.p, pos.x, pos.y] > ban.IdouList[this.ap, pos.x, pos.y])) {
+                            teList.Add(pos.Copy().setVal(0));
+                        } else {
+                            teList.Add(pos.Copy().setVal(-KoScore[(int)this.type])); // 劣勢の場所
+                        }
+                    }
+
                     if ((cont) || (ban.IdouList[this.p, pos.x, pos.y] > ban.IdouList[this.ap, pos.x, pos.y])) {
                         teList.Add(pos.setVal(250).setNari(true));
                     } else {
                         teList.Add(pos.setVal(50 - KoScore[(int)this.type]).setNari(true)); // 劣勢の場所
                     }
 
-                    // 銀桂香(2段まで)は不成もあり
-                    if ((this.type == KomaType.Ginsyou) || ((this.type == KomaType.Keima) && (pos.py > 1))) {
-
-                        if ((cont) || (ban.IdouList[this.p, pos.x, pos.y] > ban.IdouList[this.ap, pos.x, pos.y])) {
-                            teList.Add(pos.setVal(0));
-                        } else {
-                            teList.Add(pos.setVal(-KoScore[(int)this.type])); // 劣勢の場所
-                        }
-                    }
                 } else {
                     if ((cont) || (ban.IdouList[this.p, pos.x, pos.y] > ban.IdouList[this.ap, pos.x, pos.y])) {
                         teList.Add(pos.setVal(0 /* + tekouho.GetKouho(this, pos.x, pos.y) */));
@@ -798,21 +804,22 @@ namespace YTSG {
                 // 移動元(this)or移動先(p)が自分基準位置で奥3段の場合は成り考慮
                 if (((py < 3) || (pos.py < 3)) && (this.chkNari())) {
 
+                    // 銀桂香(2段まで)は不成もあり(そのまま入れると次で成になってしまうためコピー)
+                    if ((this.type == KomaType.Ginsyou) || (((this.type == KomaType.Keima) || (this.type == KomaType.Kyousha)) && (pos.py > 1))) {
+                        if ((cont) || (ban.IdouList[this.p, pos.x, pos.y] > ban.IdouList[this.ap, pos.x, pos.y])) {
+                            teList.Add(pos.Copy().setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type]));
+                        } else {
+                            teList.Add(pos.Copy().setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] - KoScore[(int)this.type]));
+                        }
+
+                    }
+
                     if ((cont) || (ban.IdouList[this.p, pos.x, pos.y] > ban.IdouList[this.ap, pos.x, pos.y])) {
                         teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] + 150).setNari(true));
                     } else {
                         teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] + 50 - KoScore[(int)this.type]).setNari(true)); // 劣勢の場所
                     }
 
-                    // 銀桂香(2段まで)は不成もあり
-                    if ((this.type == KomaType.Ginsyou) || (((this.type == KomaType.Keima) || (this.type == KomaType.Kyousha)) && (pos.py > 1))) {
-                        if ((cont) || (ban.IdouList[this.p, pos.x, pos.y] > ban.IdouList[this.ap, pos.x, pos.y])) {
-                            teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type]));
-                        } else {
-                            teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] - KoScore[(int)this.type]));
-                        }
-
-                    }
                 } else {
                     if ((cont) || (ban.IdouList[this.p, pos.x, pos.y] > ban.IdouList[this.ap, pos.x, pos.y])) {
                         teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] /* + tekouho.GetKouho(this, pos.x, pos.y) */));

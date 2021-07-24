@@ -496,7 +496,7 @@ namespace YTSG {
                     } else if (arr[1] == "mate") {
                         List<koPos> retList;
 
-                        thisProcess.PriorityClass = ProcessPriorityClass.High; //優先度高
+                        thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
 
                         cpu.maxDepth = 13;
                         retList = cpu.thinkMateMove(myTeban, ban, cpu.maxDepth);
