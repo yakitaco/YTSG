@@ -496,8 +496,12 @@ namespace YTSG {
                     } else if (arr[1] == "mate") {
                         List<koPos> retList;
 
-                        cpu.maxDepth = 999;
-                        retList = cpu.thinkMateMove(myTeban, ban, 10);
+                        thisProcess.PriorityClass = ProcessPriorityClass.High; //優先度高
+
+                        cpu.maxDepth = 13;
+                        retList = cpu.thinkMateMove(myTeban, ban, cpu.maxDepth);
+
+                        thisProcess.PriorityClass = ProcessPriorityClass.AboveNormal; //優先度普通
 
                         if (retList?.Count > 0) {
                             retList.RemoveAt(retList.Count-1);
@@ -591,6 +595,8 @@ namespace YTSG {
                     Form1.Form1Instance.addMsg("ponder miss...");
 
                     cpu.stopFlg = true;
+
+                    thisProcess.PriorityClass = ProcessPriorityClass.AboveNormal; //優先度普通
 
                     List<koPos> retList;
                     retList = aiTaskMain.Result;

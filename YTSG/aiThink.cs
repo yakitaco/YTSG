@@ -346,7 +346,7 @@ namespace YTSG {
 
             //thread同時数
             Form1.Form1Instance.addMsg("MinThreads work= " + workMin + ", i/o= " + ioMin + ", teAllList=" + teAllList.Count);
-            Thread.Sleep(2000);
+            //Thread.Sleep(2000);
             // 並行処理
             Parallel.For(0, workMin, id => {
                 while (true) {
@@ -374,7 +374,7 @@ namespace YTSG {
                     }
 
                     List<koPos> nexTe = new List<koPos>();  // 未使用
-                    nexTe = thinkMatedef(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1);
+                    nexTe = thinkMatedef(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, teAllList[cnt_local]);
 
                     //[守り方]指せる手を全てリスト追加
                     //foreach (koma km in ban.OkiKo[teban]) {
@@ -417,7 +417,7 @@ namespace YTSG {
         }
 
         //[守り方]詰将棋1手移動
-        List<koPos> thinkMatedef(int teban, BanInfo ban, int depth) {
+        List<koPos> thinkMatedef(int teban, BanInfo ban, int depth, koPos pre) {
             List<koPos> retList = new List<koPos>();
             int score = -9999999;
 
@@ -429,11 +429,14 @@ namespace YTSG {
                 teAllList.AddRange(km.baninfo(ban));
             }
 
-            //for (int i = 0; i < 7; i++) {
-            //    if (ban.MochiKo[teban, i]?.Count > 0) {
-            //        teAllList.AddRange(ban.MochiKo[teban, i][0].baninfo(ban));
-            //    }
-            //}
+            if ((pre.ko.type == KomaType.Hisya) || (pre.ko.type == KomaType.Kakugyou) || (pre.ko.type == KomaType.Ryuuma) || (pre.ko.type == KomaType.Ryuuou) || (pre.ko.type == KomaType.Kyousha)) {
+                for (int i = 0; i < 7; i++) {
+
+                    if (ban.MochiKo[teban, i]?.Count > 0) {
+                        teAllList.AddRange(ban.MochiKo[teban, i][0].baninfo(ban));
+                    }
+                }
+            }
 
             // 降順にソート
             teAllList.Sort((a, b) => b.val - a.val);
@@ -449,17 +452,17 @@ namespace YTSG {
                 }
                 ban_local.moveKoma(ko_local, te, te.nari, false);
 
-                // 王手は即スキップ
-                if (ban_local.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local.KingKo[teban].x, ban_local.KingKo[teban].y] > 0) {
-                    if (score < -999999 + (maxDepth - depth) * 10000) {
-                        retList.Clear();
-                        retList.Add(te);
-                        te.val = -999999 + (maxDepth - depth) * 10000;
-                    }
-                    continue;
-                }
-
                 if (depth > 0) {
+
+                    // 王手は即スキップ
+                    if (ban_local.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local.KingKo[teban].x, ban_local.KingKo[teban].y] > 0) {
+                        if (score < -999999 + (maxDepth - depth) * 10000) {
+                            retList.Clear();
+                            retList.Add(te);
+                            te.val = -999999 + (maxDepth - depth) * 10000;
+                        }
+                        continue;
+                    }
 
                     List<koPos> childList = thinkMateatk(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1);
 
@@ -477,7 +480,20 @@ namespace YTSG {
                         break;
                     }
 
+                } else {
+                    // 王手は即スキップ
+                    if (ban_local.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local.KingKo[teban].x, ban_local.KingKo[teban].y] > 0) {
+                        retList.Clear();
+                        retList.Add(te);
+                        te.val = -999999 + (maxDepth - depth) * 10000;
+                    } else {
+                        retList = new List<koPos>();
+                        break;
+                    }
+
                 }
+
+
             }
 
             return retList;
@@ -541,7 +557,7 @@ namespace YTSG {
                     }
                 }
 
-                List<koPos> childList = thinkMatedef(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1);
+                List<koPos> childList = thinkMatedef(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, te);
 
                 if (childList?.Count > 0) {
                     te.val -= childList[0].val;
