@@ -498,8 +498,7 @@ namespace YTSG {
 
                         thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
 
-                        cpu.maxDepth = 13;
-                        retList = cpu.thinkMateMove(myTeban, ban, cpu.maxDepth);
+                        retList = cpu.thinkMateMove(myTeban, ban, 15);
 
                         thisProcess.PriorityClass = ProcessPriorityClass.AboveNormal; //優先度普通
 

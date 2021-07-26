@@ -464,8 +464,83 @@ namespace YTSG {
             return teList;
         }
 
-        // 指定位置(tgt)へ次の手で移動可能な駒の移動リスト
+
+        // 指定位置(tgt)へ移動可能な駒の移動リスト
         public List<koPos> baninfoPos(BanInfo ban, int tgt_x, int tgt_y) {
+            //次の手の位置リスト
+            List<koPos> teList = new List<koPos>();
+
+            /* 持ち駒の場合 */
+            if (this.x == 9) {
+                // 駒がない場合のみOK(koSetPos内でチェック)
+                koSetPos(new koPos(this, tgt_x, tgt_y), ban, ref teList, 1);
+            } else {
+                /* 盤上の場合 */
+
+                //先手基準で計算(前:y-1/右:x-1)
+                if ((KoMove[(uint)this.type] & 1) > 0) { //1 : 前
+                    if (koSetPosP(new koPos(this).rMV(0, -1), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
+                }
+                if ((KoMove[(uint)this.type] & 2) > 0) { //2 : 後
+                    if (koSetPosP(new koPos(this).rMV(0, 1), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
+                }
+                if ((KoMove[(uint)this.type] & 4) > 0) { //3 : 左右前
+                    if (koSetPosP(new koPos(this).rMV(-1, -1), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
+                    if (koSetPosP(new koPos(this).rMV( 1, -1), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
+                }
+                if ((KoMove[(uint)this.type] & 8) > 0) { //4 : 左右横
+                    if (koSetPosP(new koPos(this).rMV(-1, 0), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
+                    if (koSetPosP(new koPos(this).rMV(1, 0), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
+                }
+                if ((KoMove[(uint)this.type] & 16) > 0) { //5 : 左右後
+                    if (koSetPosP(new koPos(this).rMV(-1, 1), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
+                    if (koSetPosP(new koPos(this).rMV(1, 1), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
+                }
+                if ((KoMove[(uint)this.type] & 32) > 0) { //6 : 桂馬
+                    if (koSetPosP(new koPos(this).rMV(-1, -2), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
+                    if (koSetPosP(new koPos(this).rMV(1, -2), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
+                }
+                if ((KoMove[(uint)this.type] & 64) > 0) { //7 : 香車
+                    for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
+                        if (koSetPosP(new koPos(this).rMV(1, -i), ban, ref teList, tgt_x, tgt_y) != 0) return teList;
+                    }
+                }
+
+                if ((KoMove[(uint)this.type] & 128) > 0) { //8 : 飛車
+                    for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
+                        if (koSetPosP(new koPos(this).rMV(0, -i), ban, ref teList, tgt_x, tgt_y) != 0) return teList;
+                    }
+                    for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                        if (koSetPosP(new koPos(this).rMV(-i, 0), ban, ref teList, tgt_x, tgt_y) != 0) return teList;
+                    }
+                    for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                        if (koSetPosP(new koPos(this).rMV(i, 0), ban, ref teList, tgt_x, tgt_y) != 0) return teList;
+                    }
+                    for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
+                        if (koSetPosP(new koPos(this).rMV(0, i), ban, ref teList, tgt_x, tgt_y) != 0) return teList;
+                    }
+                }
+                if ((KoMove[(uint)this.type] & 256) > 0) { //9 : 角行
+                    for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                        if (koSetPosP(new koPos(this).rMV(-i, -i), ban, ref teList, tgt_x, tgt_y) != 0) return teList;
+                    }
+                    for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                        if (koSetPosP(new koPos(this).rMV(-i, i), ban, ref teList, tgt_x, tgt_y) != 0) return teList;
+                    }
+                    for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                        if (koSetPosP(new koPos(this).rMV(i, -i), ban, ref teList, tgt_x, tgt_y) != 0) return teList;
+                    }
+                    for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                        if (koSetPosP(new koPos(this).rMV(i, i), ban, ref teList, tgt_x, tgt_y) != 0) return teList;
+                    }
+                }
+            }
+
+            return teList;
+        }
+
+        // 指定位置(tgt)へ次の手で移動可能な駒の移動リスト
+        public List<koPos> baninfoPosNext(BanInfo ban, int tgt_x, int tgt_y) {
             //次の手の位置リスト
             List<koPos> teList = new List<koPos>();
 
@@ -511,7 +586,7 @@ namespace YTSG {
                         if (koSetPos(new koPos(this, tgt_x, tgt_y).rMV(0, -i), ban, ref teList, 1) != 0) break;
                     }
                     for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
-                        if (koSetPos(new koPos(this, tgt_x, tgt_y).rMV(-i, 0), ban, ref teList, 1) != 0) break;
+                        if (koSetPos(new koPos(this, tgt_x, tgt_y).rMV(i, 0), ban, ref teList, 1) != 0) break;
                     }
                 }
                 if ((KoMove[(uint)this.type] & 256) > 0) { //9 : 角行
@@ -663,12 +738,24 @@ namespace YTSG {
         }
 
         //posがtgtかチェック
+        int koSetPosP(koPos pos, BanInfo ban, ref List<koPos> teList, int tgt_x, int tgt_y) {
+            List<koPos> a = new List<koPos>();
+            int ret = koSetPos(pos, ban, ref a, 0);
+            if ((pos.x == tgt_x) && (pos.y == tgt_y)) {
+                teList.AddRange(a);
+                ret = 3;
+            }
+            return ret;
+        }
+
+        //posが次の手でtgtかチェック
         int koSetPosPos(koPos pos, int mv_x, int mv_y, BanInfo ban, ref List<koPos> teList, int tgt_x, int tgt_y) {
             List<koPos> a = new List<koPos>();
             koPos poss = pos.Copy().rMV(mv_x, mv_y);
             int ret = koSetPos(poss, ban, ref a, 0);
             if ((poss.x == tgt_x) && (poss.y == tgt_y)) {
                 teList.Add(pos);
+                ret = 3;
             }
             return ret;
         }
@@ -1094,6 +1181,11 @@ namespace YTSG {
         }
         public List<koPos> discoverCheck_Kyousya(BanInfo ban) {
 
+            return new List<koPos>();
+        }
+
+        //個の駒に飛角香が効いている場所をリスト作成
+        public List<koPos> kikiList(BanInfo ban) {
             return new List<koPos>();
         }
 
