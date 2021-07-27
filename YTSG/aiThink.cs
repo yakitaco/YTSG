@@ -73,7 +73,11 @@ namespace YTSG {
             List<koPos> retList = new List<koPos>();
             int maxScore = -9999999;
 
-            int teCnt = 0; //手の進捗
+            /* 詰み */
+            retList = thinkMateMove(teban, ban, 7);
+            if (retList?.Count > 0) return retList;
+
+                int teCnt = 0; //手の進捗
             Object lockObj = new Object();
 
             ban.renewNifList(teban);  //二歩リスト更新
@@ -390,7 +394,7 @@ namespace YTSG {
 
                     string aaa = "";
                     foreach (var n in nexTe ?? new List<koPos>()) {
-                        aaa += "->[" + n.val + "](" + (n.x + 1) + "," + (n.y + 1) + ")" + n.ko.type;
+                        aaa += "->(" + (n.x + 1) + "," + (n.y + 1) + ")" + n.ko.type;
                     }
 
                     Form1.Form1Instance.addMsg("[" + Task.CurrentId + "]teAll[" + cnt_local + "].val = [" + teAllList[cnt_local].val + "](" + (teAllList[cnt_local].ko.x + 1) + "," + (teAllList[cnt_local].ko.y + 1) + ")->(" + (teAllList[cnt_local].x + 1) + "," + (teAllList[cnt_local].y + 1) + ")" + teAllList[cnt_local].ko.type + aaa);
@@ -443,18 +447,30 @@ namespace YTSG {
             // (王以外の駒で)効きを止める(飛車角香の効きがある場合のみ)
             List<koPos> kikiList = ban.KingKo[teban].kikiList(ban);
 
-
-            if (depth == 1) {
-                /* 盤情報表示 */
-                string bb = ban.showBanInfo();
-
-                string aaa = "";
-                foreach (var n in teAllList ?? new List<koPos>()) {
-                    aaa += "/" + (n.x + 1) + "," + (n.y + 1) + ":" + n.ko.type;
+            foreach (koPos kiki in kikiList ?? new List<koPos>()) {
+                foreach (koma km in ban.OkiKo[teban]) {
+                    if (km.type != KomaType.Ousyou) {
+                        teAllList.AddRange(km.baninfoPos(ban, kiki.x, kiki.y));
+                    }
                 }
-
-                Form1.Form1Instance.addMsg(bb + Environment.NewLine + aaa);
+                for (int i = 0; i < 7; i++) {
+                    if (ban.MochiKo[teban, i]?.Count > 0) {
+                        teAllList.AddRange(ban.MochiKo[teban, i][0].baninfoPos(ban, kiki.x, kiki.y));
+                    }
+                }
             }
+
+            //if (depth == 1) {
+            //    /* 盤情報表示 */
+            //    string bb = ban.showBanInfo();
+            //
+            //    string aaa = "";
+            //    foreach (var n in teAllList ?? new List<koPos>()) {
+            //        aaa += "/" + (n.x + 1) + "," + (n.y + 1) + ":" + n.ko.type;
+            //    }
+            //
+            //    Form1.Form1Instance.addMsg(bb + Environment.NewLine + aaa);
+            //}
 
             //一時的に停止
             //if ((pre.ko.type == KomaType.Hisya) || (pre.ko.type == KomaType.Kakugyou) || (pre.ko.type == KomaType.Ryuuma) || (pre.ko.type == KomaType.Ryuuou) || (pre.ko.type == KomaType.Kyousha)) {
@@ -554,18 +570,18 @@ namespace YTSG {
                 if (ban.MochiKo[teban, i]?.Count > 0) teAllList.AddRange(ban.MochiKo[teban, i][0].baninfoPosNext(ban, ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].x, ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].y));
             }
 
-            if (depth == 999) {
-
-                /* 盤情報表示 */
-                string b = ban.showBanInfo();
-
-                string aaa = "";
-                foreach (var n in teAllList ?? new List<koPos>()) {
-                    aaa += "/" + (n.x + 1) + "," + (n.y + 1) + ":" + n.ko.type;
-                }
-
-                Form1.Form1Instance.addMsg(b + Environment.NewLine + ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].x + "," + ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].y + "->" + aaa);
-            }
+            //if (depth == 999) {
+            //
+            //    /* 盤情報表示 */
+            //    string b = ban.showBanInfo();
+            //
+            //    string aaa = "";
+            //    foreach (var n in teAllList ?? new List<koPos>()) {
+            //        aaa += "/" + (n.x + 1) + "," + (n.y + 1) + ":" + n.ko.type;
+            //    }
+            //
+            //    Form1.Form1Instance.addMsg(b + Environment.NewLine + ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].x + "," + ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].y + "->" + aaa);
+            //}
 
             //foreach (var n in teAllList) {
             //    Form1.Form1Instance.addMsg("<" + depth \+ ">[" + n.val + "](" + (n.ko.x + 1) + "," + (n.ko.y + 1) + ")->(" + (n.x + 1) + "," + (n.y + 1) + ")" + n.ko.type);
@@ -597,7 +613,7 @@ namespace YTSG {
                 if (childList?.Count > 0) {
 
                     // 打ち歩詰め防止
-                    if ((childList?.Count == 1) && (childList[0].val < -5000)&&(te.ko.x == 9)&&(te.ko.type==KomaType.Fuhyou)) {
+                    if ((childList?.Count == 1) && (childList[0].val < -5000) && (te.ko.x == 9) && (te.ko.type == KomaType.Fuhyou)) {
                         continue;
                     }
 

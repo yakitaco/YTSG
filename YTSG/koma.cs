@@ -472,6 +472,10 @@ namespace YTSG {
 
             /* 持ち駒の場合 */
             if (this.x == 9) {
+                if (this.type == KomaType.Fuhyou) {
+                    //TODO: 2歩チェック
+                    if (ban.nifList[this.p, tgt_x] == 1) return teList;
+                }
                 // 駒がない場合のみOK(koSetPos内でチェック)
                 koSetPos(new koPos(this, tgt_x, tgt_y), ban, ref teList, 1);
             } else {
@@ -486,7 +490,7 @@ namespace YTSG {
                 }
                 if ((KoMove[(uint)this.type] & 4) > 0) { //3 : 左右前
                     if (koSetPosP(new koPos(this).rMV(-1, -1), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
-                    if (koSetPosP(new koPos(this).rMV( 1, -1), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
+                    if (koSetPosP(new koPos(this).rMV(1, -1), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
                 }
                 if ((KoMove[(uint)this.type] & 8) > 0) { //4 : 左右横
                     if (koSetPosP(new koPos(this).rMV(-1, 0), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
@@ -548,6 +552,10 @@ namespace YTSG {
             if (this.x == 9) {
                 //先手基準で計算(前:y-1/右:x-1)
                 if ((KoMove[(uint)this.type] & 1) > 0) { //1 : 前
+                    if (this.type == KomaType.Fuhyou) {
+                        //TODO: 2歩チェック
+                        if (ban.nifList[this.p, tgt_x] == 1) return teList;
+                    }
                     koSetPos(new koPos(this, tgt_x, tgt_y).rMV(0, 1), ban, ref teList, 1);
                 }
                 if ((KoMove[(uint)this.type] & 2) > 0) { //2 : 後
@@ -1184,9 +1192,72 @@ namespace YTSG {
             return new List<koPos>();
         }
 
-        //個の駒に飛角香が効いている場所をリスト作成
+        //この駒に飛角香が効いている場所をリスト作成
         public List<koPos> kikiList(BanInfo ban) {
-            return new List<koPos>();
+            List<koPos> retList = new List<koPos>();
+            List<koPos> tmpList = new List<koPos>();    // 一時移動リスト
+            for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
+                if (kikiListPos(new koPos(this).rMV(0, -i), ban, retList, tmpList, 1) != 0) break;
+            }
+            tmpList = new List<koPos>();    // 一時移動リスト
+            for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                if (kikiListPos(new koPos(this).rMV(-i, 0), ban, retList, tmpList, 0) != 0) break;
+            }
+            tmpList = new List<koPos>();    // 一時移動リスト
+            for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                if (kikiListPos(new koPos(this).rMV(i, 0), ban, retList, tmpList, 0) != 0) break;
+            }
+            tmpList = new List<koPos>();    // 一時移動リスト
+            for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
+                if (kikiListPos(new koPos(this).rMV(0, i), ban, retList, tmpList, 0) != 0) break;
+            }
+            tmpList = new List<koPos>();    // 一時移動リスト
+            for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                if (kikiListPos(new koPos(this).rMV(-i, -i), ban, retList, tmpList, 2) != 0) break;
+            }
+            tmpList = new List<koPos>();    // 一時移動リスト
+            for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                if (kikiListPos(new koPos(this).rMV(-i, i), ban, retList, tmpList, 2) != 0) break;
+            }
+            tmpList = new List<koPos>();    // 一時移動リスト
+            for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                if (kikiListPos(new koPos(this).rMV(i, -i), ban, retList, tmpList, 2) != 0) break;
+            }
+            tmpList = new List<koPos>();    // 一時移動リスト
+            for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
+                if (kikiListPos(new koPos(this).rMV(i, i), ban, retList, tmpList, 2) != 0) break;
+            }
+
+            return retList;
+        }
+
+        // type = 0 飛車 1=飛車香車 2= 角
+        int kikiListPos(koPos pos, BanInfo ban, List<koPos> retList, List<koPos> tmpList, int type) {
+
+            // 置き場所が範囲外
+            if ((pos.y < 0) || (pos.x < 0) || (pos.y >= TEIGI.SIZE_SUZI) || (pos.x >= TEIGI.SIZE_DAN)) return -1;
+
+            if (ban.BanKo[pos.x, pos.y] == null) {
+                if (ban.IdouList[this.p, pos.x, pos.y] > 0) {
+                    tmpList.Add(pos);
+                }
+            // 効き対象の駒である
+            } else if (ban.BanKo[pos.x, pos.y].p != this.p) {
+                if ((type == 0) && ((ban.BanKo[pos.x, pos.y].type == KomaType.Hisya)|| (ban.BanKo[pos.x, pos.y].type == KomaType.Ryuuou))) {
+                    retList.AddRange(tmpList);
+                } else if ((type == 1) && ((ban.BanKo[pos.x, pos.y].type == KomaType.Hisya) || (ban.BanKo[pos.x, pos.y].type == KomaType.Ryuuou) || (ban.BanKo[pos.x, pos.y].type == KomaType.Kyousha))) {
+                    retList.AddRange(tmpList);
+                } else if ((type == 2) && ((ban.BanKo[pos.x, pos.y].type == KomaType.Kakugyou) || (ban.BanKo[pos.x, pos.y].type == KomaType.Ryuuma))) {
+                    retList.AddRange(tmpList);
+                }
+                return 1;
+            // その他の駒は対象外
+            } else {
+                return 1;
+            }
+
+
+            return 0;
         }
 
     }
