@@ -226,7 +226,7 @@ namespace YTSG {
             IdouList[3, 7, 5] = 10; // (86銀)
             IdouList[3, 6, 4] = 30; // (75銀)
             IdouList[3, 4, 4] = 30; // (55銀)
-            IdouList[6, 6, 7] = 70; // (78金)
+            IdouList[6, 5, 7] = 70; // (68金)
             IdouList[6, 5, 6] = 140; // (67金)
             IdouList[6, 4, 6] = 130; // (67金)
             IdouList[0, 1, 4] = 170; // (25歩)

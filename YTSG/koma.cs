@@ -1102,14 +1102,9 @@ namespace YTSG {
                     for (int tmp_y = this.y + 1; tmp_y < ban.KingKo[this.ap].y; tmp_y++) {
                         // 味方が一人だけいる場合のみ
                         if (ban.BanKo[this.x, tmp_y] != null) {
-                            if (ban.BanKo[this.x, tmp_y]?.p == this.p) {
-                                if (tmp_koma == null) {
-                                    tmp_koma = ban.BanKo[this.x, tmp_y];
-                                } else {
-                                    tmp_koma = null;
-                                    break;
-                                }
-                            } else if (ban.BanKo[this.x, tmp_y]?.p != this.p) {
+                            if ((ban.BanKo[this.x, tmp_y].p == this.p)&&(tmp_koma == null)) {
+                                tmp_koma = ban.BanKo[this.x, tmp_y];
+                            } else {
                                 tmp_koma = null;
                                 break;
                             }
@@ -1119,14 +1114,9 @@ namespace YTSG {
                     for (int tmp_y = ban.KingKo[this.ap].y + 1; tmp_y < this.y; tmp_y++) {
                         // 味方が一人だけいる場合のみ
                         if (ban.BanKo[this.x, tmp_y] != null) {
-                            if (ban.BanKo[this.x, tmp_y]?.p == this.p) {
-                                if (tmp_koma == null) {
-                                    tmp_koma = ban.BanKo[this.x, tmp_y];
-                                } else {
-                                    tmp_koma = null;
-                                    break;
-                                }
-                            } else if (ban.BanKo[this.x, tmp_y]?.p != this.p) {
+                            if ((ban.BanKo[this.x, tmp_y].p == this.p)&&(tmp_koma == null)) {
+                                tmp_koma = ban.BanKo[this.x, tmp_y];
+                            } else {
                                 tmp_koma = null;
                                 break;
                             }
@@ -1143,14 +1133,9 @@ namespace YTSG {
                     for (int tmp_x = this.x + 1; tmp_x < ban.KingKo[this.ap].x; tmp_x++) {
                         // 味方が一人だけいる場合のみ
                         if (ban.BanKo[tmp_x, this.y] != null) {
-                            if (ban.BanKo[tmp_x, this.y]?.p == this.p) {
-                                if (tmp_koma == null) {
-                                    tmp_koma = ban.BanKo[tmp_x, this.y];
-                                } else {
-                                    tmp_koma = null;
-                                    break;
-                                }
-                            } else if (ban.BanKo[tmp_x, this.y]?.p != this.p) {
+                            if ((ban.BanKo[tmp_x, this.y].p == this.p)&&(tmp_koma == null)) {
+                                tmp_koma = ban.BanKo[tmp_x, this.y];
+                            } else {
                                 tmp_koma = null;
                                 break;
                             }
@@ -1160,14 +1145,9 @@ namespace YTSG {
                     for (int tmp_x = ban.KingKo[this.ap].x + 1; tmp_x < this.x; tmp_x++) {
                         // 味方が一人だけいる場合のみ
                         if (ban.BanKo[tmp_x, this.y] != null) {
-                            if (ban.BanKo[tmp_x, this.y]?.p == this.p) {
-                                if (tmp_koma == null) {
-                                    tmp_koma = ban.BanKo[tmp_x, this.y];
-                                } else {
-                                    tmp_koma = null;
-                                    break;
-                                }
-                            } else if (ban.BanKo[tmp_x, this.y]?.p != this.p) {
+                            if ((ban.BanKo[tmp_x, this.y].p == this.p)&&(tmp_koma == null)) {
+                                tmp_koma = ban.BanKo[tmp_x, this.y];
+                            } else {
                                 tmp_koma = null;
                                 break;
                             }
@@ -1183,13 +1163,115 @@ namespace YTSG {
 
             return retList;
         }
+        
         public List<koPos> discoverCheck_Kakugyou(BanInfo ban) {
+            List<koPos> retList = new List<koPos>();
+            int tmp_x, tmp_y;
+            koma tmp_koma = null;
+            if (ban.KingKo[this.ap].x - ban.KingKo[this.ap].y == this.x - this.y) {
+                if (ban.KingKo[this.ap].y > this.y) {
+                    for (tmp_x = this.x + 1, tmp_y = this.y + 1; tmp_x < ban.KingKo[this.ap].x; tmp_x++, tmp_y++) {
+                        // 味方が一人だけいる場合のみ
+                        if (ban.BanKo[tmp_x, tmp_y] != null) {
+                            if ((ban.BanKo[tmp_x, tmp_y].p == this.p)&&(tmp_koma == null)) {
+                                tmp_koma = ban.BanKo[tmp_x, tmp_y];
+                            } else {
+                                tmp_koma = null;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    for (tmp_x = ban.KingKo[this.ap].x + 1, tmp_y = ban.KingKo[this.ap].y + 1; tmp_y < this.y; tmp_x++, tmp_y++) {
+                        // 味方が一人だけいる場合のみ
+                        if (ban.BanKo[tmp_x, tmp_y] != null) {
+                            if ((ban.BanKo[tmp_x, tmp_y].p == this.p)&&(tmp_koma == null)) {
+                                tmp_koma = ban.BanKo[tmp_x, tmp_y];
+                            } else {
+                                tmp_koma = null;
+                                break;
+                            }
+                        }
+                    }
 
-            return new List<koPos>();
+                }
+                if (tmp_koma != null) {
+                    retList = tmp_koma.baninfo(ban);
+                    retList = retList.Where(o => o.x - o.y != this.x - this.y).ToList(); //さえぎる場所は削除
+                }
+            } else if (ban.KingKo[this.ap].x + ban.KingKo[this.ap].y == this.x + this.y) {
+                if (ban.KingKo[this.ap].x > this.x) {
+                    for (tmp_x = this.x + 1, tmp_y = this.y - 1; tmp_x < ban.KingKo[this.ap].x; tmp_x++, tmp_y--) {
+                        // 味方が一人だけいる場合のみ
+                        if (ban.BanKo[tmp_x, tmp_y] != null) {
+                            if ((ban.BanKo[tmp_x, tmp_y].p == this.p)&&(tmp_koma == null)) {
+                                tmp_koma = ban.BanKo[tmp_x, tmp_y];
+                            } else {
+                                tmp_koma = null;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    for (tmp_x = ban.KingKo[this.ap].x + 1, tmp_y = ban.KingKo[this.ap].y - 1; tmp_x < this.x; tmp_x++, tmp_y--) {
+                        // 味方が一人だけいる場合のみ
+                        if (ban.BanKo[tmp_x, tmp_y] != null) {
+                            if ((ban.BanKo[tmp_x, tmp_y].p == this.p)&&(tmp_koma == null)) {
+                                tmp_koma = ban.BanKo[tmp_x, tmp_y];
+                            } else {
+                                tmp_koma = null;
+                                break;
+                            }
+                        }
+                    }
+
+                }
+                if (tmp_koma != null) {
+                    retList = tmp_koma.baninfo(ban);
+                    retList = retList.Where(o => o.x + o.y != this.x + this.y).ToList(); //さえぎる場所は削除
+                }
+            }
+
+            return retList;
         }
+        
         public List<koPos> discoverCheck_Kyousya(BanInfo ban) {
+            List<koPos> retList = new List<koPos>();
+            koma tmp_koma = null;
+            if (ban.KingKo[this.ap].x == this.x) {
+                if ((ban.KingKo[this.ap].y > this.y)&&(this.p == TEIGI.TEBAN_GOTE)) {
+                    for (int tmp_y = this.y + 1; tmp_y < ban.KingKo[this.ap].y; tmp_y++) {
+                        // 味方が一人だけいる場合のみ
+                        if (ban.BanKo[this.x, tmp_y] != null) {
+                            if ((ban.BanKo[this.x, tmp_y].p == this.p)&&(tmp_koma == null)) {
+                                tmp_koma = ban.BanKo[this.x, tmp_y];
+                            } else {
+                                tmp_koma = null;
+                                break;
+                            }
+                        }
+                    }
+                } else if ((ban.KingKo[this.ap].y < this.y)&&(this.p == TEIGI.TEBAN_SENTE)) {
+                    for (int tmp_y = ban.KingKo[this.ap].y + 1; tmp_y < this.y; tmp_y++) {
+                        // 味方が一人だけいる場合のみ
+                        if (ban.BanKo[this.x, tmp_y] != null) {
+                            if ((ban.BanKo[this.x, tmp_y].p == this.p)&&(tmp_koma == null)) {
+                                tmp_koma = ban.BanKo[this.x, tmp_y];
+                            } else {
+                                tmp_koma = null;
+                                break;
+                            }
+                        }
+                    }
 
-            return new List<koPos>();
+                }
+                if (tmp_koma != null) {
+                    retList = tmp_koma.baninfo(ban);
+                    retList = retList.Where(o => o.x != this.x).ToList(); //さえぎる場所は削除
+                }
+            }
+
+            return retList;
         }
 
         //この駒に飛角香が効いている場所をリスト作成
