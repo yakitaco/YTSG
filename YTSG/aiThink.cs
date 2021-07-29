@@ -68,16 +68,19 @@ namespace YTSG {
         //}
 
         //思考して一手動かす
-        public List<koPos> thinkMove(int teban, BanInfo ban, int depth) {
+        public List<koPos> thinkMove(int teban, BanInfo ban, int depth, int mateDepth, int deepThinkNum, int deepThinkDepth) {
+            maxDepth = depth;
             List<koPos> teAllList = new List<koPos>();
             List<koPos> retList = new List<koPos>();
             int maxScore = -9999999;
 
             /* 詰み */
-            retList = thinkMateMove(teban, ban, 7);
-            if (retList?.Count > 0) return retList;
+            if (mateDepth > 0) {
+                retList = thinkMateMove(teban, ban, mateDepth);
+                if (retList?.Count > 0) return retList;
+            }
 
-                int teCnt = 0; //手の進捗
+            int teCnt = 0; //手の進捗
             Object lockObj = new Object();
 
             ban.renewNifList(teban);  //二歩リスト更新
@@ -149,23 +152,11 @@ namespace YTSG {
                         teAllList[cnt_local].val = -99999;
                         nexTe = new List<koPos>();  // 未使用
                     } else {
-                        if ((cnt_local > 50) && (depth > 4)) {  // 優先度低は深く調べない
-                            nexTe = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, maxScore, teAllList[cnt_local].val, teAllList[cnt_local].ko.type, teAllList[cnt_local].x, teAllList[cnt_local].y);
-                        } else {
-                            nexTe = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, maxScore, teAllList[cnt_local].val, teAllList[cnt_local].ko.type, teAllList[cnt_local].x, teAllList[cnt_local].y);
-                        }
+                        nexTe = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, 1, maxScore, teAllList[cnt_local].val, teAllList[cnt_local].ko.type, teAllList[cnt_local].x, teAllList[cnt_local].y);
 
                         if (nexTe?.Count > 0) {
                             teAllList[cnt_local].val -= nexTe[0].val;// - tekouho.GetKouho(teAllList[cnt_local]);
                         }
-
-
-                        //詰み発見のため残り処理スキップ
-                        //if (teAllList[cnt_local].val > 90000) {
-                        //    lock (lockObj) {
-                        //        teCnt = 999;
-                        //    }
-                        //}
                     }
                     string aaa = "";
                     foreach (var n in nexTe ?? new List<koPos>()) {
@@ -187,8 +178,51 @@ namespace YTSG {
             // リストをランダムに並べ替える
             //teAllList = teAllList.OrderBy(a => Guid.NewGuid()).ToList();
 
-            // 降順にソート
-            //teAllList.Sort((a, b) => b.val - a.val);
+            /* 深読み有効 */
+            if ((deepThinkDepth > 0) && (!stopFlg) && (maxScore < 5000) && (maxScore > -5000)) {
+                maxScore = -9999999;
+                List<koPos> nexTe;
+
+                Form1.Form1Instance.addMsg("Deep Think !!");
+                // 降順にソート
+                teAllList.Sort((a, b) => b.val - a.val);
+
+                for (int cnt_local = 0; cnt_local < deepThinkNum && !stopFlg; cnt_local++) {
+                    if ((teAllList[cnt_local].val > 5000) || (teAllList[cnt_local].val < -5000)) continue;
+
+                    BanInfo ban_local = new BanInfo(ban);
+
+                    koma ko_local;
+                    if (teAllList[cnt_local].ko.x == 9) {
+                        ko_local = ban_local.MochiKo[teban, (int)teAllList[cnt_local].ko.type - 1][0];
+                    } else {
+                        ko_local = ban_local.BanKo[teAllList[cnt_local].ko.x, teAllList[cnt_local].ko.y];
+                    }
+
+                    // 1手動かしてみる
+                    ban_local.moveKoma(ko_local, teAllList[cnt_local], teAllList[cnt_local].nari, false);
+
+                    // 王手は即スキップ
+                    if (ban_local.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local.KingKo[teban].x, ban_local.KingKo[teban].y] > 0) {
+                        teAllList[cnt_local].val = -99999;
+                        nexTe = new List<koPos>();  // 未使用
+                    } else {
+
+                        nexTe = thinkMove(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, deepThinkDepth, 0, 0, 0);
+                        if (nexTe?.Count > 0) {
+                            teAllList[cnt_local].val -= nexTe[0].val;
+                        }
+                    }
+
+                    if (maxScore < teAllList[cnt_local].val) {
+                        maxScore = teAllList[cnt_local].val;
+                        retList = nexTe;
+                        retList.Insert(0, teAllList[cnt_local]);
+                    }
+
+                }
+
+            }
 
             //return teAllList.Find(s => s.val == teAllList.Max(p => p.val));
             return retList;
@@ -220,14 +254,14 @@ namespace YTSG {
 
             //指せる手を全てリスト追加
             foreach (koma km in ban.OkiKo[teban]) {
-                if (depth > 0) {
+                if (depth < maxDepth) {
                     teAllList.AddRange(km.baninfo(ban));
                 } else {
                     teAllList.AddRange(km.baninfo(ban, false));
                 }
             }
             //最下層または王手でない場合は駒打ちを無視
-            if ((depth > 0) || (check == true)) {
+            if ((depth < maxDepth) || (check == true)) {
                 for (int i = 0; i < 7; i++) {
                     if (ban.MochiKo[teban, i]?.Count > 0) {
                         List<koPos> poslist = ban.MochiKo[teban, i][0].baninfo(ban);
@@ -242,7 +276,7 @@ namespace YTSG {
             // 降順にソート
             teAllList.Sort((a, b) => b.val - a.val);
 
-            if ((depth > 0) || (check == true)) {
+            if ((depth < maxDepth) || (check == true)) {
 
                 foreach (koPos te in teAllList) {
                     if (te.val > 5000) {
@@ -271,16 +305,16 @@ namespace YTSG {
 
                     // 王手は即スキップ
                     if (ban_local.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local.KingKo[teban].x, ban_local.KingKo[teban].y] > 0) {
-                        if (score < -999999 + (maxDepth - depth) * 10000) {
+                        if (score < -999999 + depth * 10000) {
                             retList.Clear();
                             retList.Add(te);
-                            te.val = -999999 + (maxDepth - depth) * 10000;
+                            te.val = -999999 + depth * 10000;
                         }
                         continue;
                     }
 
-                    List<koPos> childList = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, te.val, te.ko.type, te.x, te.y);
-                    //te.val -= think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth - 1, score, te.val).val;
+                    List<koPos> childList = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth + 1, score, te.val, te.ko.type, te.x, te.y);
+                    //te.val -= think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, depth + 1, score, te.val).val;
                     //tecount++;
                     //if (tecount> depth*20+10) break;
                     //if (childList.Count > 1) Form1.Form1Instance.addMsg("[" + childList.Count + "]");

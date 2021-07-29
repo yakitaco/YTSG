@@ -394,27 +394,27 @@ namespace YTSG {
                         if ((tesuu == 39) || (tesuu == 40)) tekouho.ResetJoseki();
 
                         if ((tesuu < 20) || (nokori < 60000)) {
-                            cpu.maxDepth = 3;
-                            //ret = cpu.thinkMove(myTeban, ban, 3)[0]; //コンピュータ思考
+                            //cpu.maxDepth = 3;
+                            //ret = cpu.thinkMove(myTeban, ban, 3, 0)[0]; //コンピュータ思考
 
                             aiTaskMain = Task.Run(() => {
-                                return cpu.thinkMove(myTeban, ban, 4);
+                                return cpu.thinkMove(myTeban, ban, 4, 0, 0, 0);
                             });
 
                         } else if ((tesuu < 50) || (nokori < 300000)) {
-                            cpu.maxDepth = 4;
+                            //cpu.maxDepth = 4;
                             //ret = cpu.thinkMove(myTeban, ban, 4)[0]; //コンピュータ思考
 
                             aiTaskMain = Task.Run(() => {
-                                return cpu.thinkMove(myTeban, ban, 4);
+                                return cpu.thinkMove(myTeban, ban, 4, 5, 0, 0);
                             });
 
                         } else {
-                            cpu.maxDepth = 5;
+                            //cpu.maxDepth = 5;
                             //ret = cpu.thinkMove(myTeban, ban, 5)[0]; //コンピュータ思考
 
                             aiTaskMain = Task.Run(() => {
-                                return cpu.thinkMove(myTeban, ban, 5);
+                                return cpu.thinkMove(myTeban, ban, 4, 7, 5, 4);
                             });
 
                         }
@@ -466,27 +466,27 @@ namespace YTSG {
                             if ((tesuu == 39) || (tesuu == 40)) tekouho.ResetJoseki();
 
                             if ((tesuu < 20) || (nokori < 60000)) {
-                                cpu.maxDepth = 4;
+                                //cpu.maxDepth = 4;
                                 //ret = cpu.thinkMove(myTeban, ban, 3)[0]; //コンピュータ思考
 
                                 aiTaskMain = Task.Run(() => {
-                                    return cpu.thinkMove(myTeban, ban, 4);
+                                return cpu.thinkMove(myTeban, ban, 3, 0, 0, 0);
                                 });
 
                             } else if ((tesuu < 50) || (nokori < 300000)) {
-                                cpu.maxDepth = 4;
+                                //cpu.maxDepth = 4;
                                 //ret = cpu.thinkMove(myTeban, ban, 4)[0]; //コンピュータ思考
 
                                 aiTaskMain = Task.Run(() => {
-                                    return cpu.thinkMove(myTeban, ban, 4);
+                                return cpu.thinkMove(myTeban, ban, 4, 5, 0, 0);
                                 });
 
                             } else {
-                                cpu.maxDepth = 5;
+                                //cpu.maxDepth = 5;
                                 //ret = cpu.thinkMove(myTeban, ban, 5)[0]; //コンピュータ思考
 
                                 aiTaskMain = Task.Run(() => {
-                                    return cpu.thinkMove(myTeban, ban, 5);
+                                return cpu.thinkMove(myTeban, ban, 4, 7, 5, 4);
                                 });
 
                             }
