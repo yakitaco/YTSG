@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace YTSG_MKMV {
@@ -38,7 +40,16 @@ namespace YTSG_MKMV {
         static void Main() {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+
+            Form1 form1 = new Form1();
+            Form1.Form1Instance = form1; //Form1Instanceに代入
+
+            //form1.Show();
+            Task.Run(() => {
+                Application.Run(form1); // デバッグフォーム
+                Console.WriteLine("bestmove resign");
+            });
+            Thread.Sleep(1000);
 
 
             Console.WriteLine("id name YT-Shogi Make Move 0.1");
