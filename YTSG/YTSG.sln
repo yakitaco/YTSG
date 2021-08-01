@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.31105.61
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YTSG", "YTSG.csproj", "{48FCFA00-07A7-40AB-AA7C-86FA0472080E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "kmove", "..\kmove\kmove.csproj", "{E528D2E3-47EB-449C-BC4A-2B3C19FD0143}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{48FCFA00-07A7-40AB-AA7C-86FA0472080E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48FCFA00-07A7-40AB-AA7C-86FA0472080E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48FCFA00-07A7-40AB-AA7C-86FA0472080E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E528D2E3-47EB-449C-BC4A-2B3C19FD0143}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E528D2E3-47EB-449C-BC4A-2B3C19FD0143}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E528D2E3-47EB-449C-BC4A-2B3C19FD0143}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E528D2E3-47EB-449C-BC4A-2B3C19FD0143}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

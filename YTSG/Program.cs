@@ -1,4 +1,5 @@
-﻿using System;
+﻿using kmoveDll;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -49,10 +50,11 @@ namespace YTSG {
         public koma ko;
         public bool nari = false;
 
-        public koPos(int _x, int _y) {
+        public koPos(int _x, int _y, bool _nari=false) {
             x = _x;
             y = _y;
             val = 0;
+            nari = _nari;
         }
 
         public koPos(int _x, int _y, int _val) {
@@ -306,6 +308,9 @@ namespace YTSG {
         // 手数によるパラメータ
         static moveParam mPar = new moveParam();
         private static System.Timers.Timer aTimer;
+        public static List<koPos> kifu = new List<koPos>();
+
+        [STAThread]
         static void Main(string[] args) {
             int myTeban = TEIGI.TEBAN_SENTE;
             aiThink cpu = new aiThink();
@@ -315,7 +320,8 @@ namespace YTSG {
 
             int rets = mPar.readParam("");
             rets = mPar.prm[0];
-
+            kmove baseKmv = null;
+            kmove tmpKmv = null;
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
@@ -360,6 +366,11 @@ namespace YTSG {
                 if ((str.Length == 7) && (str.Substring(0, 7) == "isready")) {
                     //Form1.Form1Instance.addMsg("[RECV]" + str);
 
+                    baseKmv = kmove.load();
+                    if (baseKmv == null) {  //読み込まれていない場合は新規作成
+                        baseKmv = new kmove(0, 0, 0, 0, false, 0, 0);
+                    }
+
                     /* (再)初期化処理 */
                     tekouho.ReadJoseki00("");
                     tesuu = 0;
@@ -386,6 +397,17 @@ namespace YTSG {
 
 
                         Form1.Form1Instance.addMsg("[NOKORI]" + nokori);
+
+                        //定跡あり
+                        if ((tmpKmv != null)&&(tmpKmv.nxMove.Count>0)) {
+                            Form1.Form1Instance.addMsg("Hit Move : (" + tmpKmv.nxMove[0].ox + "," + tmpKmv.nxMove[0].oy + ")->(" + tmpKmv.nxMove[0].nx +","+ tmpKmv.nxMove[0].ny+ ")");
+                            if (tmpKmv.nxMove[0].ox == 9) {
+                                Console.WriteLine("bestmove " + usio.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[0].oy,9,9), new koPos(tmpKmv.nxMove[0].nx, tmpKmv.nxMove[0].ny)));  //標準出力
+                            } else {
+                                Console.WriteLine("bestmove " + usio.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[0].oy, tmpKmv.nxMove[0].ox, tmpKmv.nxMove[0].oy), new koPos(tmpKmv.nxMove[0].nx, tmpKmv.nxMove[0].ny, tmpKmv.nxMove[0].nari)));  //標準出力
+                            }
+                            continue;
+                        }
 
                         thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
                         //thisProcess.PriorityClass = ProcessPriorityClass.BelowNormal; //優先度普通
@@ -414,7 +436,7 @@ namespace YTSG {
                             //ret = cpu.thinkMove(myTeban, ban, 5)[0]; //コンピュータ思考
 
                             aiTaskMain = Task.Run(() => {
-                                return cpu.thinkMove(myTeban, ban, 4, 7, 5, 4);
+                                return cpu.thinkMove(myTeban, ban, 4, 7, 7, 4);
                             });
 
                         }
@@ -537,11 +559,14 @@ namespace YTSG {
                             if (retList.Count > 1) {
                                 Console.WriteLine("bestmove " + usio.pos2usi(retList[0].ko, retList[0]) + " ponder " + usio.pos2usi(retList[1].ko, retList[1]));  //標準出力
                                                                                                                                                                   //Console.WriteLine("bestmove " + usio.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                                Form1.Form1Instance.addMsg("[SEND]MOVE:" + retList[0].ko.type + ":(" + (retList[0].ko.x + 1) + "," + (retList[0].ko.y + 1) + ")->(" + (retList[0].x + 1) + "," + (retList[0].y + 1) + ")" + (retList[0].nari == true ? "<NARI>" : "") + 
+                                    " ponder " + retList[1].ko.type + ":(" + (retList[1].ko.x + 1) + "," + (retList[1].ko.y + 1) + ")->(" + (retList[1].x + 1) + "," + (retList[1].y + 1) + ")" + (retList[1].nari == true ? "<NARI>" : "")  + "\n");
 
                             } else {
                                 Console.WriteLine("bestmove " + usio.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                                Form1.Form1Instance.addMsg("[SEND]MOVE:" + retList[0].ko.type + ":(" + (retList[0].ko.x + 1) + "," + (retList[0].ko.y + 1) + ")->(" + (retList[0].x + 1) + "," + (retList[0].y + 1) + ")" + (retList[0].nari == true ? "<NARI>" : "") + "\n");
+                            
                             }
-                            Form1.Form1Instance.addMsg("[SEND]MOVE:" + retList[0].ko.type + ":(" + (retList[0].ko.x + 1) + "," + (retList[0].ko.y + 1) + ")->(" + (retList[0].x + 1) + "," + (retList[0].y + 1) + ")" + (retList[0].nari == true ? "<NARI>" : "") + "\n");
                             ban.moveKoma(retList[0].ko, retList[0], retList[0].nari, false);  //動かす
                             teban = (teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE);
 
@@ -561,7 +586,10 @@ namespace YTSG {
                     teban = TEIGI.TEBAN_SENTE;
                     if (arr[1] == "startpos") {
 
+                        tmpKmv = baseKmv;
+
                         ban = new BanInfo();
+                        kifu = new List<koPos>();
                         startStrPos = 3;
 
                         // 駒落ち or 途中盤面
@@ -569,6 +597,7 @@ namespace YTSG {
 
                         ban = new BanInfo(arr[2], arr[4]);
                         startStrPos = 7;
+                        tmpKmv = null;
 
                         if (arr[3] == "b") {
                             teban = TEIGI.TEBAN_SENTE;
@@ -590,12 +619,41 @@ namespace YTSG {
                         //Form1.Form1Instance.addMsg("[RECV]AITE:" + arr[tesuu + startStrPos]);
                         //駒打ち
                         if (type != KomaType.None) {
+                            dst.ko = ban.MochiKo[teban, (int)type - 1][0];
                             ban.moveKoma(teban, type, dst, false);
+
+                            //駒打ち
+                                src.x = 9;
+                                src.y = (int)type;
+                                nari = false;
                             //駒移動
                         } else {
+                            dst.ko = ban.BanKo[src.x, src.y];
                             ban.moveKoma(src, dst, nari, false);
                         }
+                        kifu.Add(dst);
                         teban = (teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE);
+
+                        if (tmpKmv != null) {
+                            int cnt;
+                            for (cnt = 0; cnt < tmpKmv.nxMove.Count; cnt++) {
+                                Form1.Form1Instance.addMsg("[D][" + cnt + "]" + tmpKmv.nxMove[cnt].ox + "," + tmpKmv.nxMove[cnt].oy + "->" + tmpKmv.nxMove[cnt].nx + "," + tmpKmv.nxMove[cnt].ny);
+
+
+                                // 一致あり(更新)
+                                if ((tmpKmv.nxMove[cnt].ox == src.x) && (tmpKmv.nxMove[cnt].oy == src.y)
+                                    && (tmpKmv.nxMove[cnt].nx == dst.x) && (tmpKmv.nxMove[cnt].ny == dst.y) && (tmpKmv.nxMove[cnt].nari == nari)) {
+                                    tmpKmv = tmpKmv.nxMove[cnt];
+
+                                    break;
+                                }
+                            }
+
+                            // 一致なし(新規作成)
+                            if (cnt == tmpKmv.nxMove.Count) {
+                                tmpKmv = null;
+                            }
+                        }
 
                     }
                     myTeban = teban;

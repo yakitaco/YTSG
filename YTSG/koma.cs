@@ -901,25 +901,37 @@ namespace YTSG {
 
                     // 銀桂香(2段まで)は不成もあり(そのまま入れると次で成になってしまうためコピー)
                     if ((this.type == KomaType.Ginsyou) || (((this.type == KomaType.Keima) || (this.type == KomaType.Kyousha)) && (pos.py > 1))) {
-                        if ((cont) || (ban.IdouList[this.p, pos.x, pos.y] > ban.IdouList[this.ap, pos.x, pos.y])) {
+                        if (cont) {
                             teList.Add(pos.Copy().setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type]));
                         } else {
-                            teList.Add(pos.Copy().setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] - KoScore[(int)this.type]));
+                            if (ban.IdouList[this.p, pos.x, pos.y] > ban.IdouList[this.ap, pos.x, pos.y]) {
+                                teList.Add(pos.Copy().setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] / 2));
+                            } else {
+                                teList.Add(pos.Copy().setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] - KoScore[(int)this.type]));
+                            }
                         }
 
                     }
 
-                    if ((cont) || (ban.IdouList[this.p, pos.x, pos.y] > ban.IdouList[this.ap, pos.x, pos.y])) {
+                    if (cont) {
                         teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] + 150).setNari(true));
                     } else {
-                        teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] + 50 - KoScore[(int)this.type]).setNari(true)); // 劣勢の場所
+                        if (ban.IdouList[this.p, pos.x, pos.y] > ban.IdouList[this.ap, pos.x, pos.y]) {
+                            teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] / 2 + 150).setNari(true));
+                        } else {
+                            teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] + 50 - KoScore[(int)this.type]).setNari(true)); // 劣勢の場所
+                        }
                     }
 
                 } else {
-                    if ((cont) || (ban.IdouList[this.p, pos.x, pos.y] > ban.IdouList[this.ap, pos.x, pos.y])) {
-                        teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] /* + tekouho.GetKouho(this, pos.x, pos.y) */));
+                    if (cont) {
+                        teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type]));
                     } else {
-                        teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] - KoScore[(int)this.type])); // 劣勢の場所
+                        if (ban.IdouList[this.p, pos.x, pos.y] > ban.IdouList[this.ap, pos.x, pos.y]) {
+                            teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] / 2));
+                        } else {
+                            teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] - KoScore[(int)this.type])); // 劣勢の場所
+                        }
                     }
                 }
                 return 2;
@@ -1102,7 +1114,7 @@ namespace YTSG {
                     for (int tmp_y = this.y + 1; tmp_y < ban.KingKo[this.ap].y; tmp_y++) {
                         // 味方が一人だけいる場合のみ
                         if (ban.BanKo[this.x, tmp_y] != null) {
-                            if ((ban.BanKo[this.x, tmp_y].p == this.p)&&(tmp_koma == null)) {
+                            if ((ban.BanKo[this.x, tmp_y].p == this.p) && (tmp_koma == null)) {
                                 tmp_koma = ban.BanKo[this.x, tmp_y];
                             } else {
                                 tmp_koma = null;
@@ -1114,7 +1126,7 @@ namespace YTSG {
                     for (int tmp_y = ban.KingKo[this.ap].y + 1; tmp_y < this.y; tmp_y++) {
                         // 味方が一人だけいる場合のみ
                         if (ban.BanKo[this.x, tmp_y] != null) {
-                            if ((ban.BanKo[this.x, tmp_y].p == this.p)&&(tmp_koma == null)) {
+                            if ((ban.BanKo[this.x, tmp_y].p == this.p) && (tmp_koma == null)) {
                                 tmp_koma = ban.BanKo[this.x, tmp_y];
                             } else {
                                 tmp_koma = null;
@@ -1133,7 +1145,7 @@ namespace YTSG {
                     for (int tmp_x = this.x + 1; tmp_x < ban.KingKo[this.ap].x; tmp_x++) {
                         // 味方が一人だけいる場合のみ
                         if (ban.BanKo[tmp_x, this.y] != null) {
-                            if ((ban.BanKo[tmp_x, this.y].p == this.p)&&(tmp_koma == null)) {
+                            if ((ban.BanKo[tmp_x, this.y].p == this.p) && (tmp_koma == null)) {
                                 tmp_koma = ban.BanKo[tmp_x, this.y];
                             } else {
                                 tmp_koma = null;
@@ -1145,7 +1157,7 @@ namespace YTSG {
                     for (int tmp_x = ban.KingKo[this.ap].x + 1; tmp_x < this.x; tmp_x++) {
                         // 味方が一人だけいる場合のみ
                         if (ban.BanKo[tmp_x, this.y] != null) {
-                            if ((ban.BanKo[tmp_x, this.y].p == this.p)&&(tmp_koma == null)) {
+                            if ((ban.BanKo[tmp_x, this.y].p == this.p) && (tmp_koma == null)) {
                                 tmp_koma = ban.BanKo[tmp_x, this.y];
                             } else {
                                 tmp_koma = null;
@@ -1163,7 +1175,7 @@ namespace YTSG {
 
             return retList;
         }
-        
+
         public List<koPos> discoverCheck_Kakugyou(BanInfo ban) {
             List<koPos> retList = new List<koPos>();
             int tmp_x, tmp_y;
@@ -1173,7 +1185,7 @@ namespace YTSG {
                     for (tmp_x = this.x + 1, tmp_y = this.y + 1; tmp_x < ban.KingKo[this.ap].x; tmp_x++, tmp_y++) {
                         // 味方が一人だけいる場合のみ
                         if (ban.BanKo[tmp_x, tmp_y] != null) {
-                            if ((ban.BanKo[tmp_x, tmp_y].p == this.p)&&(tmp_koma == null)) {
+                            if ((ban.BanKo[tmp_x, tmp_y].p == this.p) && (tmp_koma == null)) {
                                 tmp_koma = ban.BanKo[tmp_x, tmp_y];
                             } else {
                                 tmp_koma = null;
@@ -1185,7 +1197,7 @@ namespace YTSG {
                     for (tmp_x = ban.KingKo[this.ap].x + 1, tmp_y = ban.KingKo[this.ap].y + 1; tmp_y < this.y; tmp_x++, tmp_y++) {
                         // 味方が一人だけいる場合のみ
                         if (ban.BanKo[tmp_x, tmp_y] != null) {
-                            if ((ban.BanKo[tmp_x, tmp_y].p == this.p)&&(tmp_koma == null)) {
+                            if ((ban.BanKo[tmp_x, tmp_y].p == this.p) && (tmp_koma == null)) {
                                 tmp_koma = ban.BanKo[tmp_x, tmp_y];
                             } else {
                                 tmp_koma = null;
@@ -1204,7 +1216,7 @@ namespace YTSG {
                     for (tmp_x = this.x + 1, tmp_y = this.y - 1; tmp_x < ban.KingKo[this.ap].x; tmp_x++, tmp_y--) {
                         // 味方が一人だけいる場合のみ
                         if (ban.BanKo[tmp_x, tmp_y] != null) {
-                            if ((ban.BanKo[tmp_x, tmp_y].p == this.p)&&(tmp_koma == null)) {
+                            if ((ban.BanKo[tmp_x, tmp_y].p == this.p) && (tmp_koma == null)) {
                                 tmp_koma = ban.BanKo[tmp_x, tmp_y];
                             } else {
                                 tmp_koma = null;
@@ -1216,7 +1228,7 @@ namespace YTSG {
                     for (tmp_x = ban.KingKo[this.ap].x + 1, tmp_y = ban.KingKo[this.ap].y - 1; tmp_x < this.x; tmp_x++, tmp_y--) {
                         // 味方が一人だけいる場合のみ
                         if (ban.BanKo[tmp_x, tmp_y] != null) {
-                            if ((ban.BanKo[tmp_x, tmp_y].p == this.p)&&(tmp_koma == null)) {
+                            if ((ban.BanKo[tmp_x, tmp_y].p == this.p) && (tmp_koma == null)) {
                                 tmp_koma = ban.BanKo[tmp_x, tmp_y];
                             } else {
                                 tmp_koma = null;
@@ -1234,16 +1246,16 @@ namespace YTSG {
 
             return retList;
         }
-        
+
         public List<koPos> discoverCheck_Kyousya(BanInfo ban) {
             List<koPos> retList = new List<koPos>();
             koma tmp_koma = null;
             if (ban.KingKo[this.ap].x == this.x) {
-                if ((ban.KingKo[this.ap].y > this.y)&&(this.p == TEIGI.TEBAN_GOTE)) {
+                if ((ban.KingKo[this.ap].y > this.y) && (this.p == TEIGI.TEBAN_GOTE)) {
                     for (int tmp_y = this.y + 1; tmp_y < ban.KingKo[this.ap].y; tmp_y++) {
                         // 味方が一人だけいる場合のみ
                         if (ban.BanKo[this.x, tmp_y] != null) {
-                            if ((ban.BanKo[this.x, tmp_y].p == this.p)&&(tmp_koma == null)) {
+                            if ((ban.BanKo[this.x, tmp_y].p == this.p) && (tmp_koma == null)) {
                                 tmp_koma = ban.BanKo[this.x, tmp_y];
                             } else {
                                 tmp_koma = null;
@@ -1251,11 +1263,11 @@ namespace YTSG {
                             }
                         }
                     }
-                } else if ((ban.KingKo[this.ap].y < this.y)&&(this.p == TEIGI.TEBAN_SENTE)) {
+                } else if ((ban.KingKo[this.ap].y < this.y) && (this.p == TEIGI.TEBAN_SENTE)) {
                     for (int tmp_y = ban.KingKo[this.ap].y + 1; tmp_y < this.y; tmp_y++) {
                         // 味方が一人だけいる場合のみ
                         if (ban.BanKo[this.x, tmp_y] != null) {
-                            if ((ban.BanKo[this.x, tmp_y].p == this.p)&&(tmp_koma == null)) {
+                            if ((ban.BanKo[this.x, tmp_y].p == this.p) && (tmp_koma == null)) {
                                 tmp_koma = ban.BanKo[this.x, tmp_y];
                             } else {
                                 tmp_koma = null;
@@ -1323,9 +1335,9 @@ namespace YTSG {
                 if (ban.IdouList[this.p, pos.x, pos.y] > 0) {
                     tmpList.Add(pos);
                 }
-            // 効き対象の駒である
+                // 効き対象の駒である
             } else if (ban.BanKo[pos.x, pos.y].p != this.p) {
-                if ((type == 0) && ((ban.BanKo[pos.x, pos.y].type == KomaType.Hisya)|| (ban.BanKo[pos.x, pos.y].type == KomaType.Ryuuou))) {
+                if ((type == 0) && ((ban.BanKo[pos.x, pos.y].type == KomaType.Hisya) || (ban.BanKo[pos.x, pos.y].type == KomaType.Ryuuou))) {
                     retList.AddRange(tmpList);
                 } else if ((type == 1) && ((ban.BanKo[pos.x, pos.y].type == KomaType.Hisya) || (ban.BanKo[pos.x, pos.y].type == KomaType.Ryuuou) || (ban.BanKo[pos.x, pos.y].type == KomaType.Kyousha))) {
                     retList.AddRange(tmpList);
@@ -1333,7 +1345,7 @@ namespace YTSG {
                     retList.AddRange(tmpList);
                 }
                 return 1;
-            // その他の駒は対象外
+                // その他の駒は対象外
             } else {
                 return 1;
             }

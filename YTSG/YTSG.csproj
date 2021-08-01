@@ -88,5 +88,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\kmove\kmove.csproj">
+      <Project>{e528d2e3-47eb-449c-bc4a-2b3c19fd0143}</Project>
+      <Name>kmove</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

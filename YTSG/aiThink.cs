@@ -92,6 +92,12 @@ namespace YTSG {
 
                 foreach (koPos pos in poslist) {
                     if (ban.BanKo[pos.x, pos.y] == null) pos.val += tekouho.GetKouho(pos);
+                    for (int i = Program.kifu.Count - 1; i>=0 && i > Program.kifu.Count - 8; i -= 2) {
+                        if ((pos.x == Program.kifu[i].x) && (pos.y == Program.kifu[i].y) && (pos.ko.type == Program.kifu[i].ko.type)){
+                            pos.val -= 500;
+                        }
+                    }
+
                 }
                 teAllList.AddRange(poslist);
             }
@@ -104,6 +110,11 @@ namespace YTSG {
                             pos.val -= 100;  // 味方連携無し
                         } else {
                             pos.val -= 20;  // 味方連携有り
+                        }
+                        for (int ii = Program.kifu.Count - 1; ii >= 0 && ii > Program.kifu.Count - 8; ii -= 2) {
+                            if ((pos.x == Program.kifu[ii].x) && (pos.y == Program.kifu[ii].y) && (pos.ko.type == Program.kifu[ii].ko.type)) {
+                                pos.val -= 500;
+                            }
                         }
                     }
                     teAllList.AddRange(poslist);
@@ -208,6 +219,9 @@ namespace YTSG {
                         nexTe = new List<koPos>();  // 未使用
                     } else {
 
+                        /* 盤情報表示 */
+                        string b = ban_local.showBanInfo();
+                        Form1.Form1Instance.addMsg("" + b);
                         nexTe = thinkMove(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, deepThinkDepth, 0, 0, 0);
                         if (nexTe?.Count > 0) {
                             teAllList[cnt_local].val -= nexTe[0].val;
