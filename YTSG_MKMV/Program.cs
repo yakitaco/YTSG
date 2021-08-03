@@ -44,6 +44,8 @@ namespace YTSG_MKMV {
 
             Form1 form1 = new Form1();
             Form1.Form1Instance = form1; //Form1Instanceに代入
+            int[,,] hyouka = new int[2, 99, 2];
+            int[] currentHyouka = new int[2];
 
             //form1.Show();
             Task.Run(() => {
@@ -62,7 +64,7 @@ namespace YTSG_MKMV {
             int teban = 0;
             int tesuu = 0;
             kmove baseKmv = null;
-            int val = 100;
+            //int val = 100;
             usiIO usio = new usiIO();
 
             while (true) {
@@ -73,12 +75,28 @@ namespace YTSG_MKMV {
                     if (baseKmv == null) {  //読み込まれていない場合は新規作成
                         baseKmv = new kmove(0, 0, 0, 0, false, 0, 0);
                     }
-                    Console.WriteLine("readyok");
 
                 } else if ((str.Length > 1) && (str.Substring(0, 2) == "go")) {
                     Console.WriteLine("bestmove resign");
 
                 } else if ((str.Length > 7) && (str.Substring(0, 8) == "position")) {
+
+                    /* 評価値情報をロード(先手・後手) */
+                    for (int i = 0; i < 2; i++) {
+                        string[] hyoStr = Form1.Form1Instance.getHyokaText(i, out int len);
+
+                        for (int j = 0; j < hyoStr.Length; j++) {
+                            Form1.Form1Instance.addMsg("[" + i + "," + j + "] " + hyoStr[j]);
+                            string[] arrs = hyoStr[j].Split(',');
+                            if (arrs.Length > 1) {
+                                if ((Int32.TryParse(arrs[0], out int tmp1)) && (Int32.TryParse(arrs[1], out int tmp2))) {
+                                    hyouka[i, j, 0] = tmp1;
+                                    hyouka[i, j, 1] = tmp2;
+                                }
+                            }
+                        }
+                    }
+
                     //lmv追加
                     string[] arr = str.Split(' ');
 
@@ -90,6 +108,10 @@ namespace YTSG_MKMV {
 
                         // 手を更新
                         for (tesuu = 0; tesuu + 3 < arr.Length; tesuu++) {
+
+                            if ((hyouka[teban, currentHyouka[teban]+1,0] <= tesuu)&&(hyouka[teban, currentHyouka[teban] + 1, 0] > hyouka[teban, currentHyouka[teban], 0])) {
+                                currentHyouka[teban]++;
+                            }
 
                             KomaType type;
                             koPos src = new koPos(0, 0);
@@ -106,8 +128,6 @@ namespace YTSG_MKMV {
                                 nari = false;
                             }
 
-                            teban = (teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE);
-
                             int cnt;
                             for (cnt = 0; cnt < tmpKmv.nxMove.Count; cnt++) {
                                 // 一致あり(更新)
@@ -117,9 +137,9 @@ namespace YTSG_MKMV {
                                     // 評価値の更新
                                     tmpKmv.nxMove[cnt].weight++;
                                     tmpKmv.val -= tmpKmv.nxMove[cnt].val;
-                                    tmpKmv.nxMove[cnt].val += val / tmpKmv.nxMove[cnt].weight;
+                                    tmpKmv.nxMove[cnt].val += hyouka[teban, currentHyouka[teban], 1] / tmpKmv.nxMove[cnt].weight;
                                     if (tmpKmv.nxMove[cnt].val > 0) tmpKmv.val += tmpKmv.nxMove[cnt].val;
-
+                                    Form1.Form1Instance.addMsg("ADD: (" + src.x + "," + src.y + ")->(" + dst.x + "," + dst.y + ") val=" + hyouka[teban, currentHyouka[teban], 1]);
                                     tmpKmv = tmpKmv.nxMove[cnt];
 
                                     break;
@@ -128,13 +148,16 @@ namespace YTSG_MKMV {
 
                             // 一致なし(新規作成)
                             if (cnt == tmpKmv.nxMove.Count) {
-                                kmove nkm = new kmove(src.x, src.y, dst.x, dst.y, nari, val, 1);
+                                kmove nkm = new kmove(src.x, src.y, dst.x, dst.y, nari, hyouka[teban, currentHyouka[teban], 1], 1);
                                 tmpKmv.nxMove.Add(nkm);
-                                if (val > 0) tmpKmv.val += val;
-
+                                if (hyouka[teban, currentHyouka[teban], 1] > 0) tmpKmv.val += hyouka[teban, currentHyouka[teban], 1];
+                                Form1.Form1Instance.addMsg("NEW: (" + src.x + "," + src.y + ")->(" + dst.x + "," + dst.y + ") val=" + hyouka[teban, currentHyouka[teban], 1]);
                                 tmpKmv = nkm;
 
                             }
+
+                            teban = (teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE);
+
 
                         }
 

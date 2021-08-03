@@ -45,6 +45,22 @@ namespace kmoveDll {
             return loadedData;
         }
 
+        public static kmove load(string filePath) {
+            //開くファイルを選択するダイアログを開く
+            kmove loadedData = null;
+            if (System.IO.File.Exists(filePath)) {
+                //ファイルを読込
+                Stream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                BinaryFormatter binaryFormatter = new BinaryFormatter();
+                loadedData = (kmove)binaryFormatter.Deserialize(fileStream);
+                fileStream.Close();
+            } else {
+                MessageBox.Show("'" + filePath + "'は存在しません。");
+            }
+
+            return loadedData;
+        }
+
         //ファイルへセーブ
         public bool save() {
             //保存先を指定するダイアログを開く

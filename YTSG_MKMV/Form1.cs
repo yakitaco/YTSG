@@ -47,9 +47,24 @@ namespace YTSG_MKMV {
             textBox1.ResetText();
         }
 
-        public string getText() {
-            return textBox1.Text;
+        public string[] getHyokaText(int teban, out int len) {
+            if (teban == 0) {
+                len = hyokaBox1.Lines.Length;
+                return hyokaBox1.Lines;
+            } else {
+                len = hyokaBox2.Lines.Length;
+                return hyokaBox2.Lines;
+            }
         }
 
+        private void StartButton_Click(object sender, EventArgs e) {
+            //暫定処理
+            Console.WriteLine("readyok");
+            StartButton.Enabled = false;
+        }
+
+        private void hyokaBox2_TextChanged(object sender, EventArgs e) {
+
+        }
     }
 }
