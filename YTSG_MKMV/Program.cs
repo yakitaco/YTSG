@@ -136,10 +136,10 @@ namespace YTSG_MKMV {
 
                                     // 評価値の更新
                                     tmpKmv.nxMove[cnt].weight++;
-                                    tmpKmv.val -= tmpKmv.nxMove[cnt].val;
+                                    tmpKmv.nxSum -= tmpKmv.nxMove[cnt].val;
                                     tmpKmv.nxMove[cnt].val += hyouka[teban, currentHyouka[teban], 1] / tmpKmv.nxMove[cnt].weight;
-                                    if (tmpKmv.nxMove[cnt].val > 0) tmpKmv.val += tmpKmv.nxMove[cnt].val;
-                                    Form1.Form1Instance.addMsg("ADD: (" + src.x + "," + src.y + ")->(" + dst.x + "," + dst.y + ") val=" + hyouka[teban, currentHyouka[teban], 1]);
+                                    if (tmpKmv.nxMove[cnt].val > 0) tmpKmv.nxSum += tmpKmv.nxMove[cnt].val;
+                                    Form1.Form1Instance.addMsg("ADD: (" + src.x + "," + src.y + ")->(" + dst.x + "," + dst.y + ") val= " + hyouka[teban, currentHyouka[teban], 1]);
                                     tmpKmv = tmpKmv.nxMove[cnt];
 
                                     break;
@@ -150,8 +150,9 @@ namespace YTSG_MKMV {
                             if (cnt == tmpKmv.nxMove.Count) {
                                 kmove nkm = new kmove(src.x, src.y, dst.x, dst.y, nari, hyouka[teban, currentHyouka[teban], 1], 1);
                                 tmpKmv.nxMove.Add(nkm);
-                                if (hyouka[teban, currentHyouka[teban], 1] > 0) tmpKmv.val += hyouka[teban, currentHyouka[teban], 1];
-                                Form1.Form1Instance.addMsg("NEW: (" + src.x + "," + src.y + ")->(" + dst.x + "," + dst.y + ") val=" + hyouka[teban, currentHyouka[teban], 1]);
+                                nkm.val = hyouka[teban, currentHyouka[teban], 1];
+                                if (nkm.val > 0) tmpKmv.nxSum += nkm.val;
+                                Form1.Form1Instance.addMsg("NEW: (" + src.x + "," + src.y + ")->(" + dst.x + "," + dst.y + ") val=" + nkm.val);
                                 tmpKmv = nkm;
 
                             }

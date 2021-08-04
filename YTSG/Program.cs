@@ -319,6 +319,8 @@ namespace YTSG {
             Task<List<koPos>> aiTaskMain = null;
             List<koPos> mateMove = null; // 詰みの手筋
 
+            Random rnd = new System.Random();
+
             int rets = mPar.readParam("");
             rets = mPar.prm[0];
             kmove baseKmv = null;
@@ -371,6 +373,8 @@ namespace YTSG {
                     tekouho.ReadJoseki00("");
                     tesuu = 0;
 
+                    baseKmv = kmove.load();
+
                     Thread.Sleep(1000);
                     Console.WriteLine("readyok");
                     Form1.Form1Instance.addMsg("[SEND]readyok");
@@ -395,14 +399,26 @@ namespace YTSG {
                         Form1.Form1Instance.addMsg("[NOKORI]" + nokori);
 
                         //定跡あり
-                        if ((tmpKmv != null) && (tmpKmv.nxMove.Count > 0)) {
-                            Form1.Form1Instance.addMsg("Hit Move : (" + tmpKmv.nxMove[0].ox + "," + tmpKmv.nxMove[0].oy + ")->(" + tmpKmv.nxMove[0].nx + "," + tmpKmv.nxMove[0].ny + "):" + tmpKmv.nxMove[0].val);
-                            if (tmpKmv.nxMove[0].ox == 9) {
-                                Console.WriteLine("bestmove " + usio.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[0].oy, 9, 9), new koPos(tmpKmv.nxMove[0].nx, tmpKmv.nxMove[0].ny)));  //標準出力
-                            } else {
-                                Console.WriteLine("bestmove " + usio.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[0].oy, tmpKmv.nxMove[0].ox, tmpKmv.nxMove[0].oy), new koPos(tmpKmv.nxMove[0].nx, tmpKmv.nxMove[0].ny, tmpKmv.nxMove[0].nari)));  //標準出力
+                        if (tmpKmv != null)Form1.Form1Instance.addMsg("AAA" + tmpKmv.nxSum);
+                        if ((tmpKmv != null) && (tmpKmv.nxSum > 0)) {
+                            int rVal = rnd.Next(0, tmpKmv.nxSum);
+                            int i;
+                            for (i=0;i< tmpKmv.nxMove.Count; i++) {
+                                if (tmpKmv.nxMove[i].val < 0) continue;
+                                if (rVal> tmpKmv.nxMove[i].val) {
+                                    rVal -= tmpKmv.nxMove[i].val;
+                                    continue;
+                                }
+                                Form1.Form1Instance.addMsg("Hit Move : (" + tmpKmv.nxMove[i].ox + "," + tmpKmv.nxMove[i].oy + ")->(" + tmpKmv.nxMove[i].nx + "," + tmpKmv.nxMove[i].ny + "):" + tmpKmv.nxMove[i].val);
+                                if (tmpKmv.nxMove[i].ox == 9) {
+                                    Console.WriteLine("bestmove " + usio.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, 9, 9), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny)));  //標準出力
+                                } else {
+                                    Console.WriteLine("bestmove " + usio.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, tmpKmv.nxMove[i].ox, tmpKmv.nxMove[i].oy), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny, tmpKmv.nxMove[i].nari)));  //標準出力
+                                }
+                                break;
                             }
-                            continue;
+                            if (i< tmpKmv.nxMove.Count) continue; // 定跡ありのためスキップ
+
                         }
 
                         thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
@@ -633,7 +649,7 @@ namespace YTSG {
                         if (tmpKmv != null) {
                             int cnt;
                             for (cnt = 0; cnt < tmpKmv.nxMove.Count; cnt++) {
-                                Form1.Form1Instance.addMsg("[D][" + cnt + "]" + tmpKmv.nxMove[cnt].ox + "," + tmpKmv.nxMove[cnt].oy + "->" + tmpKmv.nxMove[cnt].nx + "," + tmpKmv.nxMove[cnt].ny);
+                                Form1.Form1Instance.addMsg("[D][" + cnt + "]" + tmpKmv.nxMove[cnt].ox + "," + tmpKmv.nxMove[cnt].oy + "->" + tmpKmv.nxMove[cnt].nx + "," + tmpKmv.nxMove[cnt].ny + ":" +tmpKmv.nxMove[cnt].nxSum);
 
 
                                 // 一致あり(更新)
@@ -677,12 +693,12 @@ namespace YTSG {
                     string[] arr = str.Split(' ');
 
                     if (arr[2] == "BookFile") {
-                        baseKmv = kmove.load(arr[4]);
+                        //baseKmv = kmove.load(arr[4]);
                         //baseKmv = kmove.load();
 
-                        if (baseKmv == null) {  //読み込まれていない場合は新規作成
-                            baseKmv = new kmove(0, 0, 0, 0, false, 0, 0);
-                        }
+                        //if (baseKmv == null) {  //読み込まれていない場合は新規作成
+                        //    baseKmv = new kmove(0, 0, 0, 0, false, 0, 0);
+                        //}
                     }
 
                 } else if ((str.Length > 8) && (str.Substring(0, 8) == "gameover")) {
