@@ -373,7 +373,7 @@ namespace YTSG {
                     tekouho.ReadJoseki00("");
                     tesuu = 0;
 
-                    baseKmv = kmove.load();
+                    //baseKmv = kmove.load();
 
                     Thread.Sleep(1000);
                     Console.WriteLine("readyok");
@@ -648,21 +648,20 @@ namespace YTSG {
 
                         if (tmpKmv != null) {
                             int cnt;
-                            for (cnt = 0; cnt < tmpKmv.nxMove.Count; cnt++) {
+                            int num = tmpKmv.nxMove.Count;
+                            for (cnt = 0; cnt < num; cnt++) {
                                 Form1.Form1Instance.addMsg("[D][" + cnt + "]" + tmpKmv.nxMove[cnt].ox + "," + tmpKmv.nxMove[cnt].oy + "->" + tmpKmv.nxMove[cnt].nx + "," + tmpKmv.nxMove[cnt].ny + ":" +tmpKmv.nxMove[cnt].nxSum);
-
 
                                 // 一致あり(更新)
                                 if ((tmpKmv.nxMove[cnt].ox == src.x) && (tmpKmv.nxMove[cnt].oy == src.y)
                                     && (tmpKmv.nxMove[cnt].nx == dst.x) && (tmpKmv.nxMove[cnt].ny == dst.y) && (tmpKmv.nxMove[cnt].nari == nari)) {
                                     tmpKmv = tmpKmv.nxMove[cnt];
-
                                     break;
                                 }
                             }
 
                             // 一致なし(新規作成)
-                            if (cnt == tmpKmv.nxMove.Count) {
+                            if (cnt == num) {
                                 tmpKmv = null;
                             }
                         }
@@ -693,7 +692,8 @@ namespace YTSG {
                     string[] arr = str.Split(' ');
 
                     if (arr[2] == "BookFile") {
-                        //baseKmv = kmove.load(arr[4]);
+                        baseKmv = kmove.load(arr[4]);
+                        Form1.Form1Instance.addMsg("[BOOK]" + arr[4]);
                         //baseKmv = kmove.load();
 
                         //if (baseKmv == null) {  //読み込まれていない場合は新規作成
