@@ -399,13 +399,13 @@ namespace YTSG {
                         Form1.Form1Instance.addMsg("[NOKORI]" + nokori);
 
                         //定跡あり
-                        if (tmpKmv != null)Form1.Form1Instance.addMsg("AAA" + tmpKmv.nxSum);
+                        if (tmpKmv != null) Form1.Form1Instance.addMsg("AAA" + tmpKmv.nxSum);
                         if ((tmpKmv != null) && (tmpKmv.nxSum > 0)) {
                             int rVal = rnd.Next(0, tmpKmv.nxSum);
                             int i;
-                            for (i=0;i< tmpKmv.nxMove.Count; i++) {
+                            for (i = 0; i < tmpKmv.nxMove.Count; i++) {
                                 if (tmpKmv.nxMove[i].val < 0) continue;
-                                if (rVal> tmpKmv.nxMove[i].val) {
+                                if (rVal > tmpKmv.nxMove[i].val) {
                                     rVal -= tmpKmv.nxMove[i].val;
                                     continue;
                                 }
@@ -417,7 +417,7 @@ namespace YTSG {
                                 }
                                 break;
                             }
-                            if (i< tmpKmv.nxMove.Count) continue; // 定跡ありのためスキップ
+                            if (i < tmpKmv.nxMove.Count) continue; // 定跡ありのためスキップ
 
                         }
 
@@ -489,8 +489,13 @@ namespace YTSG {
 
                         // 先読み
                     } else if (arr[1] == "ponder") {
-                        // 詰みが見えてない場合のみ
-                        if (mateMove == null) {
+
+                        // 詰みが見える場合は何もしない
+                        if (mateMove?.Count > 0) {
+                            Form1.Form1Instance.addMsg("Think Ponder. <<mate>>" + mateMove.Count);
+
+                        // 詰みが見えてない場合のみ先読み実施
+                        } else {
                             Form1.Form1Instance.addMsg("Think Ponder.");
 
                             thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
@@ -562,6 +567,7 @@ namespace YTSG {
                     } else {
                         Form1.Form1Instance.addMsg("ponder hit!!");
                         List<koPos> retList;
+                        //Thread.Sleep(5000);  //早いと先読みthread開始前に読み取ってしまうためwait
                         retList = aiTaskMain.Result;
 
                         if ((retList?.Count == 0) || (retList[0].val < -5000)) { //投了
@@ -650,7 +656,7 @@ namespace YTSG {
                             int cnt;
                             int num = tmpKmv.nxMove.Count;
                             for (cnt = 0; cnt < num; cnt++) {
-                                Form1.Form1Instance.addMsg("[D][" + cnt + "]" + tmpKmv.nxMove[cnt].ox + "," + tmpKmv.nxMove[cnt].oy + "->" + tmpKmv.nxMove[cnt].nx + "," + tmpKmv.nxMove[cnt].ny + ":" +tmpKmv.nxMove[cnt].nxSum);
+                                Form1.Form1Instance.addMsg("[D][" + cnt + "]" + tmpKmv.nxMove[cnt].ox + "," + tmpKmv.nxMove[cnt].oy + "->" + tmpKmv.nxMove[cnt].nx + "," + tmpKmv.nxMove[cnt].ny + ":" + tmpKmv.nxMove[cnt].nxSum);
 
                                 // 一致あり(更新)
                                 if ((tmpKmv.nxMove[cnt].ox == src.x) && (tmpKmv.nxMove[cnt].oy == src.y)
