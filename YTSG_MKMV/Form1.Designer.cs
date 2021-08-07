@@ -32,6 +32,7 @@ namespace YTSG_MKMV {
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
             this.StartButton = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -123,6 +124,7 @@ namespace YTSG_MKMV {
             // 
             // splitContainer2.Panel2
             // 
+            this.splitContainer2.Panel2.Controls.Add(this.button1);
             this.splitContainer2.Panel2.Controls.Add(this.StartButton);
             this.splitContainer2.Panel2.Controls.Add(this.textBox1);
             this.splitContainer2.Size = new System.Drawing.Size(800, 450);
@@ -133,7 +135,7 @@ namespace YTSG_MKMV {
             // 
             this.StartButton.Location = new System.Drawing.Point(3, 3);
             this.StartButton.Name = "StartButton";
-            this.StartButton.Size = new System.Drawing.Size(785, 29);
+            this.StartButton.Size = new System.Drawing.Size(646, 29);
             this.StartButton.TabIndex = 2;
             this.StartButton.Text = "Start";
             this.StartButton.UseVisualStyleBackColor = true;
@@ -151,6 +153,16 @@ namespace YTSG_MKMV {
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox1.Size = new System.Drawing.Size(794, 141);
             this.textBox1.TabIndex = 3;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(655, 3);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(133, 29);
+            this.button1.TabIndex = 4;
+            this.button1.Text = "Setting";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // Form1
             // 
@@ -185,6 +197,7 @@ namespace YTSG_MKMV {
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button StartButton;
+        private System.Windows.Forms.Button button1;
     }
 }
 

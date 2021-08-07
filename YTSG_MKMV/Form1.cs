@@ -66,5 +66,15 @@ namespace YTSG_MKMV {
         private void hyokaBox2_TextChanged(object sender, EventArgs e) {
 
         }
+        [STAThread]
+        private void button1_Click(object sender, EventArgs e) {
+            //mvSetForm mvForm = new mvSetForm();
+            //mvForm.Show();
+            //Application.Run(mvForm);
+            this.Hide();
+            mvSetForm f = new mvSetForm();
+            f.ShowDialog();
+            f.Dispose();
+        }
     }
 }
