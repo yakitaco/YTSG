@@ -54,6 +54,7 @@ namespace YTSG_MKMV {
             this.button1.TabIndex = 0;
             this.button1.Text = "Exit";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // button2
             // 
@@ -86,6 +87,7 @@ namespace YTSG_MKMV {
             this.listBox1.Size = new System.Drawing.Size(235, 251);
             this.listBox1.TabIndex = 3;
             this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
+            this.listBox1.DoubleClick += new System.EventHandler(this.listBox1_DoubleClick);
             // 
             // button4
             // 

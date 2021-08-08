@@ -30,9 +30,9 @@ namespace YTSG_MKMV {
             this.hyokaBox1 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
+            this.button1 = new System.Windows.Forms.Button();
             this.StartButton = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -131,6 +131,17 @@ namespace YTSG_MKMV {
             this.splitContainer2.SplitterDistance = 264;
             this.splitContainer2.TabIndex = 3;
             // 
+            // button1
+            // 
+            this.button1.Enabled = false;
+            this.button1.Location = new System.Drawing.Point(655, 3);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(133, 29);
+            this.button1.TabIndex = 4;
+            this.button1.Text = "Setting";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // StartButton
             // 
             this.StartButton.Location = new System.Drawing.Point(3, 3);
@@ -153,16 +164,6 @@ namespace YTSG_MKMV {
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox1.Size = new System.Drawing.Size(794, 141);
             this.textBox1.TabIndex = 3;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(655, 3);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(133, 29);
-            this.button1.TabIndex = 4;
-            this.button1.Text = "Setting";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // Form1
             // 

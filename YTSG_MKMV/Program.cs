@@ -34,6 +34,9 @@ namespace YTSG_MKMV {
     }
 
     static class Program {
+
+        public static kmove baseKmv = null;
+
         /// <summary>
         /// アプリケーションのメイン エントリ ポイントです。
         /// </summary>
@@ -63,7 +66,6 @@ namespace YTSG_MKMV {
 
             int teban = 0;
             int tesuu = 0;
-            kmove baseKmv = null;
             //int val = 100;
             usiIO usio = new usiIO();
 
@@ -168,6 +170,12 @@ namespace YTSG_MKMV {
                     //kmv 保存
                     baseKmv.save();
 
+                } else if ((str.Length > 3) && (str.Substring(0, 4) == "open")) {
+                    mvSetForm f = new mvSetForm();
+                    Application.Run(f);
+                    //kmv 保存
+                    //baseKmv.save();
+
                 } else {
                     /* 無視 */
                 }
@@ -175,5 +183,8 @@ namespace YTSG_MKMV {
 
 
         }
+
+
+        
     }
 }
