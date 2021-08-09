@@ -131,10 +131,12 @@ namespace YTSG_MKMV {
                             }
 
                             int cnt;
+                            kmove tmps = tmpKmv;
                             for (cnt = 0; cnt < tmpKmv.nxMove.Count; cnt++) {
+                                tmps = tmpKmv;
                                 // 一致あり(更新)
-                                if ((tmpKmv.nxMove[cnt].ox == src.x) && (tmpKmv.nxMove[cnt].ox == src.y)
-                                    && (tmpKmv.nxMove[cnt].nx == dst.x) && (tmpKmv.nxMove[cnt].nx == dst.y) && (tmpKmv.nxMove[cnt].nari == nari)) {
+                                if ((tmpKmv.nxMove[cnt].ox == src.x) && (tmpKmv.nxMove[cnt].oy == src.y)
+                                    && (tmpKmv.nxMove[cnt].nx == dst.x) && (tmpKmv.nxMove[cnt].ny == dst.y) && (tmpKmv.nxMove[cnt].nari == nari)) {
 
                                     // 評価値の更新
                                     tmpKmv.nxMove[cnt].weight++;
@@ -149,13 +151,13 @@ namespace YTSG_MKMV {
                             }
 
                             // 一致なし(新規作成)
-                            if (cnt == tmpKmv.nxMove.Count) {
+                            if (cnt == tmps.nxMove.Count) {
                                 kmove nkm = new kmove(src.x, src.y, dst.x, dst.y, nari, hyouka[teban, currentHyouka[teban], 1], 1);
-                                tmpKmv.nxMove.Add(nkm);
+                                tmps.nxMove.Add(nkm);
                                 nkm.val = hyouka[teban, currentHyouka[teban], 1];
-                                if (nkm.val > 0) tmpKmv.nxSum += nkm.val;
+                                if (nkm.val > 0) tmps.nxSum += nkm.val;
                                 Form1.Form1Instance.addMsg("NEW: (" + src.x + "," + src.y + ")->(" + dst.x + "," + dst.y + ") val=" + nkm.val);
-                                tmpKmv = nkm;
+                                tmps = nkm;
 
                             }
 
