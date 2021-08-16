@@ -347,26 +347,25 @@ namespace YTSG {
 
             Form1.Form1Instance.resetMsg();
 
-            Console.WriteLine("id name YT-Shogi 0.1");
-            Console.WriteLine("id authoer YAKITACO");
-            Console.WriteLine("option name BookFile type string default public.bin");
-            Console.WriteLine("option name UseBook type check default true");
-            Console.WriteLine("usiok");
-
-
-            string str = Console.ReadLine();
-            Form1.Form1Instance.addMsg("[RECV]" + str);
-
             int startStrPos = 0;
             int teban = 0;
 
             //Application.Run(form1);
             while (true) {
-                str = Console.ReadLine();
+                string str = Console.ReadLine();
                 Form1.Form1Instance.addMsg("[RECV]" + str);
 
+                // usi 起動
+                if ((str.Length == 3) && (str.Substring(0, 3) == "usi")) {
+                    Console.WriteLine("id name YT-Shogi 0.1");
+                    Console.WriteLine("id authoer YAKITACO");
+                    Console.WriteLine("option name BookFile type string default public.bin");
+                    Console.WriteLine("option name UseBook type check default true");
+                    Console.WriteLine("usiok");
+
                 // isready 対局開始前
-                if ((str.Length == 7) && (str.Substring(0, 7) == "isready")) {
+                } else if ((str.Length == 7) && (str.Substring(0, 7) == "isready")) {
+
                     //Form1.Form1Instance.addMsg("[RECV]" + str);
 
                     /* (再)初期化処理 */
@@ -399,7 +398,6 @@ namespace YTSG {
                         Form1.Form1Instance.addMsg("[NOKORI]" + nokori);
 
                         //定跡あり
-                        if (tmpKmv != null) Form1.Form1Instance.addMsg("AAA" + tmpKmv.nxSum);
                         if ((tmpKmv != null) && (tmpKmv.nxSum > 0)) {
                             int rVal = rnd.Next(0, tmpKmv.nxSum);
                             int i;
