@@ -46,23 +46,13 @@ namespace YTSG_MKMV {
             Application.SetCompatibleTextRenderingDefault(false);
 
             Form1 form1 = new Form1();
-            Form1.Form1Instance = form1; //Form1Instanceに代入
             int[,,] hyouka = new int[2, 99, 2];
             int[] currentHyouka = new int[2];
-
-            //form1.Show();
-            Task.Run(() => {
-                Application.Run(form1); // デバッグフォーム
-                Console.WriteLine("bestmove resign");
-            });
-            Thread.Sleep(1000);
-
-
-            Console.WriteLine("id name YT-Shogi Make Move 0.1");
-            Console.WriteLine("id authoer YAKITACO");
-            Console.WriteLine("option name BookFile type string default public.bin");
-            Console.WriteLine("option name UseBook type check default true");
-            Console.WriteLine("usiok");
+            bool autoScore = false;
+            int autoStartWin = 0;
+            int autoStartLose = 0;
+            int autoEndWin = 0;
+            int autoEndLose = 0;
 
             int teban = 0;
             int tesuu = 0;
@@ -71,8 +61,35 @@ namespace YTSG_MKMV {
 
             while (true) {
                 string str = Console.ReadLine();
-                Form1.Form1Instance.addMsg("[RECV]" + str);
-                if ((str.Length == 7) && (str.Substring(0, 7) == "isready")) {
+
+                if (Form1.Form1Instance != null) {
+                    Form1.Form1Instance.addMsg("[RECV]" + str);
+                }
+                // usi 起動
+                if ((str.Length == 3) && (str.Substring(0, 3) == "usi")) {
+
+                    Console.WriteLine("id name YT-Shogi Make Move 0.1");
+                    Console.WriteLine("id authoer YAKITACO");
+                    Console.WriteLine("option name BookFile type string default public.bin");
+                    Console.WriteLine("option name UseBook type check default true");
+                    Console.WriteLine("option name AutoScore type check default false"); //自動評価(連続棋譜読み取り用)
+                    Console.WriteLine("option name AutoStartWin type spin default 10");
+                    Console.WriteLine("option name AutoStartLose type spin default -10");
+                    Console.WriteLine("option name AutoEndWin type spin default 100");
+                    Console.WriteLine("option name AutoEndLose type spin default -100");
+
+                    Console.WriteLine("usiok");
+
+                // isready 対局開始前
+                } else if ((str.Length == 7) && (str.Substring(0, 7) == "isready")) {
+
+                    Task.Run(() => {
+                        Application.Run(form1); // デバッグフォーム
+                        Console.WriteLine("bestmove resign");
+                    });
+                    Form1.Form1Instance = form1; //Form1Instanceに代入
+                    Thread.Sleep(1000);
+
                     baseKmv = kmove.load();
                     if (baseKmv == null) {  //読み込まれていない場合は新規作成
                         baseKmv = new kmove(0, 0, 0, 0, false, 0, 0);
@@ -111,7 +128,7 @@ namespace YTSG_MKMV {
                         // 手を更新
                         for (tesuu = 0; tesuu + 3 < arr.Length; tesuu++) {
 
-                            if ((hyouka[teban, currentHyouka[teban]+1,0] <= tesuu)&&(hyouka[teban, currentHyouka[teban] + 1, 0] > hyouka[teban, currentHyouka[teban], 0])) {
+                            if ((hyouka[teban, currentHyouka[teban] + 1, 0] <= tesuu) && (hyouka[teban, currentHyouka[teban] + 1, 0] > hyouka[teban, currentHyouka[teban], 0])) {
                                 currentHyouka[teban]++;
                             }
 
@@ -178,6 +195,25 @@ namespace YTSG_MKMV {
                     //kmv 保存
                     //baseKmv.save();
 
+                } else if ((str.Length > 8) && (str.Substring(0, 9) == "setoption")) {
+                    string[] arr = str.Split(' ');
+
+                    if (arr[2] == "AutoScore") {
+                        if (arr[4] == "True") {
+                            autoScore = true;
+                        } else {
+                            autoScore = false;
+                        }
+                    } else if (arr[2] == "AutoStartWin") {
+                        autoStartWin = int.Parse(arr[4]);
+                    } else if (arr[2] == "AutoStartLose") {
+                        autoStartLose = int.Parse(arr[4]);
+                    } else if (arr[2] == "AutoEndWin") {
+                        autoEndWin = int.Parse(arr[4]);
+                    } else if (arr[2] == "AutoEndLose") {
+                        autoEndLose = int.Parse(arr[4]);
+                    }
+
                 } else {
                     /* 無視 */
                 }
@@ -187,6 +223,6 @@ namespace YTSG_MKMV {
         }
 
 
-        
+
     }
 }
