@@ -8,5 +8,13 @@ namespace YTSG_GUI
 {
     public class guiMain
     {
+        public int mint;
+        <STATread()>
+
+
+
+
+
+
     }
 }

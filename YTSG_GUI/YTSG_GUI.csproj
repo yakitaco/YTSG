@@ -31,8 +31,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="kmove">
+      <HintPath>..\kmove\bin\Debug\kmove.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,6 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="guiForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="guiForm.Designer.cs">
+      <DependentUpon>guiForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="guiMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
