@@ -157,10 +157,12 @@ namespace YTSG_MKMV {
 
                                     // 評価値の更新
                                     tmpKmv.nxMove[cnt].weight++;
-                                    tmpKmv.nxSum -= tmpKmv.nxMove[cnt].val;
                                     tmpKmv.nxMove[cnt].val += hyouka[teban, currentHyouka[teban], 1] / tmpKmv.nxMove[cnt].weight;
                                     if (tmpKmv.nxMove[cnt].val > 0) tmpKmv.nxSum += tmpKmv.nxMove[cnt].val;
                                     Form1.Form1Instance.addMsg("ADD: (" + src.x + "," + src.y + ")->(" + dst.x + "," + dst.y + ") val= " + hyouka[teban, currentHyouka[teban], 1]);
+
+                                    tmpKmv.calcNxSum();
+
                                     tmpKmv = tmpKmv.nxMove[cnt];
 
                                     break;
@@ -172,7 +174,7 @@ namespace YTSG_MKMV {
                                 kmove nkm = new kmove(src.x, src.y, dst.x, dst.y, nari, hyouka[teban, currentHyouka[teban], 1], 1);
                                 tmps.nxMove.Add(nkm);
                                 nkm.val = hyouka[teban, currentHyouka[teban], 1];
-                                if (nkm.val > 0) tmps.nxSum += nkm.val;
+                                tmps.calcNxSum();
                                 Form1.Form1Instance.addMsg("NEW: (" + src.x + "," + src.y + ")->(" + dst.x + "," + dst.y + ") val=" + nkm.val);
                                 tmps = nkm;
 

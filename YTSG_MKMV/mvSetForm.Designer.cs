@@ -46,6 +46,7 @@ namespace YTSG_MKMV {
             this.numericUpDown6 = new System.Windows.Forms.NumericUpDown();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.button7 = new System.Windows.Forms.Button();
+            this.button8 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -56,7 +57,7 @@ namespace YTSG_MKMV {
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(253, 393);
+            this.button1.Location = new System.Drawing.Point(253, 465);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(117, 49);
             this.button1.TabIndex = 0;
@@ -66,7 +67,7 @@ namespace YTSG_MKMV {
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(7, 393);
+            this.button2.Location = new System.Drawing.Point(7, 465);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(117, 49);
             this.button2.TabIndex = 1;
@@ -76,7 +77,7 @@ namespace YTSG_MKMV {
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(130, 393);
+            this.button3.Location = new System.Drawing.Point(130, 465);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(117, 49);
             this.button3.TabIndex = 2;
@@ -92,14 +93,14 @@ namespace YTSG_MKMV {
             this.listBox1.Location = new System.Drawing.Point(12, 53);
             this.listBox1.Name = "listBox1";
             this.listBox1.ScrollAlwaysVisible = true;
-            this.listBox1.Size = new System.Drawing.Size(235, 327);
+            this.listBox1.Size = new System.Drawing.Size(235, 403);
             this.listBox1.TabIndex = 3;
             this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             this.listBox1.DoubleClick += new System.EventHandler(this.listBox1_DoubleClick);
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(253, 311);
+            this.button4.Location = new System.Drawing.Point(253, 380);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(117, 35);
             this.button4.TabIndex = 4;
@@ -109,7 +110,7 @@ namespace YTSG_MKMV {
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(253, 270);
+            this.button5.Location = new System.Drawing.Point(253, 339);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(117, 35);
             this.button5.TabIndex = 5;
@@ -119,11 +120,11 @@ namespace YTSG_MKMV {
             // 
             // button6
             // 
-            this.button6.Location = new System.Drawing.Point(253, 12);
+            this.button6.Location = new System.Drawing.Point(253, 53);
             this.button6.Name = "button6";
             this.button6.Size = new System.Drawing.Size(117, 35);
             this.button6.TabIndex = 6;
-            this.button6.Text = "Next";
+            this.button6.Text = "Back";
             this.button6.UseVisualStyleBackColor = true;
             this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
@@ -131,7 +132,7 @@ namespace YTSG_MKMV {
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label1.Location = new System.Drawing.Point(262, 63);
+            this.label1.Location = new System.Drawing.Point(262, 139);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(29, 16);
             this.label1.TabIndex = 8;
@@ -141,7 +142,7 @@ namespace YTSG_MKMV {
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label2.Location = new System.Drawing.Point(262, 92);
+            this.label2.Location = new System.Drawing.Point(262, 168);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(28, 16);
             this.label2.TabIndex = 8;
@@ -151,7 +152,7 @@ namespace YTSG_MKMV {
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label3.Location = new System.Drawing.Point(262, 121);
+            this.label3.Location = new System.Drawing.Point(262, 197);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(28, 16);
             this.label3.TabIndex = 9;
@@ -161,7 +162,7 @@ namespace YTSG_MKMV {
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label4.Location = new System.Drawing.Point(263, 150);
+            this.label4.Location = new System.Drawing.Point(263, 226);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(27, 16);
             this.label4.TabIndex = 12;
@@ -171,7 +172,7 @@ namespace YTSG_MKMV {
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label5.Location = new System.Drawing.Point(260, 207);
+            this.label5.Location = new System.Drawing.Point(260, 283);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(37, 16);
             this.label5.TabIndex = 13;
@@ -181,7 +182,7 @@ namespace YTSG_MKMV {
             // 
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label6.Location = new System.Drawing.Point(260, 236);
+            this.label6.Location = new System.Drawing.Point(260, 312);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(38, 16);
             this.label6.TabIndex = 14;
@@ -200,7 +201,7 @@ namespace YTSG_MKMV {
             // numericUpDown1
             // 
             this.numericUpDown1.Font = new System.Drawing.Font("MS UI Gothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.numericUpDown1.Location = new System.Drawing.Point(303, 59);
+            this.numericUpDown1.Location = new System.Drawing.Point(303, 135);
             this.numericUpDown1.Maximum = new decimal(new int[] {
             10,
             0,
@@ -223,7 +224,7 @@ namespace YTSG_MKMV {
             // numericUpDown2
             // 
             this.numericUpDown2.Font = new System.Drawing.Font("MS UI Gothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.numericUpDown2.Location = new System.Drawing.Point(303, 88);
+            this.numericUpDown2.Location = new System.Drawing.Point(303, 164);
             this.numericUpDown2.Maximum = new decimal(new int[] {
             9,
             0,
@@ -246,7 +247,7 @@ namespace YTSG_MKMV {
             // numericUpDown3
             // 
             this.numericUpDown3.Font = new System.Drawing.Font("MS UI Gothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.numericUpDown3.Location = new System.Drawing.Point(303, 117);
+            this.numericUpDown3.Location = new System.Drawing.Point(303, 193);
             this.numericUpDown3.Maximum = new decimal(new int[] {
             9,
             0,
@@ -269,7 +270,7 @@ namespace YTSG_MKMV {
             // numericUpDown4
             // 
             this.numericUpDown4.Font = new System.Drawing.Font("MS UI Gothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.numericUpDown4.Location = new System.Drawing.Point(303, 146);
+            this.numericUpDown4.Location = new System.Drawing.Point(303, 222);
             this.numericUpDown4.Maximum = new decimal(new int[] {
             9,
             0,
@@ -292,7 +293,7 @@ namespace YTSG_MKMV {
             // numericUpDown5
             // 
             this.numericUpDown5.Font = new System.Drawing.Font("MS UI Gothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.numericUpDown5.Location = new System.Drawing.Point(303, 203);
+            this.numericUpDown5.Location = new System.Drawing.Point(303, 279);
             this.numericUpDown5.Maximum = new decimal(new int[] {
             9999999,
             0,
@@ -315,7 +316,7 @@ namespace YTSG_MKMV {
             // numericUpDown6
             // 
             this.numericUpDown6.Font = new System.Drawing.Font("MS UI Gothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.numericUpDown6.Location = new System.Drawing.Point(303, 232);
+            this.numericUpDown6.Location = new System.Drawing.Point(303, 308);
             this.numericUpDown6.Maximum = new decimal(new int[] {
             999999,
             0,
@@ -330,7 +331,7 @@ namespace YTSG_MKMV {
             this.checkBox1.AutoSize = true;
             this.checkBox1.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.checkBox1.Font = new System.Drawing.Font("MS UI Gothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.checkBox1.Location = new System.Drawing.Point(295, 178);
+            this.checkBox1.Location = new System.Drawing.Point(295, 254);
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(69, 23);
             this.checkBox1.TabIndex = 22;
@@ -339,7 +340,7 @@ namespace YTSG_MKMV {
             // 
             // button7
             // 
-            this.button7.Location = new System.Drawing.Point(253, 352);
+            this.button7.Location = new System.Drawing.Point(253, 421);
             this.button7.Name = "button7";
             this.button7.Size = new System.Drawing.Size(117, 35);
             this.button7.TabIndex = 23;
@@ -347,11 +348,22 @@ namespace YTSG_MKMV {
             this.button7.UseVisualStyleBackColor = true;
             this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
+            // button8
+            // 
+            this.button8.Location = new System.Drawing.Point(253, 94);
+            this.button8.Name = "button8";
+            this.button8.Size = new System.Drawing.Size(117, 35);
+            this.button8.TabIndex = 24;
+            this.button8.Text = "Root";
+            this.button8.UseVisualStyleBackColor = true;
+            this.button8.Click += new System.EventHandler(this.button8_Click);
+            // 
             // mvSetForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(376, 452);
+            this.ClientSize = new System.Drawing.Size(376, 526);
+            this.Controls.Add(this.button8);
             this.Controls.Add(this.button7);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.numericUpDown6);
@@ -413,5 +425,6 @@ namespace YTSG_MKMV {
         private System.Windows.Forms.NumericUpDown numericUpDown6;
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.Button button7;
+        private System.Windows.Forms.Button button8;
     }
 }

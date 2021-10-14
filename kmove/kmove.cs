@@ -79,5 +79,15 @@ namespace kmoveDll {
             return true;
         }
 
+        // nxSumの値を更新
+        public void calcNxSum() {
+            nxSum = 0;
+            if (nxMove != null) {
+                foreach (kmove k in nxMove) {
+                    if (k.val > 0) nxSum += k.val;
+                }
+            }
+        }
+
     }
 }
