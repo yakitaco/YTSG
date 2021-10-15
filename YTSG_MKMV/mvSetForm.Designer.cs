@@ -47,6 +47,8 @@ namespace YTSG_MKMV {
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.button7 = new System.Windows.Forms.Button();
             this.button8 = new System.Windows.Forms.Button();
+            this.button9 = new System.Windows.Forms.Button();
+            this.button10 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -93,7 +95,7 @@ namespace YTSG_MKMV {
             this.listBox1.Location = new System.Drawing.Point(12, 53);
             this.listBox1.Name = "listBox1";
             this.listBox1.ScrollAlwaysVisible = true;
-            this.listBox1.Size = new System.Drawing.Size(235, 403);
+            this.listBox1.Size = new System.Drawing.Size(235, 346);
             this.listBox1.TabIndex = 3;
             this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             this.listBox1.DoubleClick += new System.EventHandler(this.listBox1_DoubleClick);
@@ -358,11 +360,34 @@ namespace YTSG_MKMV {
             this.button8.UseVisualStyleBackColor = true;
             this.button8.Click += new System.EventHandler(this.button8_Click);
             // 
+            // button9
+            // 
+            this.button9.Location = new System.Drawing.Point(7, 421);
+            this.button9.Name = "button9";
+            this.button9.Size = new System.Drawing.Size(117, 35);
+            this.button9.TabIndex = 25;
+            this.button9.Text = "Copy";
+            this.button9.UseVisualStyleBackColor = true;
+            this.button9.Click += new System.EventHandler(this.button9_Click);
+            // 
+            // button10
+            // 
+            this.button10.Enabled = false;
+            this.button10.Location = new System.Drawing.Point(130, 421);
+            this.button10.Name = "button10";
+            this.button10.Size = new System.Drawing.Size(117, 35);
+            this.button10.TabIndex = 26;
+            this.button10.Text = "Paste";
+            this.button10.UseVisualStyleBackColor = true;
+            this.button10.Click += new System.EventHandler(this.button10_Click);
+            // 
             // mvSetForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(376, 526);
+            this.ClientSize = new System.Drawing.Size(376, 528);
+            this.Controls.Add(this.button10);
+            this.Controls.Add(this.button9);
             this.Controls.Add(this.button8);
             this.Controls.Add(this.button7);
             this.Controls.Add(this.checkBox1);
@@ -426,5 +451,7 @@ namespace YTSG_MKMV {
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.Button button7;
         private System.Windows.Forms.Button button8;
+        private System.Windows.Forms.Button button9;
+        private System.Windows.Forms.Button button10;
     }
 }

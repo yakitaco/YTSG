@@ -33,6 +33,8 @@ namespace YTSG_MKMV {
             this.button1 = new System.Windows.Forms.Button();
             this.StartButton = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.label3 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -41,6 +43,7 @@ namespace YTSG_MKMV {
             this.splitContainer2.Panel1.SuspendLayout();
             this.splitContainer2.Panel2.SuspendLayout();
             this.splitContainer2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
             // hyokaBox2
@@ -124,6 +127,8 @@ namespace YTSG_MKMV {
             // 
             // splitContainer2.Panel2
             // 
+            this.splitContainer2.Panel2.Controls.Add(this.label3);
+            this.splitContainer2.Panel2.Controls.Add(this.numericUpDown1);
             this.splitContainer2.Panel2.Controls.Add(this.button1);
             this.splitContainer2.Panel2.Controls.Add(this.StartButton);
             this.splitContainer2.Panel2.Controls.Add(this.textBox1);
@@ -134,7 +139,7 @@ namespace YTSG_MKMV {
             // button1
             // 
             this.button1.Enabled = false;
-            this.button1.Location = new System.Drawing.Point(655, 3);
+            this.button1.Location = new System.Drawing.Point(489, 3);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(133, 29);
             this.button1.TabIndex = 4;
@@ -146,7 +151,7 @@ namespace YTSG_MKMV {
             // 
             this.StartButton.Location = new System.Drawing.Point(3, 3);
             this.StartButton.Name = "StartButton";
-            this.StartButton.Size = new System.Drawing.Size(646, 29);
+            this.StartButton.Size = new System.Drawing.Size(480, 29);
             this.StartButton.TabIndex = 2;
             this.StartButton.Text = "Start";
             this.StartButton.UseVisualStyleBackColor = true;
@@ -164,6 +169,24 @@ namespace YTSG_MKMV {
             this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox1.Size = new System.Drawing.Size(794, 141);
             this.textBox1.TabIndex = 3;
+            // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Font = new System.Drawing.Font("MS UI Gothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.numericUpDown1.Location = new System.Drawing.Point(724, 6);
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(64, 26);
+            this.numericUpDown1.TabIndex = 5;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("MS UI Gothic", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label3.Location = new System.Drawing.Point(628, 8);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(85, 19);
+            this.label3.TabIndex = 6;
+            this.label3.Text = "保存手数";
             // 
             // Form1
             // 
@@ -184,6 +207,7 @@ namespace YTSG_MKMV {
             this.splitContainer2.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).EndInit();
             this.splitContainer2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -199,6 +223,8 @@ namespace YTSG_MKMV {
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button StartButton;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.NumericUpDown numericUpDown1;
+        private System.Windows.Forms.Label label3;
     }
 }
 

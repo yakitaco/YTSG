@@ -126,7 +126,7 @@ namespace YTSG_MKMV {
                         kmove tmpKmv = baseKmv;
 
                         // 手を更新
-                        for (tesuu = 0; tesuu + 3 < arr.Length; tesuu++) {
+                        for (tesuu = 0; tesuu + 3 < arr.Length && ( tesuu < form1.getSaveNum() || form1.getSaveNum() == 0 ); tesuu++) {
 
                             if ((hyouka[teban, currentHyouka[teban] + 1, 0] <= tesuu) && (hyouka[teban, currentHyouka[teban] + 1, 0] > hyouka[teban, currentHyouka[teban], 0])) {
                                 currentHyouka[teban]++;
@@ -170,13 +170,13 @@ namespace YTSG_MKMV {
                             }
 
                             // 一致なし(新規作成)
-                            if (cnt == tmps.nxMove.Count) {
+                            if (cnt == tmpKmv.nxMove.Count) {
                                 kmove nkm = new kmove(src.x, src.y, dst.x, dst.y, nari, hyouka[teban, currentHyouka[teban], 1], 1);
-                                tmps.nxMove.Add(nkm);
+                                tmpKmv.nxMove.Add(nkm);
                                 nkm.val = hyouka[teban, currentHyouka[teban], 1];
-                                tmps.calcNxSum();
+                                tmpKmv.calcNxSum();
                                 Form1.Form1Instance.addMsg("NEW: (" + src.x + "," + src.y + ")->(" + dst.x + "," + dst.y + ") val=" + nkm.val);
-                                tmps = nkm;
+                                tmpKmv = nkm;
 
                             }
 

@@ -10,6 +10,8 @@ namespace YTSG_MKMV {
         int cnt = 0;
         List<kmove> selList = new List<kmove>();
 
+        List<kmove> copyList = new List<kmove>();
+
         public mvSetForm() {
             InitializeComponent();
         }
@@ -125,20 +127,46 @@ namespace YTSG_MKMV {
 
         // 追加
         private void button4_Click(object sender, EventArgs e) {
-            baseKmv.nxMove.Add(new kmove((int)numericUpDown1.Value - 1, (int)numericUpDown2.Value - 1, (int)numericUpDown3.Value - 1,
-                (int)numericUpDown4.Value - 1, checkBox1.Checked, (int)numericUpDown5.Value, (int)numericUpDown6.Value));
-            if (checkBox1.Checked == true) {
-                listBox1.Items.Add("(" + (int)numericUpDown1.Value + "," + (int)numericUpDown2.Value + ")->(" +
-                    (int)numericUpDown3.Value + "," + (int)numericUpDown4.Value + ")* : " +
-                    (int)numericUpDown5.Value + " / " + (int)numericUpDown6.Value);
-            } else {
-                listBox1.Items.Add("(" + (int)numericUpDown1.Value + "," + (int)numericUpDown2.Value + ")->(" +
-                    (int)numericUpDown3.Value + "," + (int)numericUpDown4.Value + ") : " +
-                    (int)numericUpDown5.Value + " / " + (int)numericUpDown6.Value);
-            }
-            baseKmv.calcNxSum(); // nxSum更新
-            showCurrentPos();
 
+            /* defaultが存在する */
+            if ((baseKmv.nxMove.Count > 0) &&
+                (baseKmv.nxMove[baseKmv.nxMove.Count - 1].ox == 0) && (baseKmv.nxMove[baseKmv.nxMove.Count - 1].oy == 0) &&
+                (baseKmv.nxMove[baseKmv.nxMove.Count - 1].nx == 0) && (baseKmv.nxMove[baseKmv.nxMove.Count - 1].ny == 0)) {
+
+                baseKmv.nxMove.Insert(baseKmv.nxMove.Count - 1, new kmove((int)numericUpDown1.Value - 1, (int)numericUpDown2.Value - 1, (int)numericUpDown3.Value - 1,
+                (int)numericUpDown4.Value - 1, checkBox1.Checked, (int)numericUpDown5.Value, (int)numericUpDown6.Value));
+
+                if (checkBox1.Checked == true) {
+                    listBox1.Items.Insert(baseKmv.nxMove.Count - 2, "(" + (int)numericUpDown1.Value + "," + (int)numericUpDown2.Value + ")->(" +
+                        (int)numericUpDown3.Value + "," + (int)numericUpDown4.Value + ")* : " +
+                        (int)numericUpDown5.Value + " / " + (int)numericUpDown6.Value);
+                } else {
+                    listBox1.Items.Insert(baseKmv.nxMove.Count - 2, "(" + (int)numericUpDown1.Value + "," + (int)numericUpDown2.Value + ")->(" +
+                        (int)numericUpDown3.Value + "," + (int)numericUpDown4.Value + ") : " +
+                        (int)numericUpDown5.Value + " / " + (int)numericUpDown6.Value);
+                }
+
+                baseKmv.calcNxSum(); // nxSum更新
+                showCurrentPos();
+
+            } else {
+
+                baseKmv.nxMove.Add(new kmove((int)numericUpDown1.Value - 1, (int)numericUpDown2.Value - 1, (int)numericUpDown3.Value - 1,
+                (int)numericUpDown4.Value - 1, checkBox1.Checked, (int)numericUpDown5.Value, (int)numericUpDown6.Value));
+
+                if (checkBox1.Checked == true) {
+                    listBox1.Items.Add("(" + (int)numericUpDown1.Value + "," + (int)numericUpDown2.Value + ")->(" +
+                        (int)numericUpDown3.Value + "," + (int)numericUpDown4.Value + ")* : " +
+                        (int)numericUpDown5.Value + " / " + (int)numericUpDown6.Value);
+                } else {
+                    listBox1.Items.Add("(" + (int)numericUpDown1.Value + "," + (int)numericUpDown2.Value + ")->(" +
+                        (int)numericUpDown3.Value + "," + (int)numericUpDown4.Value + ") : " +
+                        (int)numericUpDown5.Value + " / " + (int)numericUpDown6.Value);
+                }
+
+                baseKmv.calcNxSum(); // nxSum更新
+                showCurrentPos();
+            }
         }
 
         //削除
@@ -180,7 +208,7 @@ namespace YTSG_MKMV {
         //先頭へ戻る
         private void button8_Click(object sender, EventArgs e) {
             baseKmv = rootKmv;
-            cnt=0;
+            cnt = 0;
             selList.Clear();
             showCurrentPos();
             if (baseKmv != null) {
@@ -202,7 +230,7 @@ namespace YTSG_MKMV {
 
         private void showCurrentPos() {
             if (baseKmv != null) {
-                if (cnt==0) {
+                if (cnt == 0) {
                     label7.Text = "[" + cnt + "] startpos <" + baseKmv.nxSum + ">";
                     button6.Enabled = false;
                     button8.Enabled = false;
@@ -220,6 +248,29 @@ namespace YTSG_MKMV {
                 button6.Enabled = false;
                 button8.Enabled = false;
             }
+        }
+
+        /* Copy */
+        private void button9_Click(object sender, EventArgs e) {
+            copyList = baseKmv.nxMove;
+            button10.Enabled = true;
+
+        }
+
+        /* Paste */
+        private void button10_Click(object sender, EventArgs e) {
+            baseKmv.nxMove = copyList;
+
+            listBox1.Items.Clear();
+            foreach (kmove k in baseKmv.nxMove) {
+                if (k.nari == true) {
+                    listBox1.Items.Add("(" + (k.ox + 1) + "," + (k.oy + 1) + ")->(" + (k.nx + 1) + "," + (k.ny + 1) + ")* : " + k.val + " / " + k.weight);
+                } else {
+                    listBox1.Items.Add("(" + (k.ox + 1) + "," + (k.oy + 1) + ")->(" + (k.nx + 1) + "," + (k.ny + 1) + ") : " + k.val + " / " + k.weight);
+                }
+            }
+
+            showCurrentPos();
         }
     }
 }

@@ -49,6 +49,12 @@ namespace YTSG_MKMV {
                 return hyokaBox2.Lines;
             }
         }
+        
+        // 保存する手数を返す (0なら制限なし)
+        public int getSaveNum() {
+            return (int)numericUpDown1.Value;
+        }
+
 
         private void StartButton_Click(object sender, EventArgs e) {
             //暫定処理
