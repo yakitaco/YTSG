@@ -363,7 +363,7 @@ namespace YTSG {
                     Console.WriteLine("option name UseBook type check default true");
                     Console.WriteLine("usiok");
 
-                // isready 対局開始前
+                    // isready 対局開始前
                 } else if ((str.Length == 7) && (str.Substring(0, 7) == "isready")) {
 
                     //Form1.Form1Instance.addMsg("[RECV]" + str);
@@ -408,10 +408,30 @@ namespace YTSG {
                                     continue;
                                 }
                                 Form1.Form1Instance.addMsg("Hit Move : (" + tmpKmv.nxMove[i].ox + "," + tmpKmv.nxMove[i].oy + ")->(" + tmpKmv.nxMove[i].nx + "," + tmpKmv.nxMove[i].ny + "):" + tmpKmv.nxMove[i].val);
-                                if (tmpKmv.nxMove[i].ox == 9) {
-                                    Console.WriteLine("bestmove " + usio.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, 9, 9), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny)));  //標準出力
-                                } else {
-                                    Console.WriteLine("bestmove " + usio.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, tmpKmv.nxMove[i].ox, tmpKmv.nxMove[i].oy), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny, tmpKmv.nxMove[i].nari)));  //標準出力
+
+                                // 移動チェック
+                                BanInfo tmpBan = new BanInfo(ban);
+                                int ret;
+                                
+                                if (tmpKmv.nxMove[i].ox == 9) { // 駒打ち
+                                    koPos dst = new koPos(0, 0);
+                                    dst.ko = tmpBan.MochiKo[teban, tmpKmv.nxMove[i].oy - 1][0];
+                                    ret = tmpBan.moveKoma(teban, (KomaType)tmpKmv.nxMove[i].oy, dst, true);
+                                } else { // 移動
+                                    koPos src = new koPos(tmpKmv.nxMove[i].ox, tmpKmv.nxMove[i].oy);
+                                    koPos dst = new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny);
+                                    ret = tmpBan.moveKoma(src, dst, tmpKmv.nxMove[i].nari, true);
+                                }
+
+                                if (ret == 0) {  //移動OK
+                                    if (tmpKmv.nxMove[i].ox == 9) {
+                                        Console.WriteLine("bestmove " + usio.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, 9, 9), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny)));  //標準出力
+                                    } else {
+                                        Console.WriteLine("bestmove " + usio.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, tmpKmv.nxMove[i].ox, tmpKmv.nxMove[i].oy), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny, tmpKmv.nxMove[i].nari)));  //標準出力
+                                    }
+                                } else {  //移動NG
+                                    Form1.Form1Instance.addMsg("Move chk NG!!");
+                                    i = tmpKmv.nxMove.Count;
                                 }
                                 break;
                             }
@@ -492,7 +512,7 @@ namespace YTSG {
                         if (mateMove?.Count > 0) {
                             Form1.Form1Instance.addMsg("Think Ponder. <<mate>>" + mateMove.Count);
 
-                        // 詰みが見えてない場合のみ先読み実施
+                            // 詰みが見えてない場合のみ先読み実施
                         } else {
                             Form1.Form1Instance.addMsg("Think Ponder.");
 
