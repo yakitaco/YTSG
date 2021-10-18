@@ -359,7 +359,7 @@ namespace YTSG {
                 if ((str.Length == 3) && (str.Substring(0, 3) == "usi")) {
                     Console.WriteLine("id name YT-Shogi 0.1");
                     Console.WriteLine("id authoer YAKITACO");
-                    Console.WriteLine("option name BookFile type string default public.bin");
+                    Console.WriteLine("option name BookFile type string default default.ytj");
                     Console.WriteLine("option name UseBook type check default true");
                     Console.WriteLine("usiok");
 
@@ -466,7 +466,8 @@ namespace YTSG {
                             //ret = cpu.thinkMove(myTeban, ban, 5)[0]; //コンピュータ思考
 
                             aiTaskMain = Task.Run(() => {
-                                return cpu.thinkMove(myTeban, ban, 4, 7, 7, 4);
+                                //return cpu.thinkMove(myTeban, ban, 4, 7, 7, 4);
+                                return cpu.thinkMove(myTeban, ban, 5, 7, 0, 0);
                             });
 
                         }
@@ -543,7 +544,8 @@ namespace YTSG {
                                 //ret = cpu.thinkMove(myTeban, ban, 5)[0]; //コンピュータ思考
 
                                 aiTaskMain = Task.Run(() => {
-                                    return cpu.thinkMove(myTeban, ban, 4, 7, 5, 4);
+                                    //return cpu.thinkMove(myTeban, ban, 4, 7, 5, 4);
+                                    return cpu.thinkMove(myTeban, ban, 5, 5, 0, 0);
                                 });
 
                             }
@@ -674,14 +676,18 @@ namespace YTSG {
                             int cnt;
                             int num = tmpKmv.nxMove.Count;
                             for (cnt = 0; cnt < num; cnt++) {
-                                Form1.Form1Instance.addMsg("[D][" + cnt + "]" + tmpKmv.nxMove[cnt].ox + "," + tmpKmv.nxMove[cnt].oy + "->" + tmpKmv.nxMove[cnt].nx + "," + tmpKmv.nxMove[cnt].ny + ":" + tmpKmv.nxMove[cnt].nxSum);
 
                                 // 一致あり(更新)
-                                if ((tmpKmv.nxMove[cnt].ox == src.x) && (tmpKmv.nxMove[cnt].oy == src.y)
-                                    && (tmpKmv.nxMove[cnt].nx == dst.x) && (tmpKmv.nxMove[cnt].ny == dst.y) && (tmpKmv.nxMove[cnt].nari == nari)) {
+                                if ((
+                                    (tmpKmv.nxMove[cnt].ox == src.x) && (tmpKmv.nxMove[cnt].oy == src.y)
+                                    && (tmpKmv.nxMove[cnt].nx == dst.x) && (tmpKmv.nxMove[cnt].ny == dst.y) && (tmpKmv.nxMove[cnt].nari == nari))||
+                                    ((tmpKmv.nxMove[cnt].ox == 0) && (tmpKmv.nxMove[cnt].oy == 0) && (tmpKmv.nxMove[cnt].nx == 0) && (tmpKmv.nxMove[cnt].ny == 0))  //デフォルト
+                                    ) {
+                                    Form1.Form1Instance.addMsg("[JS][" + cnt + "]" + tmpKmv.nxMove[cnt].ox + "," + tmpKmv.nxMove[cnt].oy + "->" + tmpKmv.nxMove[cnt].nx + "," + tmpKmv.nxMove[cnt].ny + ":" + tmpKmv.nxMove[cnt].nxSum + " Hit!!");
                                     tmpKmv = tmpKmv.nxMove[cnt];
                                     break;
                                 }
+                                Form1.Form1Instance.addMsg("[JS][" + cnt + "]" + tmpKmv.nxMove[cnt].ox + "," + tmpKmv.nxMove[cnt].oy + "->" + tmpKmv.nxMove[cnt].nx + "," + tmpKmv.nxMove[cnt].ny + ":" + tmpKmv.nxMove[cnt].nxSum);
                             }
 
                             // 一致なし(新規作成)

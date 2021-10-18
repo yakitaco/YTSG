@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace YTSG_MKMV {
     public partial class mvSetForm : Form {
-        kmove rootKmv = new kmove(0, 0, 0, 0, false, 0, 0);
+        kmove rootKmv = new kmove(0, 0, 0, 0, false, 0, 0, OPLIST.None, CSLIST.None);
         kmove baseKmv = null;
         int cnt = 0;
         List<kmove> selList = new List<kmove>();
@@ -94,6 +94,12 @@ namespace YTSG_MKMV {
                 }
                 numericUpDown5.Value = baseKmv.nxMove[listBox1.SelectedIndex].val;
                 numericUpDown6.Value = baseKmv.nxMove[listBox1.SelectedIndex].weight;
+                if (baseKmv.nxMove[listBox1.SelectedIndex].opening != null) {
+                    numericUpDown7.Value = (int)baseKmv.nxMove[listBox1.SelectedIndex].opening[0];
+                }
+                if (baseKmv.nxMove[listBox1.SelectedIndex].castle != null) {
+                    numericUpDown8.Value = (int)baseKmv.nxMove[listBox1.SelectedIndex].castle[0];
+                }
             }
         }
 
@@ -120,6 +126,9 @@ namespace YTSG_MKMV {
                         (baseKmv.nxMove[listBox1.SelectedIndex].nx + 1) + "," + (baseKmv.nxMove[listBox1.SelectedIndex].ny + 1) + ") : " +
                         baseKmv.nxMove[listBox1.SelectedIndex].val + " / " + baseKmv.nxMove[listBox1.SelectedIndex].weight;
                 }
+                baseKmv.nxMove[listBox1.SelectedIndex].setOpening((OPLIST)numericUpDown7.Value);
+                baseKmv.nxMove[listBox1.SelectedIndex].setCastle((CSLIST)numericUpDown8.Value);
+
                 baseKmv.calcNxSum(); // nxSum更新
                 showCurrentPos();
             }
@@ -134,7 +143,7 @@ namespace YTSG_MKMV {
                 (baseKmv.nxMove[baseKmv.nxMove.Count - 1].nx == 0) && (baseKmv.nxMove[baseKmv.nxMove.Count - 1].ny == 0)) {
 
                 baseKmv.nxMove.Insert(baseKmv.nxMove.Count - 1, new kmove((int)numericUpDown1.Value - 1, (int)numericUpDown2.Value - 1, (int)numericUpDown3.Value - 1,
-                (int)numericUpDown4.Value - 1, checkBox1.Checked, (int)numericUpDown5.Value, (int)numericUpDown6.Value));
+                (int)numericUpDown4.Value - 1, checkBox1.Checked, (int)numericUpDown5.Value, (int)numericUpDown6.Value, (OPLIST)numericUpDown7.Value, (CSLIST)numericUpDown8.Value));
 
                 if (checkBox1.Checked == true) {
                     listBox1.Items.Insert(baseKmv.nxMove.Count - 2, "(" + (int)numericUpDown1.Value + "," + (int)numericUpDown2.Value + ")->(" +
@@ -152,7 +161,7 @@ namespace YTSG_MKMV {
             } else {
 
                 baseKmv.nxMove.Add(new kmove((int)numericUpDown1.Value - 1, (int)numericUpDown2.Value - 1, (int)numericUpDown3.Value - 1,
-                (int)numericUpDown4.Value - 1, checkBox1.Checked, (int)numericUpDown5.Value, (int)numericUpDown6.Value));
+                (int)numericUpDown4.Value - 1, checkBox1.Checked, (int)numericUpDown5.Value, (int)numericUpDown6.Value, (OPLIST)numericUpDown7.Value, (CSLIST)numericUpDown8.Value));
 
                 if (checkBox1.Checked == true) {
                     listBox1.Items.Add("(" + (int)numericUpDown1.Value + "," + (int)numericUpDown2.Value + ")->(" +
@@ -259,7 +268,10 @@ namespace YTSG_MKMV {
 
         /* Paste */
         private void button10_Click(object sender, EventArgs e) {
-            baseKmv.nxMove = copyList;
+            //baseKmv.nxMove = copyList;
+            foreach (kmove k in copyList) {
+                baseKmv.nxMove.Add(k);
+            }
 
             listBox1.Items.Clear();
             foreach (kmove k in baseKmv.nxMove) {
@@ -269,7 +281,7 @@ namespace YTSG_MKMV {
                     listBox1.Items.Add("(" + (k.ox + 1) + "," + (k.oy + 1) + ")->(" + (k.nx + 1) + "," + (k.ny + 1) + ") : " + k.val + " / " + k.weight);
                 }
             }
-
+            baseKmv.calcNxSum(); // nxSum更新
             showCurrentPos();
         }
     }

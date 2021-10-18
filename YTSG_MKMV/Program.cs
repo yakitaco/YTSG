@@ -80,7 +80,7 @@ namespace YTSG_MKMV {
 
                     Console.WriteLine("usiok");
 
-                // isready 対局開始前
+                    // isready 対局開始前
                 } else if ((str.Length == 7) && (str.Substring(0, 7) == "isready")) {
 
                     Task.Run(() => {
@@ -92,7 +92,7 @@ namespace YTSG_MKMV {
 
                     baseKmv = kmove.load();
                     if (baseKmv == null) {  //読み込まれていない場合は新規作成
-                        baseKmv = new kmove(0, 0, 0, 0, false, 0, 0);
+                        baseKmv = new kmove(0, 0, 0, 0, false, 0, 0, OPLIST.None, CSLIST.None);
                     }
 
                 } else if ((str.Length > 1) && (str.Substring(0, 2) == "go")) {
@@ -126,11 +126,13 @@ namespace YTSG_MKMV {
                         kmove tmpKmv = baseKmv;
 
                         // 手を更新
-                        for (tesuu = 0; tesuu + 3 < arr.Length && ( tesuu < form1.getSaveNum() || form1.getSaveNum() == 0 ); tesuu++) {
+                        for (tesuu = 0; tesuu + 3 < arr.Length && (tesuu < form1.getSaveNum() || form1.getSaveNum() == 0); tesuu++) {
 
                             if ((hyouka[teban, currentHyouka[teban] + 1, 0] <= tesuu) && (hyouka[teban, currentHyouka[teban] + 1, 0] > hyouka[teban, currentHyouka[teban], 0])) {
                                 currentHyouka[teban]++;
                             }
+
+                            bool hitMove = false;
 
                             KomaType type;
                             koPos src = new koPos(0, 0);
@@ -162,17 +164,28 @@ namespace YTSG_MKMV {
                                     Form1.Form1Instance.addMsg("ADD: (" + src.x + "," + src.y + ")->(" + dst.x + "," + dst.y + ") val= " + hyouka[teban, currentHyouka[teban], 1]);
 
                                     tmpKmv.calcNxSum();
-
                                     tmpKmv = tmpKmv.nxMove[cnt];
+
+                                    hitMove = true;
 
                                     break;
                                 }
                             }
 
                             // 一致なし(新規作成)
-                            if (cnt == tmpKmv.nxMove.Count) {
-                                kmove nkm = new kmove(src.x, src.y, dst.x, dst.y, nari, hyouka[teban, currentHyouka[teban], 1], 1);
-                                tmpKmv.nxMove.Add(nkm);
+                            if (hitMove == false) {
+                                kmove nkm = new kmove(src.x, src.y, dst.x, dst.y, nari, hyouka[teban, currentHyouka[teban], 1], 1, OPLIST.None, CSLIST.None);
+
+                                //デフォルトがある場合
+                                if ((tmpKmv.nxMove.Count > 0) &&
+                                    (tmpKmv.nxMove[tmpKmv.nxMove.Count - 1].ox == 0) && (tmpKmv.nxMove[tmpKmv.nxMove.Count - 1].oy == 0) &&
+                                    (tmpKmv.nxMove[tmpKmv.nxMove.Count - 1].nx == 0) && (tmpKmv.nxMove[tmpKmv.nxMove.Count - 1].ny == 0)) {
+
+                                    tmpKmv.nxMove.Insert(tmpKmv.nxMove.Count - 1, nkm);
+                                } else {
+                                    tmpKmv.nxMove.Add(nkm);
+                                }
+
                                 nkm.val = hyouka[teban, currentHyouka[teban], 1];
                                 tmpKmv.calcNxSum();
                                 Form1.Form1Instance.addMsg("NEW: (" + src.x + "," + src.y + ")->(" + dst.x + "," + dst.y + ") val=" + nkm.val);

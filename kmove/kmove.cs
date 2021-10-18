@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Windows.Forms;
 
@@ -18,7 +19,11 @@ namespace kmoveDll {
         public List<kmove> nxMove = new List<kmove>(); //次の移動手
         public int nxSum; //次の移動手の合計値(次のvalが0以上の値のみ加算)
 
-        public kmove(int _ox, int _oy, int _nx, int _ny, bool _nari, int _val, int _weight) {
+        [OptionalField]
+        public OPLIST[] opening; // 戦型
+        public CSLIST[] castle; // 囲い
+
+        public kmove(int _ox, int _oy, int _nx, int _ny, bool _nari, int _val, int _weight, OPLIST _opening, CSLIST _castle) {
             ox = _ox;
             oy = _oy;
             nx = _nx;
@@ -26,6 +31,14 @@ namespace kmoveDll {
             nari = _nari;
             val = _val;
             weight = _weight;
+            if (_opening > 0) {
+                opening = new OPLIST[1];
+                opening[0] = _opening;
+            }
+            if (_castle > 0) {
+                castle = new CSLIST[1];
+                castle[0] = _castle;
+            }
         }
 
         //ファイルから読み取り
@@ -66,9 +79,9 @@ namespace kmoveDll {
             //保存先を指定するダイアログを開く
             System.IO.Directory.CreateDirectory(@"Userdata");
             SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter = "チームデータ(*.ytj)|*.ytj";
+            sfd.Filter = "YTSG定跡データ(*.ytj)|*.ytj";
             sfd.InitialDirectory = Directory.GetCurrentDirectory() + @"\Userdata";
-            sfd.FileName = "dat" + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day + "_" + DateTime.Now.Hour + DateTime.Now.Minute + DateTime.Now.Second + ".tdt";
+            sfd.FileName = "dat" + DateTime.Now.Year + DateTime.Now.Month + DateTime.Now.Day + "_" + DateTime.Now.Hour + DateTime.Now.Minute + DateTime.Now.Second;
             if (sfd.ShowDialog() == DialogResult.OK) {
                 //指定したパスにファイルを保存する
                 Stream fileStream = sfd.OpenFile();
@@ -89,5 +102,19 @@ namespace kmoveDll {
             }
         }
 
+        //戦型を更新
+        public void setOpening(OPLIST _opening) {
+            if (_opening > 0) {
+                opening = new OPLIST[1];
+                opening[0] = _opening;
+            }
+        }
+        //囲いを更新
+        public void setCastle(CSLIST _castle) {
+            if (_castle > 0) {
+                castle = new CSLIST[1];
+                castle[0] = _castle;
+            }
+        }
     }
 }

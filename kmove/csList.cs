@@ -4,13 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace YTSG {
-    class castle {
-
-
-
-
-
+namespace kmoveDll {
+    public enum CSLIST : int
+    {
+        None = 0,
 
     }
 }
