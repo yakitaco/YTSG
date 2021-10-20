@@ -91,7 +91,7 @@ namespace YTSG {
                 List<koPos> poslist = km.baninfo(ban);
 
                 foreach (koPos pos in poslist) {
-                    if (ban.BanKo[pos.x, pos.y] == null) pos.val += tekouho.GetKouho(pos);
+                    //if (ban.BanKo[pos.x, pos.y] == null) pos.val += tekouho.GetKouho(pos);
                     for (int i = Program.kifu.Count - 1; i>=0 && i > Program.kifu.Count - 8; i -= 2) {
                         if ((pos.x == Program.kifu[i].x) && (pos.y == Program.kifu[i].y) && (pos.ko.type == Program.kifu[i].ko.type)){
                             pos.val -= 500;
