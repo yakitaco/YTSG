@@ -68,7 +68,7 @@ namespace kmoveDll {
                 loadedData = (kmove)binaryFormatter.Deserialize(fileStream);
                 fileStream.Close();
             } else {
-                MessageBox.Show("'" + filePath + "'は存在しません。");
+                //MessageBox.Show("'" + filePath + "'は存在しません。");
             }
 
             return loadedData;

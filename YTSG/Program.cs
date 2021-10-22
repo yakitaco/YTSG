@@ -203,108 +203,6 @@ namespace YTSG {
         }
     }
 
-    static class tekouho {
-        static int[,,] IdouList = new int[14, 9, 9];
-
-        public static void ResetJoseki() {
-            Array.Clear(IdouList, 0, IdouList.Length);
-        }
-
-        public static void ReadJoseki00(string file) {
-            Array.Clear(IdouList, 0, IdouList.Length);
-            IdouList[0, 6, 5] = 100; // (76歩)
-            IdouList[0, 5, 5] = 90; // (66歩) 
-            IdouList[3, 5, 7] = 60; // (68銀)
-            IdouList[3, 6, 6] = 150; // (77銀)
-            IdouList[5, 1, 1] = -500; // (22角)
-        }
-
-        public static void ReadJoseki03(string file) {
-            Array.Clear(IdouList, 0, IdouList.Length);
-            IdouList[0, 6, 5] = 50; // (76歩)
-            IdouList[0, 5, 5] = 50; // (66歩) 
-            IdouList[0, 1, 5] = 110; // (26歩)
-            IdouList[3, 5, 7] = 10; // (68銀)
-            IdouList[3, 6, 6] = 50; // (77銀)
-            IdouList[3, 7, 5] = 10; // (86銀)
-            IdouList[3, 6, 4] = 30; // (75銀)
-            IdouList[3, 4, 4] = 30; // (55銀)
-            IdouList[6, 5, 7] = 70; // (68金)
-            IdouList[6, 5, 6] = 140; // (67金)
-            IdouList[6, 4, 6] = 130; // (67金)
-            IdouList[0, 1, 4] = 170; // (25歩)
-            IdouList[0, 1, 3] = 30; // (24歩)
-
-
-            IdouList[0, 4, 5] = 50; // (56歩)
-            IdouList[7, 5, 7] = 40;  //王
-            IdouList[7, 5, 8] = 50;  //王
-            IdouList[7, 6, 7] = 80;  //王
-            IdouList[7, 6, 8] = 70;  //王
-            IdouList[7, 7, 7] = 160; //王
-            IdouList[7, 8, 8] = 200; //王
-
-            IdouList[6, 4, 8] = 50; // (59金)
-
-            for (int i = 0; i < 9; i++) {
-                for (int j = 0; j < 3; j++) {
-                    IdouList[0, i, j] = (3 - j) * 100 + 100;
-                    IdouList[1, i, j] = (3 - j) * 100 + 100;
-                    IdouList[2, i, j] = (3 - j) * 100 + 100;
-                    IdouList[3, i, j] = (3 - j) * 100 + 100;
-                    IdouList[4, i, j] = (3 - j) * 100 + 100;
-                    IdouList[5, i, j] = (3 - j) * 100 + 100;
-                }
-            }
-            IdouList[0, 8, 5] = 10; //(左端歩)
-            IdouList[0, 0, 5] = 10; //(右端歩)
-            IdouList[0, 2, 4] = -50;
-            IdouList[0, 2, 5] = 30; //(右桂上の歩)
-            IdouList[0, 7, 5] = -50;
-            IdouList[2, 2, 6] = 50;  //右桂
-            IdouList[2, 8, 6] = -50; //左桂
-
-            IdouList[3, 2, 7] = 40;  //右銀
-            IdouList[3, 1, 6] = 80;  //右銀
-            IdouList[3, 2, 6] = 80;  //右銀
-            IdouList[3, 0, 5] = 120; //右銀
-            IdouList[3, 1, 5] = 120; //右銀
-
-            IdouList[5, 6, 6] = 10;  //角
-            IdouList[5, 7, 5] = -70; //角
-            IdouList[5, 8, 4] = -70; //角
-            IdouList[5, 6, 8] = 30;  //角
-            IdouList[5, 5, 7] = 70;  //角
-
-        }
-
-        public static int GetKouho(koPos dstPos) {
-            if (dstPos.ko.x == 9) return 0;  //　駒打ちは対象外
-
-            //後手は逆
-            int sX = (dstPos.ko.p == TEIGI.TEBAN_SENTE ? dstPos.ko.x : (TEIGI.SIZE_SUZI - dstPos.ko.x - 1));
-            int sY = (dstPos.ko.p == TEIGI.TEBAN_SENTE ? dstPos.ko.y : (TEIGI.SIZE_SUZI - dstPos.ko.y - 1));
-            int dX = (dstPos.ko.p == TEIGI.TEBAN_SENTE ? dstPos.x : (TEIGI.SIZE_SUZI - dstPos.x - 1));
-            int dY = (dstPos.ko.p == TEIGI.TEBAN_SENTE ? dstPos.y : (TEIGI.SIZE_SUZI - dstPos.y - 1));
-
-            //移動前と移動後の差分
-            return IdouList[(int)dstPos.ko.type - 1, dX, dY] - IdouList[(int)dstPos.ko.type - 1, sX, sY];
-        }
-        public static int GetKouho(koma ko, int x, int y) {
-            if (ko.x == 9) return 0;  //　駒打ちは対象外
-
-            //後手は逆
-            int sX = (ko.p == TEIGI.TEBAN_SENTE ? ko.x : (TEIGI.SIZE_SUZI - ko.x - 1));
-            int sY = (ko.p == TEIGI.TEBAN_SENTE ? ko.y : (TEIGI.SIZE_SUZI - ko.y - 1));
-            int dX = (ko.p == TEIGI.TEBAN_SENTE ? x : (TEIGI.SIZE_SUZI - x - 1));
-            int dY = (ko.p == TEIGI.TEBAN_SENTE ? y : (TEIGI.SIZE_SUZI - y - 1));
-
-            //移動前と移動後の差分
-            return IdouList[(int)ko.type - 1, dX, dY] - IdouList[(int)ko.type - 1, sX, sY];
-        }
-
-    }
-
     class Program {
         // 手数によるパラメータ
         static moveParam mPar = new moveParam();
@@ -369,7 +267,7 @@ namespace YTSG {
                     //Form1.Form1Instance.addMsg("[RECV]" + str);
 
                     /* (再)初期化処理 */
-                    tekouho.ReadJoseki00("");
+                    //tekouho.ReadJoseki00("");
                     tesuu = 0;
 
                     //baseKmv = kmove.load();
@@ -442,8 +340,8 @@ namespace YTSG {
                         thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
                         //thisProcess.PriorityClass = ProcessPriorityClass.BelowNormal; //優先度普通
 
-                        if ((tesuu == 9) || (tesuu == 10)) tekouho.ReadJoseki03("");
-                        if ((tesuu == 39) || (tesuu == 40)) tekouho.ResetJoseki();
+                        //if ((tesuu == 9) || (tesuu == 10)) tekouho.ReadJoseki03("");
+                        //if ((tesuu == 39) || (tesuu == 40)) tekouho.ResetJoseki();
 
                         if ((tesuu < 20) || (nokori < 60000)) {
                             //cpu.maxDepth = 3;
@@ -520,8 +418,8 @@ namespace YTSG {
                             thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
                             int nokori = Convert.ToInt32(myTeban == TEIGI.TEBAN_SENTE ? arr[3] : arr[5]);
 
-                            if ((tesuu == 9) || (tesuu == 10)) tekouho.ReadJoseki03("");
-                            if ((tesuu == 39) || (tesuu == 40)) tekouho.ResetJoseki();
+                            //if ((tesuu == 9) || (tesuu == 10)) tekouho.ReadJoseki03("");
+                            //if ((tesuu == 39) || (tesuu == 40)) tekouho.ResetJoseki();
 
                             if ((tesuu < 20) || (nokori < 60000)) {
                                 //cpu.maxDepth = 4;
