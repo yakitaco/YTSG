@@ -55,7 +55,7 @@
     <Compile Include="castle.cs" />
     <Compile Include="lineNotify.cs" />
     <Compile Include="moveParam.cs" />
-    <Compile Include="Properties\mVal.cs" />
+    <Compile Include="mVal.cs" />
     <Compile Include="SaveLog.cs" />
     <Compile Include="koma.cs" />
     <Compile Include="sfen.cs" />
