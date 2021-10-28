@@ -119,7 +119,7 @@ namespace YTSG {
                 if (int.TryParse(mochi.Substring(j, 1), out var tmp)) {
                     j++;
                     num = num * 10 + tmp;
-                        } else {
+                } else {
                     if (num == 0) num = 1;
                     // 持ち駒追加(複数駒ありを考慮)
                     koma k = sfen.toKoma(mochi, ref j, 9, 9);
@@ -625,6 +625,32 @@ namespace YTSG {
         //public static koPos posBplayer(koPos){
         //    
         //}
+
+
+        //現時点での評価(暫定処理)
+        public int chkScore(int teban) {
+            int score = 0;
+            foreach (var k in OkiKo[TEIGI.TEBAN_SENTE]) {
+                score += (k.kScore / 10);
+            }
+            for (int i = 0; i < 7; i++) {
+                if (MochiKo[TEIGI.TEBAN_SENTE, i]?.Count > 0) score += (MochiKo[TEIGI.TEBAN_SENTE, i][0].kScore / 5);
+            }
+
+            foreach (var k in OkiKo[TEIGI.TEBAN_GOTE]) {
+                score -= (k.kScore / 10);
+            }
+            for (int i = 0; i < 7; i++) {
+                if (MochiKo[TEIGI.TEBAN_GOTE, i]?.Count > 0) score += (MochiKo[TEIGI.TEBAN_GOTE, i][0].kScore / 5);
+            }
+
+            if (teban == TEIGI.TEBAN_SENTE) {
+                return score;
+            } else {
+                return -score;
+            }
+
+        }
 
 
     }

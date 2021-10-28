@@ -248,10 +248,10 @@ namespace YTSG {
 
             int startStrPos = 0;
             int teban = 0;
+            int score = 0;
 
             //Application.Run(form1);
             while (true) {
-                int score = 0;
                 string str = Console.ReadLine();
                 Form1.Form1Instance.addMsg("[RECV]" + str);
 
@@ -328,8 +328,10 @@ namespace YTSG {
 
                                 if (ret == 0) {  //移動OK
                                     if (tmpKmv.nxMove[i].ox == 9) {
+                                        Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + usio.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, 9, 9), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny)));
                                         Console.WriteLine("bestmove " + usio.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, 9, 9), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny)));  //標準出力
                                     } else {
+                                        Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + usio.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, tmpKmv.nxMove[i].ox, tmpKmv.nxMove[i].oy), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny, tmpKmv.nxMove[i].nari)));
                                         Console.WriteLine("bestmove " + usio.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, tmpKmv.nxMove[i].ox, tmpKmv.nxMove[i].oy), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny, tmpKmv.nxMove[i].nari)));  //標準出力
                                     }
                                 } else {  //移動NG
@@ -389,6 +391,15 @@ namespace YTSG {
                             Console.WriteLine("bestmove resign");
 
                         } else {
+
+                            if (retList[0].val > 5000) {
+                                Console.WriteLine("info score mate " + retList.Count + " pv " + usio.pos2usi(retList[0].ko, retList[0]));  //標準出力
+
+                            } else {
+                                score += retList[0].tval;
+                                Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + usio.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                            }
+
                             if (retList.Count > 1) {
                                 Console.WriteLine("bestmove " + usio.pos2usi(retList[0].ko, retList[0]) + " ponder " + usio.pos2usi(retList[1].ko, retList[1]));  //標準出力
                                 //Console.WriteLine("bestmove " + usio.pos2usi(retList[0].ko, retList[0]));  //標準出力
@@ -403,17 +414,10 @@ namespace YTSG {
                             // 詰みの手筋が見えている(先頭2手は削除)
                             if (retList[0].val > 5000) {
                                 mateMove = retList;
-
-                                Console.WriteLine("info score mate " + mateMove.Count);  //標準出力
-
                                 mateMove.RemoveAt(0);
                                 mateMove.RemoveAt(0);
 
-                            } else {
-                                score += retList[0].tval;
-                                Console.WriteLine("info score cp " + score);  //標準出力
                             }
-
                         }
 
                         // 先読み
@@ -491,6 +495,7 @@ namespace YTSG {
                     // 詰みが見えている場合
                     if (mateMove?.Count > 0) {
                         Form1.Form1Instance.addMsg("ponder hit!! <<mate>>");
+                        Console.WriteLine("info score mate " + mateMove.Count + " pv " + usio.pos2usi(mateMove[0].ko, mateMove[0]));  //標準出力
                         Console.WriteLine("bestmove " + usio.pos2usi(mateMove[0].ko, mateMove[0]) + " ponder " + usio.pos2usi(mateMove[1].ko, mateMove[1]));
                         mateMove.RemoveAt(0);
                         mateMove.RemoveAt(0);
@@ -504,6 +509,15 @@ namespace YTSG {
                             Console.WriteLine("bestmove resign");
 
                         } else {
+
+                            if (retList[0].val > 5000) {
+                                Console.WriteLine("info score mate " + retList.Count + " pv " + usio.pos2usi(retList[0].ko, retList[0]));  //標準出力
+
+                            } else {
+                                score += retList[0].tval;
+                                Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + usio.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                            }
+
                             if (retList.Count > 1) {
                                 Console.WriteLine("bestmove " + usio.pos2usi(retList[0].ko, retList[0]) + " ponder " + usio.pos2usi(retList[1].ko, retList[1]));  //標準出力
                                                                                                                                                                   //Console.WriteLine("bestmove " + usio.pos2usi(retList[0].ko, retList[0]));  //標準出力

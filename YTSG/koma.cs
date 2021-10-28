@@ -85,6 +85,12 @@ namespace YTSG {
             }
         }
 
+        public int kScore {
+            get {
+                return KoScore[(int)type];
+            }
+        }
+
         // 初期化関数
         static koma() {
             for (int i = 0; i < 15; i++) {
