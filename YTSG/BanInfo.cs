@@ -271,15 +271,16 @@ namespace YTSG {
 
         //駒打ち用
         public int moveKoma(int teban, KomaType type, koPos dstPos, bool chk) {
+            int ret;
             koma ko = MochiKo[teban, (int)type - 1].Find(k => k.type == type);
 
             if (ko != null) {
-                moveKoma(ko, dstPos, false, chk);
+                ret = moveKoma(ko, dstPos, false, chk);
             } else {
                 return -1;
             }
 
-            return 0;
+            return ret;
         }
 
         //駒の移動(座標指定:[移動元位置][移動先位置][駒種(打つのみ)][成有無][駒移動チェック有無]) (0:移動OK, -1:移動NG(駒が存在しない,移動できない 等))

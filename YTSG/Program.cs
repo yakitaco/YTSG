@@ -251,6 +251,7 @@ namespace YTSG {
 
             //Application.Run(form1);
             while (true) {
+                int score = 0;
                 string str = Console.ReadLine();
                 Form1.Form1Instance.addMsg("[RECV]" + str);
 
@@ -270,6 +271,9 @@ namespace YTSG {
                     /* (再)初期化処理 */
                     //tekouho.ReadJoseki00("");
                     tesuu = 0;
+
+                    mVal.reset(); //評価値のリセット
+                    score = 0;
 
                     //baseKmv = kmove.load();
 
@@ -399,8 +403,15 @@ namespace YTSG {
                             // 詰みの手筋が見えている(先頭2手は削除)
                             if (retList[0].val > 5000) {
                                 mateMove = retList;
+
+                                Console.WriteLine("info score mate " + mateMove.Count);  //標準出力
+
                                 mateMove.RemoveAt(0);
                                 mateMove.RemoveAt(0);
+
+                            } else {
+                                score += retList[0].tval;
+                                Console.WriteLine("info score cp " + score);  //標準出力
                             }
 
                         }
