@@ -355,7 +355,7 @@ namespace YTSG {
                             //ret = cpu.thinkMove(myTeban, ban, 3, 0)[0]; //コンピュータ思考
 
                             aiTaskMain = Task.Run(() => {
-                                return cpu.thinkMove(myTeban, ban, 4, 0, 0, 0);
+                                return cpu.thinkMove(myTeban, ban, 4, 0, 3, 4);
                             });
 
                         } else if ((tesuu < 50) || (nokori < 300000)) {
@@ -363,7 +363,7 @@ namespace YTSG {
                             //ret = cpu.thinkMove(myTeban, ban, 4)[0]; //コンピュータ思考
 
                             aiTaskMain = Task.Run(() => {
-                                return cpu.thinkMove(myTeban, ban, 4, 5, 3, 0);
+                                return cpu.thinkMove(myTeban, ban, 5, 5, 0, 0);
                             });
 
                         } else {
@@ -371,8 +371,8 @@ namespace YTSG {
                             //ret = cpu.thinkMove(myTeban, ban, 5)[0]; //コンピュータ思考
 
                             aiTaskMain = Task.Run(() => {
-                                return cpu.thinkMove(myTeban, ban, 4, 10, 7, 4);
-                                //return cpu.thinkMove(myTeban, ban, 5, 7, 0, 0);
+                                //return cpu.thinkMove(myTeban, ban, 4, 10, 7, 4);
+                                return cpu.thinkMove(myTeban, ban, 5, 7, 5, 5);
                             });
 
                         }
@@ -442,7 +442,7 @@ namespace YTSG {
                                 //ret = cpu.thinkMove(myTeban, ban, 3)[0]; //コンピュータ思考
 
                                 aiTaskMain = Task.Run(() => {
-                                    return cpu.thinkMove(myTeban, ban, 4, 0, 0, 0);
+                                    return cpu.thinkMove(myTeban, ban, 4, 0, 5, 4);
                                 });
 
                             } else if ((tesuu < 50) || (nokori < 300000)) {
@@ -450,7 +450,7 @@ namespace YTSG {
                                 //ret = cpu.thinkMove(myTeban, ban, 4)[0]; //コンピュータ思考
 
                                 aiTaskMain = Task.Run(() => {
-                                    return cpu.thinkMove(myTeban, ban, 4, 5, 3, 0);
+                                    return cpu.thinkMove(myTeban, ban, 5, 5, 0, 0);
                                 });
 
                             } else {
@@ -459,7 +459,7 @@ namespace YTSG {
 
                                 aiTaskMain = Task.Run(() => {
                                     //return cpu.thinkMove(myTeban, ban, 4, 7, 5, 4);
-                                    return cpu.thinkMove(myTeban, ban, 4, 10, 7, 4);
+                                    return cpu.thinkMove(myTeban, ban, 5, 7, 5, 5);
                                 });
 
                             }
