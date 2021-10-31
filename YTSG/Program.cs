@@ -240,8 +240,6 @@ namespace YTSG {
 
             BanInfo ban = new BanInfo();
 
-            usiIO usio = new usiIO();
-
             Process thisProcess = System.Diagnostics.Process.GetCurrentProcess();
 
             Form1.Form1Instance.resetMsg();
@@ -328,11 +326,11 @@ namespace YTSG {
 
                                 if (ret == 0) {  //移動OK
                                     if (tmpKmv.nxMove[i].ox == 9) {
-                                        Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + usio.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, 9, 9), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny)));
-                                        Console.WriteLine("bestmove " + usio.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, 9, 9), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny)));  //標準出力
+                                        Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + usiIO.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, 9, 9), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny)));
+                                        Console.WriteLine("bestmove " + usiIO.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, 9, 9), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny)));  //標準出力
                                     } else {
-                                        Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + usio.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, tmpKmv.nxMove[i].ox, tmpKmv.nxMove[i].oy), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny, tmpKmv.nxMove[i].nari)));
-                                        Console.WriteLine("bestmove " + usio.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, tmpKmv.nxMove[i].ox, tmpKmv.nxMove[i].oy), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny, tmpKmv.nxMove[i].nari)));  //標準出力
+                                        Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + usiIO.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, tmpKmv.nxMove[i].ox, tmpKmv.nxMove[i].oy), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny, tmpKmv.nxMove[i].nari)));
+                                        Console.WriteLine("bestmove " + usiIO.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, tmpKmv.nxMove[i].ox, tmpKmv.nxMove[i].oy), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny, tmpKmv.nxMove[i].nari)));  //標準出力
                                     }
                                 } else {  //移動NG
                                     Form1.Form1Instance.addMsg("Move chk NG!!");
@@ -393,19 +391,19 @@ namespace YTSG {
                         } else {
 
                             if (retList[0].val > 5000) {
-                                Console.WriteLine("info score mate " + retList.Count + " pv " + usio.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                                Console.WriteLine("info score mate " + retList.Count + " pv " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
 
                             } else {
                                 score += retList[0].tval;
-                                Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + usio.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                                Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
                             }
 
                             if (retList.Count > 1) {
-                                Console.WriteLine("bestmove " + usio.pos2usi(retList[0].ko, retList[0]) + " ponder " + usio.pos2usi(retList[1].ko, retList[1]));  //標準出力
-                                //Console.WriteLine("bestmove " + usio.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                                Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]) + " ponder " + usiIO.pos2usi(retList[1].ko, retList[1]));  //標準出力
+                                //Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
 
                             } else {
-                                Console.WriteLine("bestmove " + usio.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                                Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
                             }
                             Form1.Form1Instance.addMsg("[SEND]MOVE:" + retList[0].ko.type + ":(" + (retList[0].ko.x + 1) + "," + (retList[0].ko.y + 1) + ")->(" + (retList[0].x + 1) + "," + (retList[0].y + 1) + ")" + (retList[0].nari == true ? "<NARI>" : "") + "\n");
                             ban.moveKoma(retList[0].ko, retList[0], retList[0].nari, false);  //動かす
@@ -479,7 +477,7 @@ namespace YTSG {
                             retList.RemoveAt(retList.Count - 1);
                             string aaa = "";
                             foreach (var n in retList ?? new List<koPos>()) {
-                                aaa += " " + usio.pos2usi(n.ko, n);
+                                aaa += " " + usiIO.pos2usi(n.ko, n);
                             }
                             Console.WriteLine("checkmate" + aaa);
 
@@ -495,8 +493,8 @@ namespace YTSG {
                     // 詰みが見えている場合
                     if (mateMove?.Count > 0) {
                         Form1.Form1Instance.addMsg("ponder hit!! <<mate>>");
-                        Console.WriteLine("info score mate " + mateMove.Count + " pv " + usio.pos2usi(mateMove[0].ko, mateMove[0]));  //標準出力
-                        Console.WriteLine("bestmove " + usio.pos2usi(mateMove[0].ko, mateMove[0]) + " ponder " + usio.pos2usi(mateMove[1].ko, mateMove[1]));
+                        Console.WriteLine("info score mate " + mateMove.Count + " pv " + usiIO.pos2usi(mateMove[0].ko, mateMove[0]));  //標準出力
+                        Console.WriteLine("bestmove " + usiIO.pos2usi(mateMove[0].ko, mateMove[0]) + " ponder " + usiIO.pos2usi(mateMove[1].ko, mateMove[1]));
                         mateMove.RemoveAt(0);
                         mateMove.RemoveAt(0);
                     } else {
@@ -511,21 +509,21 @@ namespace YTSG {
                         } else {
 
                             if (retList[0].val > 5000) {
-                                Console.WriteLine("info score mate " + retList.Count + " pv " + usio.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                                Console.WriteLine("info score mate " + retList.Count + " pv " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
 
                             } else {
                                 score += retList[0].tval;
-                                Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + usio.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                                Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
                             }
 
                             if (retList.Count > 1) {
-                                Console.WriteLine("bestmove " + usio.pos2usi(retList[0].ko, retList[0]) + " ponder " + usio.pos2usi(retList[1].ko, retList[1]));  //標準出力
-                                                                                                                                                                  //Console.WriteLine("bestmove " + usio.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                                Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]) + " ponder " + usiIO.pos2usi(retList[1].ko, retList[1]));  //標準出力
+                                                                                                                                                                  //Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
                                 Form1.Form1Instance.addMsg("[SEND]MOVE:" + retList[0].ko.type + ":(" + (retList[0].ko.x + 1) + "," + (retList[0].ko.y + 1) + ")->(" + (retList[0].x + 1) + "," + (retList[0].y + 1) + ")" + (retList[0].nari == true ? "<NARI>" : "") +
                                     " ponder " + retList[1].ko.type + ":(" + (retList[1].ko.x + 1) + "," + (retList[1].ko.y + 1) + ")->(" + (retList[1].x + 1) + "," + (retList[1].y + 1) + ")" + (retList[1].nari == true ? "<NARI>" : "") + "\n");
 
                             } else {
-                                Console.WriteLine("bestmove " + usio.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                                Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
                                 Form1.Form1Instance.addMsg("[SEND]MOVE:" + retList[0].ko.type + ":(" + (retList[0].ko.x + 1) + "," + (retList[0].ko.y + 1) + ")->(" + (retList[0].x + 1) + "," + (retList[0].y + 1) + ")" + (retList[0].nari == true ? "<NARI>" : "") + "\n");
 
                             }
@@ -577,7 +575,7 @@ namespace YTSG {
                         koPos dst = new koPos(0, 0);
                         bool nari = false;
 
-                        usio.usi2pos(arr[tesuu + startStrPos], out src, out dst, out type, out nari);
+                        usiIO.usi2pos(arr[tesuu + startStrPos], out src, out dst, out type, out nari);
                         //Form1.Form1Instance.addMsg("[RECV]AITE:" + arr[tesuu + startStrPos]);
                         //駒打ち
                         if (type != KomaType.None) {

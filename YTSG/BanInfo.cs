@@ -15,6 +15,7 @@ namespace YTSG {
         public koma[] KingKo = new koma[2];                                 //王の駒情報 (Kingko[0]:先手 / Kingko[1]:後手)
         public int[,,] IdouList = new int[2, 9, 9];                         //駒の移動可能リスト
         public int[,] nifList = new int[2, 9];                              //二歩リスト (BanKo[X.Y]:X 0:先手 1:後手, Y=1～9筋)
+        public int banScore;                                                //現在の盤評価値(先手+/後手-)
 
         //平手の盤情報生成(盤情報,置き駒情報,持ち駒情報)
         public BanInfo() {
@@ -641,8 +642,10 @@ namespace YTSG {
                 score -= (k.kScore / 10);
             }
             for (int i = 0; i < 7; i++) {
-                if (MochiKo[TEIGI.TEBAN_GOTE, i]?.Count > 0) score += (MochiKo[TEIGI.TEBAN_GOTE, i][0].kScore / 5);
+                if (MochiKo[TEIGI.TEBAN_GOTE, i]?.Count > 0) score -= (MochiKo[TEIGI.TEBAN_GOTE, i][0].kScore / 5);
             }
+
+            banScore = score;
 
             if (teban == TEIGI.TEBAN_SENTE) {
                 return score;

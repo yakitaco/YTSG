@@ -69,7 +69,7 @@ namespace YTSG {
                   {  0,  0,  0,  0,  0,  0,  0, 50,  0},
                   {-10,-10,-10,-10,-10,-10,-10,  0,  0},
                   {-10,-10,-10,-10,-10,-10,-10,  0,  0},
-                  {  0,  0,  0,  0,  0,  0,  0,  0,  0},
+                  {  0,  0,  0,  0,  0,  0,  0,-20,  0},
                   {-10,-10,-10,-10,-10,-10,-10,  0,-10},
                   {-10,-10,-10,-10,-10,-10,-10,  0,-10},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0}},
@@ -98,8 +98,8 @@ namespace YTSG {
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
-                  { 0,20, 7, 5, 0, 0, 0, 0, 0},
-                  { 0, 0, 7, 5, 0, 0, 0, 0, 0}},
+                  {  0, 20,  7,  5,  0,  0,  0,  0,  0},
+                  {  0,  0,  7,  5,  0,  0,  0,  0,  0}},
                 { {  0,  0,  0,  0,  0,  0,  0,  0,  0}, // と
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
@@ -433,8 +433,21 @@ namespace YTSG {
             goTeNum = 0;
         }
 
-        public static void setType(OPLIST _type, int turn) {
+        public static void setType(OPLIST _type, int turn, int count) {
+            int tmpCount = 0;
+            for (int cnt = 0; cnt <  mV.Count ; cnt++) {
+                if ((mV[cnt].type == _type)&&(mV[cnt].move <= count)&&(tmpCount < mV[cnt].move)) {
+                    if (turn == 0) {
+                        senTeNum = cnt;
+                    } else {
+                        goTeNum = cnt;
+                    }
+                    tmpCount = mV[cnt].move;
+                }
 
+
+            }
+            senTeNum = 0;
         }
 
         public static void countUp(int count) {

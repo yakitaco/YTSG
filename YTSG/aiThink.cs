@@ -171,11 +171,14 @@ namespace YTSG {
                         }
                     }
                     string aaa = "";
+                    string bbb = "";
                     foreach (var n in nexTe ?? new List<koPos>()) {
                         aaa += "->[" + n.val + "](" + (n.x + 1) + "," + (n.y + 1) + ")" + n.ko.type;
+                        bbb += " " + usiIO.pos2usi(n.ko, n);
                     }
 
                     Form1.Form1Instance.addMsg("[" + Task.CurrentId + "]teAll[" + cnt_local + "].val = [" + teAllList[cnt_local].val + "](" + (teAllList[cnt_local].x + 1) + "," + (teAllList[cnt_local].y + 1) + ")" + teAllList[cnt_local].ko.type + aaa);
+                    Console.WriteLine("info score cp " + (ban.chkScore(teban) + teAllList[cnt_local].val) + " pv " + usiIO.pos2usi(teAllList[cnt_local].ko, teAllList[cnt_local]) + bbb);  //標準出力
 
                     lock (lockObj) {
                         if (maxScore < teAllList[cnt_local].val) {

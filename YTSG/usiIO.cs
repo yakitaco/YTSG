@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace YTSG {
     // USIプロトコルのインタフェース
-    class usiIO {
+    static class usiIO {
         //USI座標→内部座標変換
-        public int usi2pos(string usi, out koPos src, out koPos dst, out KomaType type, out bool nari) {
+        public static int usi2pos(string usi, out koPos src, out koPos dst, out KomaType type, out bool nari) {
 
             //駒打ち
             if (usi.Substring(1, 1) == "*") {
@@ -32,7 +32,7 @@ namespace YTSG {
         }
 
         //内部座標→USI座標変換
-        public string pos2usi(koma ko, koPos pos) {
+        public static string pos2usi(koma ko, koPos pos) {
             string usiStr = "";
             if (ko.x == 9) {
                 usiStr = ktype2Kafb(ko.type) + "*" + (pos.x + 1).ToString() + int2Dafb(pos.y + 1);
@@ -47,7 +47,7 @@ namespace YTSG {
         }
 
         //駒打ち用
-        public string ktype2Kafb(KomaType type) {
+        public static string ktype2Kafb(KomaType type) {
             string usiStr = "";
             switch (type) {
                 case KomaType.Fuhyou:
@@ -83,7 +83,7 @@ namespace YTSG {
 
 
         //駒打ち用
-        public KomaType kafb2Ktype(string usiStr) {
+        public static KomaType kafb2Ktype(string usiStr) {
             KomaType type = KomaType.None;
             switch (usiStr) {
                 case "P":
@@ -117,7 +117,7 @@ namespace YTSG {
             return type;
         }
 
-        public string int2Dafb(int val) {
+        public static string int2Dafb(int val) {
             string usiStr = "";
             switch (val) {
                 case 1:
@@ -154,7 +154,7 @@ namespace YTSG {
             return usiStr;
         }
 
-        public int dafb2int(string str) {
+        public static int dafb2int(string str) {
             int val = 0; ;
             switch (str) {
                 case "a":
