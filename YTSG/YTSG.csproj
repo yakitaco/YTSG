@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="aiThink.cs" />
+    <Compile Include="aVal.cs" />
     <Compile Include="BanInfo.cs" />
     <Compile Include="castle.cs" />
     <Compile Include="lineNotify.cs" />
