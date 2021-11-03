@@ -450,22 +450,22 @@ namespace YTSG {
             senTeNum = 0;
         }
 
-        public static void countUp(int count) {
-            int tmpCount = 0;
-            for (int cnt = 0; cnt < mV.Count; cnt++) {
-                if ((mV[cnt].type == _type) && (mV[cnt].move <= count) && (tmpCount < mV[cnt].move)) {
-                    if (turn == 0) {
-                        senTeNum = cnt;
-                    } else {
-                        goTeNum = cnt;
-                    }
-                    tmpCount = mV[cnt].move;
-                }
-
-
-            }
-
-        }
+        //public static void countUp(int count) {
+        //    int tmpCount = 0;
+        //    for (int cnt = 0; cnt < mV.Count; cnt++) {
+        //        if ((mV[cnt].type == _type) && (mV[cnt].move <= count) && (tmpCount < mV[cnt].move)) {
+        //            if (turn == 0) {
+        //                senTeNum = cnt;
+        //            } else {
+        //                goTeNum = cnt;
+        //            }
+        //            tmpCount = mV[cnt].move;
+        //        }
+        //
+        //
+        //    }
+        //
+        //}
 
         // 指定評価値テーブルを取得
         public int[,,] getTbl() {

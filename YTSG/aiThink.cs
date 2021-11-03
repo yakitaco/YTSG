@@ -83,7 +83,7 @@ namespace YTSG {
             int teCnt = 0; //手の進捗
             Object lockObj = new Object();
 
-            ban.renewNifList(teban);  //二歩リスト更新
+            //ban.renewNifList(teban);  //二歩リスト更新
 
             //指せる手を全てリスト追加
             foreach (koma km in ban.OkiKo[teban]) {
@@ -255,7 +255,7 @@ namespace YTSG {
             bool check = false; // 王手フラグ
             //Form1.Form1Instance.addMsg("think MochiKo= " + ban.OkiKo[teban].Count + ", " + ban.OkiKo[teban].Count + ":" + teban);
             List<koPos> teAllList = new List<koPos>();
-            ban.renewNifList(teban);  //二歩リスト更新
+            //ban.renewNifList(teban);  //二歩リスト更新
 
             if (stopFlg) return retList;
 
@@ -376,7 +376,7 @@ namespace YTSG {
             List<koPos> teAllList = new List<koPos>();
             int teCnt = 0; //手の進捗
             Object lockObj = new Object();
-            ban.renewNifList(teban);  //二歩リスト更新
+            //ban.renewNifList(teban);  //二歩リスト更新
             int maxScore = -9999999;
 
             //[攻め方]王手を指せる手を全てリスト追加
@@ -484,7 +484,7 @@ namespace YTSG {
             int score = -9999999;
 
             List<koPos> teAllList = new List<koPos>();
-            ban.renewNifList(teban);  //二歩リスト更新
+            //ban.renewNifList(teban);  //二歩リスト更新
 
             // 王の移動(王手の駒を取るも含む)
             teAllList.AddRange(ban.KingKo[teban].baninfo(ban));
@@ -602,7 +602,7 @@ namespace YTSG {
             List<koPos> retList = new List<koPos>();
 
             int score = -9999999;
-            ban.renewNifList(teban);  //二歩リスト更新
+            //ban.renewNifList(teban);  //二歩リスト更新
 
             //[攻め方]王手を指せる手を全てリスト追加
             foreach (koma km in ban.OkiKo[teban]) {

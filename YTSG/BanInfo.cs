@@ -75,6 +75,9 @@ namespace YTSG {
             for (int i = 0; i < 2; i++) {
                 KingKo[i] = this.OkiKo[i].FirstOrDefault(k => k.type == KomaType.Ousyou);
             }
+
+            // 二歩リスト更新
+            renewNifList();
         }
 
         //盤情報作成(指定の場面)
@@ -131,6 +134,10 @@ namespace YTSG {
                 }
 
             }
+
+            // 二歩リスト更新
+            renewNifList();
+
         }
 
         //盤情報作成(コピー)
@@ -173,6 +180,10 @@ namespace YTSG {
                 }
             }
 
+            //二歩リストコピー
+            Array.Copy(ban.nifList, nifList, nifList.Length);
+
+
         }
 
         //駒の追加(駒指定:[駒情報]) (0:追加OK, -1:追加NG(すでに駒が存在する))
@@ -187,14 +198,17 @@ namespace YTSG {
             return 0;
         }
 
-        //二歩リスト更新
-        public void renewNifList(int teban) {
+        //二歩リスト更新(重いので盤情報初期化時のみ使用)
+        void renewNifList() {
             // 二歩リスト初期化
             Array.Clear(nifList, 0, nifList.Length);
 
             for (int i = 0; i < TEIGI.SIZE_SUZI; i++) {  //筋(X)
-                if (OkiKo[teban].Exists(k => (k.type == KomaType.Fuhyou && k.x == i)) == true) {  //その筋上に味方の歩があるか
-                    nifList[teban, i] = 1;
+                if (OkiKo[TEIGI.TEBAN_SENTE].Exists(k => (k.type == KomaType.Fuhyou && k.x == i)) == true) {  //その筋上に味方の歩があるか
+                    nifList[TEIGI.TEBAN_SENTE, i] = 1;
+                }
+                if (OkiKo[TEIGI.TEBAN_GOTE].Exists(k => (k.type == KomaType.Fuhyou && k.x == i)) == true) {  //その筋上に味方の歩があるか
+                    nifList[TEIGI.TEBAN_GOTE, i] = 1;
                 }
             }
         }
@@ -224,6 +238,12 @@ namespace YTSG {
 
                 toriKo.x = 9;  //持ち駒状態
                 toriKo.y = 9;  //持ち駒状態
+
+                //歩の場合は2歩リスト更新
+                if (toriKo.type == KomaType.Fuhyou) {
+                    nifList[ko.ap, dstPos.x] = 0;
+                }
+
                 toriKo.doKModori();  //成り状態を戻す
                 OkiKo[toriKo.p].Remove(toriKo);
                 if (toriKo.type == KomaType.Ousyou) {
@@ -244,6 +264,12 @@ namespace YTSG {
 
                 IdouListKousinKoma.Add(ko);
                 RenewLinking(dstPos.x, dstPos.y, -1, ref IdouListKousinKoma);
+
+                //歩の場合は2歩リスト更新
+                if (ko.type == KomaType.Fuhyou) {
+                    nifList[ko.p, dstPos.x] = 1;
+                }
+
             } else {
                 /* 駒移動 */
 
@@ -255,7 +281,15 @@ namespace YTSG {
                 RenewLinking(ko.x, ko.y, -1, ref IdouListKousinKoma);
 
                 BanKo[ko.x, ko.y] = null;
-                if (naru == true) ko.doKNari(); //駒成り
+                if (naru == true) {
+
+                    //歩の場合は2歩リスト更新
+                    if (ko.type == KomaType.Fuhyou) {
+                        nifList[ko.p, dstPos.x] = 0;
+                    }
+
+                    ko.doKNari(); //駒成り
+                }
             }
 
             BanKo[dstPos.x, dstPos.y] = ko;
