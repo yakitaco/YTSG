@@ -92,7 +92,7 @@ namespace YTSG {
 
                 foreach (koPos pos in poslist) {
                     //if (ban.BanKo[pos.x, pos.y] == null) pos.val += tekouho.GetKouho(pos);
-                    for (int i = Program.kifu.Count - 1; i>=0 && i > Program.kifu.Count - 4; i -= 2) {
+                    for (int i = Program.kifu.Count - 1; i>=0 && i > Program.kifu.Count - 6; i -= 2) {
                         if ((pos.x == Program.kifu[i].x) && (pos.y == Program.kifu[i].y) && (pos.ko.type == Program.kifu[i].ko.type)){
                             //pos.val -= 500;
                         }
@@ -111,7 +111,7 @@ namespace YTSG {
                         } else {
                             pos.val -= 20;  // 味方連携有り
                         }
-                        for (int ii = Program.kifu.Count - 1; ii >= 0 && ii > Program.kifu.Count - 4; ii -= 2) {
+                        for (int ii = Program.kifu.Count - 1; ii >= 0 && ii > Program.kifu.Count - 6; ii -= 2) {
                             if ((pos.x == Program.kifu[ii].x) && (pos.y == Program.kifu[ii].y) && (pos.ko.type == Program.kifu[ii].ko.type)) {
                                 //pos.val -= 500;
                             }
@@ -398,12 +398,8 @@ namespace YTSG {
                 if (ban.MochiKo[teban, i]?.Count > 0) teAllList.AddRange(ban.MochiKo[teban, i][0].baninfoPosNext(ban, ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].x, ban.KingKo[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE].y));
             }
 
-            foreach (var n in teAllList) {
-                Form1.Form1Instance.addMsg("[" + n.val + "](" + (n.ko.x + 1) + "," + (n.ko.y + 1) + ")->(" + (n.x + 1) + "," + (n.y + 1) + ")" + n.ko.type);
-            }
-
             //thread同時数
-            Form1.Form1Instance.addMsg("MinThreads work= " + workMin + ", i/o= " + ioMin + ", teAllList=" + teAllList.Count);
+            Form1.Form1Instance.addMsg("[TUME]MinThreads work= " + workMin + ", i/o= " + ioMin + ", teAllList=" + teAllList.Count);
             //Thread.Sleep(2000);
             // 並行処理
             Parallel.For(0, workMin, id => {

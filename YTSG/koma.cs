@@ -396,6 +396,25 @@ namespace YTSG {
 
                             }
 
+                            // 敵飛車前の歩は高評価
+                            if ((this.type == KomaType.Fuhyou) && (ban.IdouList[this.p, j, i] > 0)) {
+                                if (this.p == TEIGI.TEBAN_SENTE) {
+                                    for (int k = 1; k < TEIGI.SIZE_DAN; k++) {
+                                        if (i - k < 0)  break;
+                                        if (ban.BanKo[j, i-k] == null) continue;
+                                        if (((ban.BanKo[j, i - k].type == KomaType.Hisya) || (ban.BanKo[j, i - k].type == KomaType.Ryuuou))&&(ban.BanKo[j, i - k].p == this.ap)) val += 500;
+                                        break;
+                                    }
+                                } else {
+                                    for (int k = 1; k < TEIGI.SIZE_DAN; k++) {
+                                        if (i + k > 8) break;
+                                        if (ban.BanKo[j, i + k] == null) continue;
+                                        if (((ban.BanKo[j, i + k].type == KomaType.Hisya) || (ban.BanKo[j, i + k].type == KomaType.Ryuuou)) && (ban.BanKo[j, i + k].p == this.ap)) val += 500;
+                                        break;
+                                    }
+                                }
+                            }
+
                             teList.Add(new koPos(j, i, val, this, false));
                         }
                     }
@@ -512,36 +531,36 @@ namespace YTSG {
                 }
                 if ((KoMove[(uint)this.type] & 64) > 0) { //7 : 香車
                     for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
-                        if (koSetPosP(new koPos(this).rMV(1, -i), ban, ref teList, tgt_x, tgt_y) != 0) return teList;
+                        if (koSetPosP(new koPos(this).rMV(0, -i), ban, ref teList, tgt_x, tgt_y) != 0) return teList;
                     }
                 }
 
                 if ((KoMove[(uint)this.type] & 128) > 0) { //8 : 飛車
                     for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
-                        if (koSetPosP(new koPos(this).rMV(0, -i), ban, ref teList, tgt_x, tgt_y) != 0) return teList;
+                        if (koSetPosP(new koPos(this).rMV(0, -i), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
                     }
                     for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                        if (koSetPosP(new koPos(this).rMV(-i, 0), ban, ref teList, tgt_x, tgt_y) != 0) return teList;
+                        if (koSetPosP(new koPos(this).rMV(-i, 0), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
                     }
                     for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                        if (koSetPosP(new koPos(this).rMV(i, 0), ban, ref teList, tgt_x, tgt_y) != 0) return teList;
+                        if (koSetPosP(new koPos(this).rMV(i, 0), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
                     }
                     for (int i = 1; i < TEIGI.SIZE_DAN; i++) {
-                        if (koSetPosP(new koPos(this).rMV(0, i), ban, ref teList, tgt_x, tgt_y) != 0) return teList;
+                        if (koSetPosP(new koPos(this).rMV(0, i), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
                     }
                 }
                 if ((KoMove[(uint)this.type] & 256) > 0) { //9 : 角行
                     for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                        if (koSetPosP(new koPos(this).rMV(-i, -i), ban, ref teList, tgt_x, tgt_y) != 0) return teList;
+                        if (koSetPosP(new koPos(this).rMV(-i, -i), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
                     }
                     for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                        if (koSetPosP(new koPos(this).rMV(-i, i), ban, ref teList, tgt_x, tgt_y) != 0) return teList;
+                        if (koSetPosP(new koPos(this).rMV(-i, i), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
                     }
                     for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                        if (koSetPosP(new koPos(this).rMV(i, -i), ban, ref teList, tgt_x, tgt_y) != 0) return teList;
+                        if (koSetPosP(new koPos(this).rMV(i, -i), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
                     }
                     for (int i = 1; i < TEIGI.SIZE_SUZI; i++) {
-                        if (koSetPosP(new koPos(this).rMV(i, i), ban, ref teList, tgt_x, tgt_y) != 0) return teList;
+                        if (koSetPosP(new koPos(this).rMV(i, i), ban, ref teList, tgt_x, tgt_y) == 3) return teList;
                     }
                 }
             }
