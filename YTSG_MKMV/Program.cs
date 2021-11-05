@@ -210,6 +210,12 @@ namespace YTSG_MKMV {
                     //kmv 保存
                     //baseKmv.save();
 
+                } else if ((str.Length > 2) && (str.Substring(0, 3) == "csa")) {
+                    csaReadForm f = new csaReadForm();
+                    Application.Run(f);
+                    //kmv 保存
+                    //baseKmv.save();
+
                 } else if ((str.Length > 8) && (str.Substring(0, 9) == "setoption")) {
                     string[] arr = str.Split(' ');
 

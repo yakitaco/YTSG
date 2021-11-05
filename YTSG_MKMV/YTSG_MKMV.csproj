@@ -52,6 +52,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="csaReadForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="csaReadForm.Designer.cs">
+      <DependentUpon>csaReadForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -68,6 +74,9 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="usiIO.cs" />
+    <EmbeddedResource Include="csaReadForm.resx">
+      <DependentUpon>csaReadForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
