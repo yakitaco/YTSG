@@ -92,6 +92,14 @@ namespace kmoveDll {
             return true;
         }
 
+        public bool save(string filePath) {
+            Stream fileStream = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            BinaryFormatter binaryFormatter = new BinaryFormatter();
+            binaryFormatter.Serialize(fileStream, this);
+            fileStream.Close();
+            return true;
+        }
+
         // nxSumの値を更新
         public void calcNxSum() {
             nxSum = 0;

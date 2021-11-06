@@ -150,9 +150,9 @@ namespace YTSG_MKMV {
                             }
 
                             int cnt;
-                            kmove tmps = tmpKmv;
+                            //kmove tmps = tmpKmv;
                             for (cnt = 0; cnt < tmpKmv.nxMove.Count; cnt++) {
-                                tmps = tmpKmv;
+                                //tmps = tmpKmv;
                                 // 一致あり(更新)
                                 if ((tmpKmv.nxMove[cnt].ox == src.x) && (tmpKmv.nxMove[cnt].oy == src.y)
                                     && (tmpKmv.nxMove[cnt].nx == dst.x) && (tmpKmv.nxMove[cnt].ny == dst.y) && (tmpKmv.nxMove[cnt].nari == nari)) {
