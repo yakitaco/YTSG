@@ -13,6 +13,11 @@ namespace YTSG {
             int val = 0;
             switch (type) {
                 case KomaType.Fuhyou:
+                    /* 飛車先を突くほうが評価値が高い */
+
+                    /* 相手の角桂をつくほうが評価値が高い */
+
+
                     break;
                 case KomaType.Kyousha:
                     break;

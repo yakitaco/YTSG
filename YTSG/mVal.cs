@@ -1,5 +1,6 @@
 ﻿using kmoveDll;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace YTSG {
     class mVal {
@@ -10,8 +11,9 @@ namespace YTSG {
         static List<mVal> mV;
         static int senTeNum = 0;
         static int goTeNum = 0;
+        static int stage = 0;  //0:序盤(型作成) 1:中盤(攻防開始) 2:終盤(詰め重視) 
 
-        static int[,] allZero = new int[9,9]
+        static int[,] allZero = new int[9, 9]
                 { {  0,  0,  0,  0,  0,  0,  0,  0,  0}, // 香
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
@@ -158,7 +160,7 @@ namespace YTSG {
             mV.Add(tmp);
 
             //居飛車
-            tmp = new mVal(OPLIST.None, 0);
+            tmp = new mVal(OPLIST.IBISYA, 0);
             tmp.val = new int[14, 9, 9]  {
                 { {  0,  0,  0,  0,  0,  0,  0, 60,  0}, // 歩
                   {  0,  0,  0,  0,  0,  0,  0, 50,  0},
@@ -292,13 +294,13 @@ namespace YTSG {
             // 向飛車
             tmp = new mVal(OPLIST.MUKAIBISYA, 0);
             tmp.val = new int[14, 9, 9]  {
-                { { 0, 0,60, 0, 0, 0, 0, 0, 0}, // 歩
-                  { 0, 0,50, 0, 0, 0, 0, 0, 0},
-                  { 0, 0,40, 0, 0, 0, 0, 0, 0},
-                  { 0, 0,30, 0, 0, 0, 0, 0, 0},
-                  { 0, 0,20, 0, 0, 0, 0, 0, 0},
-                  { 0, 0,10, 0, 0, 0, 0, 0, 0},
-                  {10,10, 0,10,10,10,10,10,10},
+                { {  0, 60,  0,  0,  0,  0,  0,  0,  0}, // 歩
+                  {  0, 50,  0,  0,  0,  0,  0,  0,  0},
+                  {  0, 40,  0,  0,  0,  0,  0,  0,  0},
+                  {  0, 30,  0,  0,  0,  0,  0,  0,  0},
+                  {  0, 20,  0,  0,  0,  0,  0,  0,  0},
+                  { 10, 10, 10, 10,  0,  0,  0,  0,  0},
+                  {  0,  1,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0}},
                 { {  0,  0,  0,  0,  0,  0,  0,  0,  0}, // 香
@@ -316,34 +318,34 @@ namespace YTSG {
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
-                  { -5,  0, -5,  0,  0,  0,  3,  0,  0},
+                  {  5,  0, -5,  0,  0,  0,  3,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0}},
                 { {  0,  0,  0,  0,  0,  0,  0,  0,  0}, // 銀
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
-                  { 0, 0, 0, 0, 0, 0,70,70,70},
-                  { 0, 0, 0, 0, 0, 0,60,50,60},
-                  { 0, 0, 0, 0, 0, 0,50,40,50},
-                  { 0, 0, 0, 0, 0, 0, 0,30, 0},
-                  { 0, 0, 0, 0, 0, 0,20,20, 0},
-                  { 0, 0, 0, 0, 0, 0,10, 0, 0},
+                  {  0,  0,  0,  0,  0,  0,  0,  0,  0},
+                  {  0,  0,  0,  0,  0,  0,  0,  0,  0},
+                  {  0,  0,  0,  0,  0,  0,  0,  0,  0},
+                  {  0,  0,  0,  0,  0,  0,  0,  0,  0},
+                  {  0,  0,  0, 20,  0,  0,  0,  0,  0},
+                  {  0,  0,  0, 10,  0,  5,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0}},
-                { { 0, 0, 0, 0, 0, 0, 0,50, 0}, // 飛
-                  { 0, 0, 0, 0, 0, 0, 0,50, 0},
-                  { 0, 0, 0, 0, 0, 0, 0,50, 0},
+                { {  0, 50,  0,  0,  0,  0,  0,  0,  0}, // 飛
+                  {  0, 50,  0,  0,  0,  0,  0,  0,  0},
+                  {  0, 50,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
-                  {  0,  0,  0,  0,  0,  0,  0,  0,  0},
-                  {  0,  0,  0,  0,  0,  0,  0,  0,  0}},
+                  {  0, 20,  0,  0,  0,  0,  0,  0,  0},
+                  {  0, 20,  0,  0,  0,  0,  0,  0,  0}},
                 { {  0,  0,  0,  0,  0,  0,  0,  0,  0}, // 角
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
-                  {  0,  0,  0,  0,  0,  0,  0,  0,  0},
+                  {  0,  0, 20,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0}},
                 { {  0,  0,  0,  0,  0,  0,  0,  0,  0}, // 金
@@ -353,8 +355,8 @@ namespace YTSG {
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
-                  {  0,  0,  0,  0,  0,  0,  0,  0,  0},
-                  {  0,  0,  0,  0,  0,  0,  0,  0,  0}},
+                  {  0,  0, 10,  0,  0,  0,  0,  0,  0},
+                  {  0,  0,  0,  0,  0, 10,  0,  0,  0}},
                 { {  0,  0,  0,  0,  0,  0,  0,  0,  0}, // 王
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
@@ -362,8 +364,8 @@ namespace YTSG {
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
-                  { 0, 0, 0,10, 0, 0, 0, 0, 0},
-                  { 0, 0, 0,10, 0, 0, 0, 0, 0}},
+                  {  0,  0,  0,  0,  0, 20, 40,  0,  0},
+                  {  0,  0,  0,  0,  0,  0,  0,  0,  0}},
                 { {  0,  0,  0,  0,  0,  0,  0,  0,  0}, // と
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
                   {  0,  0,  0,  0,  0,  0,  0,  0,  0},
@@ -421,6 +423,41 @@ namespace YTSG {
             };
             mV.Add(tmp);
 
+            // 右地下鉄
+            tmp = new mVal(OPLIST.MIGICHIKATETU, 0);
+            tmp.val = new int[14, 9, 9];
+            mV.Add(tmp);
+
+            // 袖飛車
+            tmp = new mVal(OPLIST.SODEBISYA, 0);
+            tmp.val = new int[14, 9, 9];
+            mV.Add(tmp);
+
+            // 右四間飛車
+            tmp = new mVal(OPLIST.MIGISIKENBISYA, 0);
+            tmp.val = new int[14, 9, 9];
+            mV.Add(tmp);
+
+            // 中飛車
+            tmp = new mVal(OPLIST.NAKBISYA, 0);
+            tmp.val = new int[14, 9, 9];
+            mV.Add(tmp);
+
+            // 四間飛車
+            tmp = new mVal(OPLIST.SIKENBISYA, 0);
+            tmp.val = new int[14, 9, 9];
+            mV.Add(tmp);
+
+            // 三間飛車
+            tmp = new mVal(OPLIST.SANKENBISYA, 0);
+            tmp.val = new int[14, 9, 9];
+            mV.Add(tmp);
+
+            // 左地下鉄
+            tmp = new mVal(OPLIST.HIDARICHIKATETU, 0);
+            tmp.val = new int[14, 9, 9];
+            mV.Add(tmp);
+
         }
 
         mVal(OPLIST _type, int _move) {
@@ -431,12 +468,13 @@ namespace YTSG {
         public static void reset() {
             senTeNum = 0;
             goTeNum = 0;
+            stage = 0;
         }
 
         public static void setType(OPLIST _type, int turn, int count) {
-            int tmpCount = 0;
-            for (int cnt = 0; cnt <  mV.Count ; cnt++) {
-                if ((mV[cnt].type == _type)&&(mV[cnt].move <= count)&&(tmpCount < mV[cnt].move)) {
+            int tmpCount = -1;
+            for (int cnt = 0; cnt < mV.Count; cnt++) {
+                if ((mV[cnt].type == _type) && (mV[cnt].move <= count) && (tmpCount < mV[cnt].move)) {
                     if (turn == 0) {
                         senTeNum = cnt;
                     } else {
@@ -447,7 +485,102 @@ namespace YTSG {
 
 
             }
-            senTeNum = 0;
+            if (turn == 0) {
+                senTeNum = 0;
+            } else {
+                goTeNum = 0;
+            }
+        }
+
+
+        // 局面のチェック★暫定版
+        public static void tmpChk(BanInfo ban) {
+            //序盤のみ
+            if (stage == 0) {
+                //先手
+                koma hisya = ban.OkiKo[TEIGI.TEBAN_SENTE].FirstOrDefault(k => k.type == KomaType.Hisya);
+                koma fuhyou;
+                if (hisya != null) {
+                    switch (hisya.x) {
+                        case 0:    // 1筋 (右地下鉄？)
+                            setType(OPLIST.MIGICHIKATETU, TEIGI.TEBAN_SENTE, 0);
+                            break;
+                        case 1:    // 2筋 (居飛車？)
+                            fuhyou = ban.OkiKo[TEIGI.TEBAN_SENTE].FirstOrDefault(k => k.type == KomaType.Fuhyou && k.x == 1);
+                            if ((fuhyou == null) || (fuhyou.y < 6)) setType(OPLIST.IBISYA, TEIGI.TEBAN_SENTE, 0);
+                            break;
+                        case 2:    // 3筋 (袖飛車？)
+                            fuhyou = ban.OkiKo[TEIGI.TEBAN_SENTE].FirstOrDefault(k => k.type == KomaType.Fuhyou && k.x == 2);
+                            if ((fuhyou == null) || (fuhyou.y < 6)) setType(OPLIST.SODEBISYA, TEIGI.TEBAN_SENTE, 0);
+                            break;
+                        case 3:    // 4筋 (右四間飛車？)
+                            fuhyou = ban.OkiKo[TEIGI.TEBAN_SENTE].FirstOrDefault(k => k.type == KomaType.Fuhyou && k.x == 3);
+                            if ((fuhyou == null) || (fuhyou.y < 6)) setType(OPLIST.MIGISIKENBISYA, TEIGI.TEBAN_SENTE, 0);
+                            break;
+                        case 4:    // 5筋 (中飛車？)
+                            fuhyou = ban.OkiKo[TEIGI.TEBAN_SENTE].FirstOrDefault(k => k.type == KomaType.Fuhyou && k.x == 4);
+                            if ((fuhyou == null) || (fuhyou.y < 6)) setType(OPLIST.NAKBISYA, TEIGI.TEBAN_SENTE, 0);
+                            break;
+                        case 5:    // 6筋 (四間飛車？)
+                            fuhyou = ban.OkiKo[TEIGI.TEBAN_SENTE].FirstOrDefault(k => k.type == KomaType.Fuhyou && k.x == 5);
+                            if ((fuhyou == null) || (fuhyou.y < 6)) setType(OPLIST.SIKENBISYA, TEIGI.TEBAN_SENTE, 0);
+                            break;
+                        case 6:    // 7筋 (三間飛車？)
+                            fuhyou = ban.OkiKo[TEIGI.TEBAN_SENTE].FirstOrDefault(k => k.type == KomaType.Fuhyou && k.x == 6);
+                            if ((fuhyou == null) || (fuhyou.y < 6)) setType(OPLIST.SANKENBISYA, TEIGI.TEBAN_SENTE, 0);
+                            break;
+                        case 7:    // 8筋 (向かい飛車？)
+                            fuhyou = ban.OkiKo[TEIGI.TEBAN_SENTE].FirstOrDefault(k => k.type == KomaType.Fuhyou && k.x == 6);
+                            if ((fuhyou == null) || (fuhyou.y < 6)) setType(OPLIST.MUKAIBISYA, TEIGI.TEBAN_SENTE, 0);
+                            break;
+                        case 8:    // 9筋 (左地下鉄？)
+                            setType(OPLIST.HIDARICHIKATETU, TEIGI.TEBAN_SENTE, 0);
+                            break;
+                    }
+                }
+
+                hisya = ban.OkiKo[TEIGI.TEBAN_GOTE].FirstOrDefault(k => k.type == KomaType.Hisya);
+                if (hisya != null) {
+                    switch (hisya.x) {
+                        case 8:    // 1筋 (右地下鉄？)
+                            setType(OPLIST.MIGICHIKATETU, TEIGI.TEBAN_GOTE, 0);
+                            break;
+                        case 7:    // 2筋 (居飛車？)
+                            fuhyou = ban.OkiKo[TEIGI.TEBAN_GOTE].FirstOrDefault(k => k.type == KomaType.Fuhyou && k.x == 7);
+                            if ((fuhyou == null) || (fuhyou.y > 2)) setType(OPLIST.IBISYA, TEIGI.TEBAN_GOTE, 0);
+                            break;
+                        case 6:    // 3筋 (袖飛車？)
+                            fuhyou = ban.OkiKo[TEIGI.TEBAN_GOTE].FirstOrDefault(k => k.type == KomaType.Fuhyou && k.x == 6);
+                            if ((fuhyou == null) || (fuhyou.y > 2)) setType(OPLIST.SODEBISYA, TEIGI.TEBAN_GOTE, 0);
+                            break;
+                        case 5:    // 4筋 (右四間飛車？)
+                            fuhyou = ban.OkiKo[TEIGI.TEBAN_GOTE].FirstOrDefault(k => k.type == KomaType.Fuhyou && k.x == 5);
+                            if ((fuhyou == null) || (fuhyou.y > 2)) setType(OPLIST.MIGISIKENBISYA, TEIGI.TEBAN_GOTE, 0);
+                            break;
+                        case 4:    // 5筋 (中飛車？)
+                            fuhyou = ban.OkiKo[TEIGI.TEBAN_GOTE].FirstOrDefault(k => k.type == KomaType.Fuhyou && k.x == 4);
+                            if ((fuhyou == null) || (fuhyou.y > 2)) setType(OPLIST.NAKBISYA, TEIGI.TEBAN_GOTE, 0);
+                            break;
+                        case 3:    // 6筋 (四間飛車？)
+                            fuhyou = ban.OkiKo[TEIGI.TEBAN_GOTE].FirstOrDefault(k => k.type == KomaType.Fuhyou && k.x == 3);
+                            if ((fuhyou == null) || (fuhyou.y > 2)) setType(OPLIST.SIKENBISYA, TEIGI.TEBAN_GOTE, 0);
+                            break;
+                        case 2:    // 7筋 (三間飛車？)
+                            fuhyou = ban.OkiKo[TEIGI.TEBAN_GOTE].FirstOrDefault(k => k.type == KomaType.Fuhyou && k.x == 2);
+                            if ((fuhyou == null) || (fuhyou.y > 2)) setType(OPLIST.SANKENBISYA, TEIGI.TEBAN_GOTE, 0);
+                            break;
+                        case 1:    // 8筋 (向かい飛車？)
+                            fuhyou = ban.OkiKo[TEIGI.TEBAN_GOTE].FirstOrDefault(k => k.type == KomaType.Fuhyou && k.x == 2);
+                            if ((fuhyou == null) || (fuhyou.y > 2)) setType(OPLIST.MUKAIBISYA, TEIGI.TEBAN_SENTE, 0);
+                            break;
+                        case 0:    // 9筋 (左地下鉄？)
+                            setType(OPLIST.HIDARICHIKATETU, TEIGI.TEBAN_GOTE, 0);
+                            break;
+                    }
+                }
+                Form1.Form1Instance.addMsg("SENKEI[" + senTeNum + ":" + mV[senTeNum].type + "]-[" + goTeNum + ":" + mV[goTeNum].type);
+            }
+
         }
 
         //public static void countUp(int count) {
@@ -472,12 +605,22 @@ namespace YTSG {
             return mV[0].val;
         }
 
+        public static void setStage(int _stage) {
+            if (stage < _stage) {
+                stage = _stage;
+            }
+        }
+
         // 指定評価値を取得
         public static int get(KomaType type, int nx, int ny, int ox, int oy, int turn) {
-            if (turn == 0) {
-                return mV[0].val[(int)type - 1, ny, 8 - nx] - mV[0].val[(int)type - 1, oy, 8 - ox];
+            if (stage == 0) {
+                if (turn == 0) {
+                    return mV[0].val[(int)type - 1, ny, 8 - nx] - mV[0].val[(int)type - 1, oy, 8 - ox];
+                } else {
+                    return mV[0].val[(int)type - 1, 8 - ny, nx] - mV[0].val[(int)type - 1, 8 - oy, ox];
+                }
             } else {
-                return mV[0].val[(int)type - 1, 8 - ny, nx] - mV[0].val[(int)type - 1, 8 - oy, ox];
+                return 0;
             }
 
         }

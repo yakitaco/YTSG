@@ -342,13 +342,15 @@ namespace YTSG {
 
                         }
 
+                        mVal.tmpChk(ban);
+
                         thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
                         //thisProcess.PriorityClass = ProcessPriorityClass.BelowNormal; //優先度普通
 
                         //if ((tesuu == 9) || (tesuu == 10)) tekouho.ReadJoseki03("");
                         //if ((tesuu == 39) || (tesuu == 40)) tekouho.ResetJoseki();
 
-                        if ((tesuu < 20) || (nokori < 60000)) {
+                        if (nokori < 60000) {
                             //cpu.maxDepth = 3;
                             //ret = cpu.thinkMove(myTeban, ban, 3, 0)[0]; //コンピュータ思考
 
@@ -367,10 +369,10 @@ namespace YTSG {
                         } else {
                             //cpu.maxDepth = 5;
                             //ret = cpu.thinkMove(myTeban, ban, 5)[0]; //コンピュータ思考
-
+                            mVal.setStage(1);//中盤
                             aiTaskMain = Task.Run(() => {
                                 //return cpu.thinkMove(myTeban, ban, 4, 10, 7, 4);
-                                return cpu.thinkMove(myTeban, ban, 5, 7, 5, 5);
+                                return cpu.thinkMove(myTeban, ban, 5, 7, 3, 5);
                             });
 
                         }
