@@ -22,7 +22,9 @@ namespace kmoveDll {
         SIKENBISYA  = 220,//四間飛車
         SANKENBISYA = 230,//三間飛車
         MUKAIBISYA  = 240,//向かい飛車
-        SODEBISYA   = 250,//袖飛車
+        MIGISIKENBISYA = 250,//右四間飛車
+        SODEBISYA   = 260,//袖飛車
+
 
         KISYU = 300,          //奇襲・不明
         ONIGOROSHI = 310,     //鬼殺し
@@ -31,7 +33,8 @@ namespace kmoveDll {
         SUZICHIGAIKAKU = 330, //筋違い角
         HAYAISHIDA     = 340, //筋違い角
 
-
+        MIGICHIKATETU = 350,//右地下鉄
+        HIDARICHIKATETU = 360,//左地下鉄
 
     }
 }
