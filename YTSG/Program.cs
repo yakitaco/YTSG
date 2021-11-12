@@ -290,6 +290,7 @@ namespace YTSG {
                     if (arr[1] == "btime") {
 
                         int nokori = Convert.ToInt32(myTeban == TEIGI.TEBAN_SENTE ? arr[2] : arr[4]);
+                        List<koPos> retList = new List<koPos>();
 
                         // タイマー設定
                         //if (nokori > )
@@ -299,7 +300,7 @@ namespace YTSG {
                         Form1.Form1Instance.addMsg("[NOKORI]" + nokori);
 
                         //定跡あり
-                        if ((tmpKmv != null) && (tmpKmv.nxSum > 0)) {
+                        for (int cnt = 0 ; (tmpKmv != null) && (tmpKmv.nxSum > 0) && (cnt < 20) ; cnt++) {
                             int rVal = rnd.Next(0, tmpKmv.nxSum);
                             int i;
                             for (i = 0; i < tmpKmv.nxMove.Count; i++) {
@@ -332,6 +333,7 @@ namespace YTSG {
                                         Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + usiIO.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, tmpKmv.nxMove[i].ox, tmpKmv.nxMove[i].oy), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny, tmpKmv.nxMove[i].nari)));
                                         Console.WriteLine("bestmove " + usiIO.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, tmpKmv.nxMove[i].ox, tmpKmv.nxMove[i].oy), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny, tmpKmv.nxMove[i].nari)));  //標準出力
                                     }
+                                    retList.Add(new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny, tmpKmv.nxMove[i].nari));
                                 } else {  //移動NG
                                     Form1.Form1Instance.addMsg("Move chk NG!!");
                                     i = tmpKmv.nxMove.Count;
@@ -380,7 +382,7 @@ namespace YTSG {
                         //Thread.Sleep(2000);
                         //Form1.Form1Instance.addMsg("TESTTESTETEST");
 
-                        List<koPos> retList;
+                        
                         retList = aiTaskMain.Result;
 
                         thisProcess.PriorityClass = ProcessPriorityClass.AboveNormal; //優先度普通
