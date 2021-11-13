@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -170,15 +171,15 @@ namespace YTSG {
                             teAllList[cnt_local].val -= nexTe[0].val;// - tekouho.GetKouho(teAllList[cnt_local]);
                         }
                     }
-                    string aaa = "";
-                    string bbb = "";
+                    StringBuilder aaa = new StringBuilder("");
+                    //string bbb = "";
                     foreach (var n in nexTe ?? new List<koPos>()) {
-                        aaa += "->[" + n.val + "](" + (n.x + 1) + "," + (n.y + 1) + ")" + n.ko.type;
-                        bbb += " " + usiIO.pos2usi(n.ko, n);
+                        aaa.Append("->[" + n.val + "](" + (n.x + 1) + "," + (n.y + 1) + ")" + n.ko.type);
+                        //bbb += " " + usiIO.pos2usi(n.ko, n);
                     }
 
                     Form1.Form1Instance.addMsg("[" + Task.CurrentId + "]teAll[" + cnt_local + "].val = [" + teAllList[cnt_local].val + "](" + (teAllList[cnt_local].x + 1) + "," + (teAllList[cnt_local].y + 1) + ")" + teAllList[cnt_local].ko.type + aaa);
-                    Console.WriteLine("info score cp " + (ban.chkScore(teban) + teAllList[cnt_local].val) + " pv " + usiIO.pos2usi(teAllList[cnt_local].ko, teAllList[cnt_local]) + bbb);  //標準出力
+                    //Console.WriteLine("info score cp " + (ban.chkScore(teban) + teAllList[cnt_local].val) + " pv " + usiIO.pos2usi(teAllList[cnt_local].ko, teAllList[cnt_local]) + bbb);  //標準出力
 
                     lock (lockObj) {
                         if (maxScore < teAllList[cnt_local].val) {
@@ -440,9 +441,9 @@ namespace YTSG {
 
                     }
 
-                    string aaa = "";
+                    StringBuilder aaa = new StringBuilder("");
                     foreach (var n in nexTe ?? new List<koPos>()) {
-                        aaa += "->(" + (n.x + 1) + "," + (n.y + 1) + ")" + n.ko.type;
+                        aaa.Append("->(" + (n.x + 1) + "," + (n.y + 1) + ")" + n.ko.type);
                     }
 
                     Form1.Form1Instance.addMsg("[" + Task.CurrentId + "]teAll[" + cnt_local + "].val = [" + teAllList[cnt_local].val + "](" + (teAllList[cnt_local].ko.x + 1) + "," + (teAllList[cnt_local].ko.y + 1) + ")->(" + (teAllList[cnt_local].x + 1) + "," + (teAllList[cnt_local].y + 1) + ")" + teAllList[cnt_local].ko.type + aaa);

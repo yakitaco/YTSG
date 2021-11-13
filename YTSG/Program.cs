@@ -1,6 +1,4 @@
-﻿
-using kmoveDll;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -218,12 +216,11 @@ namespace YTSG {
             Task<List<koPos>> aiTaskMain = null;
             List<koPos> mateMove = null; // 詰みの手筋
 
-            Random rnd = new System.Random();
 
             int rets = mPar.readParam("");
             rets = mPar.prm[0];
-            kmove baseKmv = null;
-            kmove tmpKmv = null;
+            //kmove baseKmv = null;
+            //kmove tmpKmv = null;
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
@@ -247,11 +244,13 @@ namespace YTSG {
             int startStrPos = 0;
             int teban = 0;
             int score = 0;
+            List<koPos> retList = new List<koPos>();
 
             //Application.Run(form1);
             while (true) {
                 string str = Console.ReadLine();
                 Form1.Form1Instance.addMsg("[RECV]" + str);
+
 
                 // usi 起動
                 if ((str.Length == 3) && (str.Substring(0, 3) == "usi")) {
@@ -290,58 +289,30 @@ namespace YTSG {
                     if (arr[1] == "btime") {
 
                         int nokori = Convert.ToInt32(myTeban == TEIGI.TEBAN_SENTE ? arr[2] : arr[4]);
-                        List<koPos> retList = new List<koPos>();
+                        retList = new List<koPos>();
 
                         // タイマー設定
                         //if (nokori > )
                         aTimer = new System.Timers.Timer(2000);
-
-
                         Form1.Form1Instance.addMsg("[NOKORI]" + nokori);
 
-                        //定跡あり
-                        for (int cnt = 0 ; (tmpKmv != null) && (tmpKmv.nxSum > 0) && (cnt < 20) ; cnt++) {
-                            int rVal = rnd.Next(0, tmpKmv.nxSum);
-                            int i;
-                            for (i = 0; i < tmpKmv.nxMove.Count; i++) {
-                                if (tmpKmv.nxMove[i].val < 0) continue;
-                                if (rVal > tmpKmv.nxMove[i].val) {
-                                    rVal -= tmpKmv.nxMove[i].val;
-                                    continue;
-                                }
-                                Form1.Form1Instance.addMsg("Hit Move : (" + tmpKmv.nxMove[i].ox + "," + tmpKmv.nxMove[i].oy + ")->(" + tmpKmv.nxMove[i].nx + "," + tmpKmv.nxMove[i].ny + "):" + tmpKmv.nxMove[i].val);
+                        //定跡取得
+                        retList = sMove.getSmove(ban, teban);
 
-                                // 移動チェック
-                                BanInfo tmpBan = new BanInfo(ban);
-                                int ret;
-                                
-                                if (tmpKmv.nxMove[i].ox == 9) { // 駒打ち
-                                    koPos dst = new koPos(0, 0);
-                                    dst.ko = tmpBan.MochiKo[teban, tmpKmv.nxMove[i].oy - 1][0];
-                                    ret = tmpBan.moveKoma(teban, (KomaType)tmpKmv.nxMove[i].oy, dst, true);
-                                } else { // 移動
-                                    koPos src = new koPos(tmpKmv.nxMove[i].ox, tmpKmv.nxMove[i].oy);
-                                    koPos dst = new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny);
-                                    ret = tmpBan.moveKoma(src, dst, tmpKmv.nxMove[i].nari, true);
-                                }
-
-                                if (ret == 0) {  //移動OK
-                                    if (tmpKmv.nxMove[i].ox == 9) {
-                                        Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + usiIO.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, 9, 9), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny)));
-                                        Console.WriteLine("bestmove " + usiIO.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, 9, 9), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny)));  //標準出力
-                                    } else {
-                                        Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + usiIO.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, tmpKmv.nxMove[i].ox, tmpKmv.nxMove[i].oy), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny, tmpKmv.nxMove[i].nari)));
-                                        Console.WriteLine("bestmove " + usiIO.pos2usi(new koma(0, (KomaType)tmpKmv.nxMove[i].oy, tmpKmv.nxMove[i].ox, tmpKmv.nxMove[i].oy), new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny, tmpKmv.nxMove[i].nari)));  //標準出力
-                                    }
-                                    retList.Add(new koPos(tmpKmv.nxMove[i].nx, tmpKmv.nxMove[i].ny, tmpKmv.nxMove[i].nari));
-                                } else {  //移動NG
-                                    Form1.Form1Instance.addMsg("Move chk NG!!");
-                                    i = tmpKmv.nxMove.Count;
-                                }
-                                break;
+                        // 定跡あり
+                        if (retList.Count > 0) {
+                            string pstr = "";
+                            for (int i = 1; i < retList.Count; i++) {
+                                pstr += " " + usiIO.pos2usi(retList[i].ko, retList[i]);
                             }
-                            if (i < tmpKmv.nxMove.Count) continue; // 定跡ありのためスキップ
-
+                            Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + pstr);
+                            if (retList.Count > 1) { //先読みあり
+                                Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]) + " ponder " + usiIO.pos2usi(retList[1].ko, retList[1]));   //標準出力
+                                retList.RemoveAt(0);
+                            } else {
+                                Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                            }
+                            continue;
                         }
 
                         mVal.tmpChk(ban);
@@ -382,7 +353,7 @@ namespace YTSG {
                         //Thread.Sleep(2000);
                         //Form1.Form1Instance.addMsg("TESTTESTETEST");
 
-                        
+
                         retList = aiTaskMain.Result;
 
                         thisProcess.PriorityClass = ProcessPriorityClass.AboveNormal; //優先度普通
@@ -393,13 +364,17 @@ namespace YTSG {
                             Console.WriteLine("bestmove resign");
 
                         } else {
+                            string pstr = "";
+                            for (int i = 1; i < retList.Count; i++) {
+                                pstr += " " + usiIO.pos2usi(retList[i].ko, retList[i]);
+                            }
 
                             if (retList[0].val > 5000) {
-                                Console.WriteLine("info score mate " + retList.Count + " pv " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                                Console.WriteLine("info score mate " + retList.Count + " pv " + pstr);  //標準出力
 
                             } else {
                                 score += retList[0].tval;
-                                Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                                Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + pstr);  //標準出力
                             }
 
                             if (retList.Count > 1) {
@@ -425,51 +400,64 @@ namespace YTSG {
                         // 先読み
                     } else if (arr[1] == "ponder") {
 
-                        // 詰みが見える場合は何もしない
-                        if (mateMove?.Count > 0) {
-                            Form1.Form1Instance.addMsg("Think Ponder. <<mate>>" + mateMove.Count);
+                        if (retList?.Count > 1) {
+                            string pstr = "";
+                            for (int i = 1; i < retList.Count; i++) {
+                                pstr += " " + usiIO.pos2usi(retList[i].ko, retList[i]);
+                            }
+                            Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + pstr);
+                        }
 
-                            // 詰みが見えてない場合のみ先読み実施
+                        // 定跡の場合
+                        if ((sMove.currentKmv != null)&&((retList?.Count > 1))) {
+                            /* 何もしない */
                         } else {
-                            Form1.Form1Instance.addMsg("Think Ponder.");
 
-                            thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
-                            int nokori = Convert.ToInt32(myTeban == TEIGI.TEBAN_SENTE ? arr[3] : arr[5]);
+                            // 詰みが見える場合は何もしない
+                            if (mateMove?.Count > 0) {
+                                Form1.Form1Instance.addMsg("Think Ponder. <<mate>>" + mateMove.Count);
 
-                            //if ((tesuu == 9) || (tesuu == 10)) tekouho.ReadJoseki03("");
-                            //if ((tesuu == 39) || (tesuu == 40)) tekouho.ResetJoseki();
-
-                            if ((tesuu < 20) || (nokori < 60000)) {
-                                //cpu.maxDepth = 4;
-                                //ret = cpu.thinkMove(myTeban, ban, 3)[0]; //コンピュータ思考
-
-                                aiTaskMain = Task.Run(() => {
-                                    return cpu.thinkMove(myTeban, ban, 4, 0, 5, 4);
-                                });
-
-                            } else if ((tesuu < 50) || (nokori < 300000)) {
-                                //cpu.maxDepth = 4;
-                                //ret = cpu.thinkMove(myTeban, ban, 4)[0]; //コンピュータ思考
-
-                                aiTaskMain = Task.Run(() => {
-                                    return cpu.thinkMove(myTeban, ban, 5, 5, 0, 0);
-                                });
-
+                                // 詰みが見えてない場合のみ先読み実施
                             } else {
-                                //cpu.maxDepth = 5;
-                                //ret = cpu.thinkMove(myTeban, ban, 5)[0]; //コンピュータ思考
+                                Form1.Form1Instance.addMsg("Think Ponder.");
 
-                                aiTaskMain = Task.Run(() => {
-                                    //return cpu.thinkMove(myTeban, ban, 4, 7, 5, 4);
-                                    return cpu.thinkMove(myTeban, ban, 5, 7, 5, 5);
-                                });
+                                thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
+                                int nokori = Convert.ToInt32(myTeban == TEIGI.TEBAN_SENTE ? arr[3] : arr[5]);
 
+                                //if ((tesuu == 9) || (tesuu == 10)) tekouho.ReadJoseki03("");
+                                //if ((tesuu == 39) || (tesuu == 40)) tekouho.ResetJoseki();
+
+                                if ((tesuu < 20) || (nokori < 60000)) {
+                                    //cpu.maxDepth = 4;
+                                    //ret = cpu.thinkMove(myTeban, ban, 3)[0]; //コンピュータ思考
+
+                                    aiTaskMain = Task.Run(() => {
+                                        return cpu.thinkMove(myTeban, ban, 4, 0, 5, 4);
+                                    });
+
+                                } else if ((tesuu < 50) || (nokori < 300000)) {
+                                    //cpu.maxDepth = 4;
+                                    //ret = cpu.thinkMove(myTeban, ban, 4)[0]; //コンピュータ思考
+
+                                    aiTaskMain = Task.Run(() => {
+                                        return cpu.thinkMove(myTeban, ban, 5, 5, 0, 0);
+                                    });
+
+                                } else {
+                                    //cpu.maxDepth = 5;
+                                    //ret = cpu.thinkMove(myTeban, ban, 5)[0]; //コンピュータ思考
+
+                                    aiTaskMain = Task.Run(() => {
+                                        //return cpu.thinkMove(myTeban, ban, 4, 7, 5, 4);
+                                        return cpu.thinkMove(myTeban, ban, 5, 7, 5, 5);
+                                    });
+
+                                }
                             }
                         }
 
                         // 詰将棋
                     } else if (arr[1] == "mate") {
-                        List<koPos> retList;
 
                         thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
 
@@ -494,53 +482,80 @@ namespace YTSG {
 
                 } else if ((str.Length > 8) && (str.Substring(0, 9) == "ponderhit")) {
 
-                    // 詰みが見えている場合
-                    if (mateMove?.Count > 0) {
-                        Form1.Form1Instance.addMsg("ponder hit!! <<mate>>");
-                        Console.WriteLine("info score mate " + mateMove.Count + " pv " + usiIO.pos2usi(mateMove[0].ko, mateMove[0]));  //標準出力
-                        Console.WriteLine("bestmove " + usiIO.pos2usi(mateMove[0].ko, mateMove[0]) + " ponder " + usiIO.pos2usi(mateMove[1].ko, mateMove[1]));
-                        mateMove.RemoveAt(0);
-                        mateMove.RemoveAt(0);
-                    } else {
-                        Form1.Form1Instance.addMsg("ponder hit!!");
-                        List<koPos> retList;
-                        //Thread.Sleep(5000);  //早いと先読みthread開始前に読み取ってしまうためwait
-                        retList = aiTaskMain.Result;
+                    // 定跡の場合
+                    if ((sMove.currentKmv != null) && ((retList?.Count > 1))) {
 
-                        if ((retList?.Count == 0) || (retList[0].val < -5000)) { //投了
-                            Console.WriteLine("bestmove resign");
-
+                        retList.RemoveAt(0);
+                        string pstr = "";
+                        for (int i = 1; i < retList.Count; i++) {
+                            pstr += " " + usiIO.pos2usi(retList[i].ko, retList[i]);
+                        }
+                        Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + pstr);
+                        if (retList.Count > 1) { //先読みあり
+                            Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]) + " ponder " + usiIO.pos2usi(retList[1].ko, retList[1]));   //標準出力
+                            retList.RemoveAt(0);
                         } else {
+                            Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                        }
+                        continue;
+                    } else {
 
-                            if (retList[0].val > 5000) {
-                                Console.WriteLine("info score mate " + retList.Count + " pv " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                        // 詰みが見えている場合
+                        if (mateMove?.Count > 0) {
+                            string pstr = "";
+                            for (int i = 1; i < mateMove.Count; i++) {
+                                pstr += " " + usiIO.pos2usi(mateMove[i].ko, mateMove[i]);
+                            }
+                            Form1.Form1Instance.addMsg("ponder hit!! <<mate>>");
+                            Console.WriteLine("info score mate " + mateMove.Count + " pv " + pstr);  //標準出力
+                            Console.WriteLine("bestmove " + usiIO.pos2usi(mateMove[0].ko, mateMove[0]) + " ponder " + usiIO.pos2usi(mateMove[1].ko, mateMove[1]));
+                            mateMove.RemoveAt(0);
+                            mateMove.RemoveAt(0);
+                        } else {
+                            Form1.Form1Instance.addMsg("ponder hit!!");
+                            //Thread.Sleep(5000);  //早いと先読みthread開始前に読み取ってしまうためwait
+                            retList = aiTaskMain.Result;
+
+                            if ((retList?.Count == 0) || (retList[0].val < -5000)) { //投了
+                                Console.WriteLine("bestmove resign");
 
                             } else {
-                                score += retList[0].tval;
-                                Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
+
+                                string pstr = "";
+                                for (int i = 1; i < retList.Count; i++) {
+                                    pstr += " " + usiIO.pos2usi(retList[i].ko, retList[i]);
+                                }
+
+                                if (retList[0].val > 5000) {
+                                    Console.WriteLine("info score mate " + retList.Count + " pv " + pstr);  //標準出力
+
+                                } else {
+                                    score += retList[0].tval;
+                                    Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + pstr);  //標準出力
+                                }
+
+                                if (retList.Count > 1) {
+                                    Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]) + " ponder " + usiIO.pos2usi(retList[1].ko, retList[1]));  //標準出力
+                                                                                                                                                                        //Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                                    Form1.Form1Instance.addMsg("[SEND]MOVE:" + retList[0].ko.type + ":(" + (retList[0].ko.x + 1) + "," + (retList[0].ko.y + 1) + ")->(" + (retList[0].x + 1) + "," + (retList[0].y + 1) + ")" + (retList[0].nari == true ? "<NARI>" : "") +
+                                        " ponder " + retList[1].ko.type + ":(" + (retList[1].ko.x + 1) + "," + (retList[1].ko.y + 1) + ")->(" + (retList[1].x + 1) + "," + (retList[1].y + 1) + ")" + (retList[1].nari == true ? "<NARI>" : "") + "\n");
+
+                                } else {
+                                    Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                                    Form1.Form1Instance.addMsg("[SEND]MOVE:" + retList[0].ko.type + ":(" + (retList[0].ko.x + 1) + "," + (retList[0].ko.y + 1) + ")->(" + (retList[0].x + 1) + "," + (retList[0].y + 1) + ")" + (retList[0].nari == true ? "<NARI>" : "") + "\n");
+
+                                }
+                                ban.moveKoma(retList[0].ko, retList[0], retList[0].nari, false);  //動かす
+                                teban = (teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE);
+
+                                // 詰みの手筋が見えている(先頭2手は削除)
+                                if (retList[0].val > 5000) {
+                                    mateMove = retList;
+                                    mateMove.RemoveAt(0);
+                                    mateMove.RemoveAt(0);
+                                }
+
                             }
-
-                            if (retList.Count > 1) {
-                                Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]) + " ponder " + usiIO.pos2usi(retList[1].ko, retList[1]));  //標準出力
-                                                                                                                                                                  //Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
-                                Form1.Form1Instance.addMsg("[SEND]MOVE:" + retList[0].ko.type + ":(" + (retList[0].ko.x + 1) + "," + (retList[0].ko.y + 1) + ")->(" + (retList[0].x + 1) + "," + (retList[0].y + 1) + ")" + (retList[0].nari == true ? "<NARI>" : "") +
-                                    " ponder " + retList[1].ko.type + ":(" + (retList[1].ko.x + 1) + "," + (retList[1].ko.y + 1) + ")->(" + (retList[1].x + 1) + "," + (retList[1].y + 1) + ")" + (retList[1].nari == true ? "<NARI>" : "") + "\n");
-
-                            } else {
-                                Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
-                                Form1.Form1Instance.addMsg("[SEND]MOVE:" + retList[0].ko.type + ":(" + (retList[0].ko.x + 1) + "," + (retList[0].ko.y + 1) + ")->(" + (retList[0].x + 1) + "," + (retList[0].y + 1) + ")" + (retList[0].nari == true ? "<NARI>" : "") + "\n");
-
-                            }
-                            ban.moveKoma(retList[0].ko, retList[0], retList[0].nari, false);  //動かす
-                            teban = (teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE);
-
-                            // 詰みの手筋が見えている(先頭2手は削除)
-                            if (retList[0].val > 5000) {
-                                mateMove = retList;
-                                mateMove.RemoveAt(0);
-                                mateMove.RemoveAt(0);
-                            }
-
                         }
                     }
 
@@ -550,7 +565,7 @@ namespace YTSG {
                     teban = TEIGI.TEBAN_SENTE;
                     if (arr[1] == "startpos") {
 
-                        tmpKmv = baseKmv;
+                        sMove.currentKmv = sMove.rootKmv;
 
                         ban = new BanInfo();
                         kifu = new List<koPos>();
@@ -561,7 +576,7 @@ namespace YTSG {
 
                         ban = new BanInfo(arr[2], arr[4]);
                         startStrPos = 7;
-                        tmpKmv = null;
+                        sMove.currentKmv = null;
 
                         if (arr[3] == "b") {
                             teban = TEIGI.TEBAN_SENTE;
@@ -598,27 +613,27 @@ namespace YTSG {
                         kifu.Add(dst);
                         teban = (teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE);
 
-                        if (tmpKmv != null) {
+                        if (sMove.currentKmv != null) {
                             int cnt;
-                            int num = tmpKmv.nxMove.Count;
+                            int num = sMove.currentKmv.nxMove.Count;
                             for (cnt = 0; cnt < num; cnt++) {
 
                                 // 一致あり(更新)
                                 if ((
-                                    (tmpKmv.nxMove[cnt].ox == src.x) && (tmpKmv.nxMove[cnt].oy == src.y)
-                                    && (tmpKmv.nxMove[cnt].nx == dst.x) && (tmpKmv.nxMove[cnt].ny == dst.y) && (tmpKmv.nxMove[cnt].nari == nari))||
-                                    ((tmpKmv.nxMove[cnt].ox == 0) && (tmpKmv.nxMove[cnt].oy == 0) && (tmpKmv.nxMove[cnt].nx == 0) && (tmpKmv.nxMove[cnt].ny == 0))  //デフォルト
+                                    (sMove.currentKmv.nxMove[cnt].ox == src.x) && (sMove.currentKmv.nxMove[cnt].oy == src.y)
+                                    && (sMove.currentKmv.nxMove[cnt].nx == dst.x) && (sMove.currentKmv.nxMove[cnt].ny == dst.y) && (sMove.currentKmv.nxMove[cnt].nari == nari)) ||
+                                    ((sMove.currentKmv.nxMove[cnt].ox == 0) && (sMove.currentKmv.nxMove[cnt].oy == 0) && (sMove.currentKmv.nxMove[cnt].nx == 0) && (sMove.currentKmv.nxMove[cnt].ny == 0))  //デフォルト
                                     ) {
-                                    Form1.Form1Instance.addMsg("[JS][" + cnt + "]" + tmpKmv.nxMove[cnt].ox + "," + tmpKmv.nxMove[cnt].oy + "->" + tmpKmv.nxMove[cnt].nx + "," + tmpKmv.nxMove[cnt].ny + ":" + tmpKmv.nxMove[cnt].nxSum + " Hit!!");
-                                    tmpKmv = tmpKmv.nxMove[cnt];
+                                    Form1.Form1Instance.addMsg("[JS][" + cnt + "]" + sMove.currentKmv.nxMove[cnt].ox + "," + sMove.currentKmv.nxMove[cnt].oy + "->" + sMove.currentKmv.nxMove[cnt].nx + "," + sMove.currentKmv.nxMove[cnt].ny + ":" + sMove.currentKmv.nxMove[cnt].nxSum + " Hit!!");
+                                    sMove.currentKmv = sMove.currentKmv.nxMove[cnt];
                                     break;
                                 }
-                                Form1.Form1Instance.addMsg("[JS][" + cnt + "]" + tmpKmv.nxMove[cnt].ox + "," + tmpKmv.nxMove[cnt].oy + "->" + tmpKmv.nxMove[cnt].nx + "," + tmpKmv.nxMove[cnt].ny + ":" + tmpKmv.nxMove[cnt].nxSum);
+                                Form1.Form1Instance.addMsg("[JS][" + cnt + "]" + sMove.currentKmv.nxMove[cnt].ox + "," + sMove.currentKmv.nxMove[cnt].oy + "->" + sMove.currentKmv.nxMove[cnt].nx + "," + sMove.currentKmv.nxMove[cnt].ny + ":" + sMove.currentKmv.nxMove[cnt].nxSum);
                             }
 
-                            // 一致なし(新規作成)
+                            // 一致なし
                             if (cnt == num) {
-                                tmpKmv = null;
+                                sMove.currentKmv = null;
                             }
                         }
 
@@ -635,9 +650,11 @@ namespace YTSG {
                     cpu.stopFlg = true;
 
                     thisProcess.PriorityClass = ProcessPriorityClass.AboveNormal; //優先度普通
-
-                    List<koPos> retList;
-                    retList = aiTaskMain.Result;
+                    if ((sMove.currentKmv != null) && ((retList?.Count > 1))) {
+                        retList = new List<koPos>();
+                    } else {
+                        retList = aiTaskMain.Result;
+                    }
 
                     Console.WriteLine("bestmove 4a3b");  //標準出力
 
@@ -648,7 +665,8 @@ namespace YTSG {
                     string[] arr = str.Split(' ');
 
                     if (arr[2] == "BookFile") {
-                        baseKmv = kmove.load(arr[4]);
+                        sMove.readFile(arr[4]);
+                        //baseKmv = kmove.load(arr[4]);
                         Form1.Form1Instance.addMsg("[BOOK]" + arr[4]);
                         //baseKmv = kmove.load();
 
