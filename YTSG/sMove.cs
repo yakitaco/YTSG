@@ -12,9 +12,11 @@ namespace YTSG {
         public static kmove currentKmv;  //現在の定跡リスト
         static Random rnd = new Random();
 
-        public static void readFile(string filePath) {
+        public static int readFile(string filePath) {
+            int ret = -1;
             rootKmv = kmove.load(filePath);
-
+            if (rootKmv != null) ret = 0;
+            return ret;
         }
 
         // 定跡リストを取得

@@ -235,11 +235,17 @@ namespace YTSG {
             });
             Thread.Sleep(1000);
 
+
             BanInfo ban = new BanInfo();
 
             Process thisProcess = System.Diagnostics.Process.GetCurrentProcess();
 
             Form1.Form1Instance.resetMsg();
+
+            rets = sMove.readFile("default.ytj");
+            Form1.Form1Instance.addMsg("read default.ytj ret=" + rets);
+            mVal.reset();
+
 
             int startStrPos = 0;
             int teban = 0;
@@ -302,7 +308,7 @@ namespace YTSG {
                         // 定跡あり
                         if (retList.Count > 0) {
                             string pstr = "";
-                            for (int i = 1; i < retList.Count; i++) {
+                            for (int i = 0; i < retList.Count; i++) {
                                 pstr += " " + usiIO.pos2usi(retList[i].ko, retList[i]);
                             }
                             Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + pstr);
@@ -365,7 +371,7 @@ namespace YTSG {
 
                         } else {
                             string pstr = "";
-                            for (int i = 1; i < retList.Count; i++) {
+                            for (int i = 0; i < retList.Count; i++) {
                                 pstr += " " + usiIO.pos2usi(retList[i].ko, retList[i]);
                             }
 
@@ -379,21 +385,22 @@ namespace YTSG {
 
                             if (retList.Count > 1) {
                                 Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]) + " ponder " + usiIO.pos2usi(retList[1].ko, retList[1]));  //標準出力
-                                //Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                                Form1.Form1Instance.addMsg("[SEND]MOVE:" + retList[0].ko.type + ":(" + (retList[0].ko.x + 1) + "," + (retList[0].ko.y + 1) + ")->(" + (retList[0].x + 1) + "," + (retList[0].y + 1) + ")" + (retList[0].nari == true ? "<NARI>" : "") +
+                                    " ponder " + retList[1].ko.type + ":(" + (retList[1].ko.x + 1) + "," + (retList[1].ko.y + 1) + ")->(" + (retList[1].x + 1) + "," + (retList[1].y + 1) + ")" + (retList[1].nari == true ? "<NARI>" : "") + "\n");
 
                             } else {
                                 Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
+                                Form1.Form1Instance.addMsg("[SEND]MOVE:" + retList[0].ko.type + ":(" + (retList[0].ko.x + 1) + "," + (retList[0].ko.y + 1) + ")->(" + (retList[0].x + 1) + "," + (retList[0].y + 1) + ")" + (retList[0].nari == true ? "<NARI>" : "") + "\n");
                             }
-                            Form1.Form1Instance.addMsg("[SEND]MOVE:" + retList[0].ko.type + ":(" + (retList[0].ko.x + 1) + "," + (retList[0].ko.y + 1) + ")->(" + (retList[0].x + 1) + "," + (retList[0].y + 1) + ")" + (retList[0].nari == true ? "<NARI>" : "") + "\n");
+
                             ban.moveKoma(retList[0].ko, retList[0], retList[0].nari, false);  //動かす
+                            retList.RemoveAt(0);
                             teban = (teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE);
 
                             // 詰みの手筋が見えている(先頭2手は削除)
                             if (retList[0].val > 5000) {
                                 mateMove = retList;
                                 mateMove.RemoveAt(0);
-                                mateMove.RemoveAt(0);
-
                             }
                         }
 
@@ -487,7 +494,7 @@ namespace YTSG {
 
                         retList.RemoveAt(0);
                         string pstr = "";
-                        for (int i = 1; i < retList.Count; i++) {
+                        for (int i = 0; i < retList.Count; i++) {
                             pstr += " " + usiIO.pos2usi(retList[i].ko, retList[i]);
                         }
                         Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + pstr);
@@ -534,6 +541,8 @@ namespace YTSG {
                                     Console.WriteLine("info score cp " + ban.chkScore(teban) + " pv " + pstr);  //標準出力
                                 }
 
+
+
                                 if (retList.Count > 1) {
                                     Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]) + " ponder " + usiIO.pos2usi(retList[1].ko, retList[1]));  //標準出力
                                                                                                                                                                         //Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]));  //標準出力
@@ -545,13 +554,14 @@ namespace YTSG {
                                     Form1.Form1Instance.addMsg("[SEND]MOVE:" + retList[0].ko.type + ":(" + (retList[0].ko.x + 1) + "," + (retList[0].ko.y + 1) + ")->(" + (retList[0].x + 1) + "," + (retList[0].y + 1) + ")" + (retList[0].nari == true ? "<NARI>" : "") + "\n");
 
                                 }
+
                                 ban.moveKoma(retList[0].ko, retList[0], retList[0].nari, false);  //動かす
+                                retList.RemoveAt(0);
                                 teban = (teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE);
 
                                 // 詰みの手筋が見えている(先頭2手は削除)
                                 if (retList[0].val > 5000) {
                                     mateMove = retList;
-                                    mateMove.RemoveAt(0);
                                     mateMove.RemoveAt(0);
                                 }
 
@@ -665,9 +675,9 @@ namespace YTSG {
                     string[] arr = str.Split(' ');
 
                     if (arr[2] == "BookFile") {
-                        sMove.readFile(arr[4]);
+                        //sMove.readFile(arr[4]);
                         //baseKmv = kmove.load(arr[4]);
-                        Form1.Form1Instance.addMsg("[BOOK]" + arr[4]);
+                        //Form1.Form1Instance.addMsg("[BOOK]" + arr[4]);
                         //baseKmv = kmove.load();
 
                         //if (baseKmv == null) {  //読み込まれていない場合は新規作成

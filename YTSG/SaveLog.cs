@@ -13,8 +13,10 @@ namespace YTSG
         {
             DateTime dt = DateTime.Now;
             string result = dt.ToString("yyyyMMdd_HHmmss");
-
-            StreamWriter sw = new StreamWriter(result + "_" + teban + ".txt", false, Encoding.GetEncoding("shift_jis"));
+            if (!Directory.Exists("log")) {
+                Directory.CreateDirectory("log");
+            }
+            StreamWriter sw = new StreamWriter("log/" + result + "_" + teban + ".txt", false, Encoding.GetEncoding("shift_jis"));
             sw.Write(str);
             sw.Close();
 
