@@ -33,6 +33,7 @@
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
+            this.csaLoad = new System.ComponentModel.BackgroundWorker();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -147,6 +148,13 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.Button2_Click);
             // 
+            // csaLoad
+            // 
+            this.csaLoad.WorkerReportsProgress = true;
+            this.csaLoad.WorkerSupportsCancellation = true;
+            this.csaLoad.DoWork += new System.ComponentModel.DoWorkEventHandler(this.csaLoad_DoWork);
+            this.csaLoad.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.csaLoad_RunWorkerCompleted);
+            // 
             // csaReadForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -183,5 +191,6 @@
         private System.Windows.Forms.TextBox textBox4;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
+        private System.ComponentModel.BackgroundWorker csaLoad;
     }
 }
