@@ -41,7 +41,7 @@ namespace YTSG {
                 case KomaType.Ryuuma:
                     /* 相手の玉に近いほうが評価値が高い */
                     var ak = ban.KingKo[turn == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE];
-                    val = Math.Abs(ak.x - nx) + Math.Abs(ak.y - nx) - Math.Abs(ak.x - ox) - Math.Abs(ak.y - ox);
+                    if (ak != null) val = Math.Abs(ak.x - nx) + Math.Abs(ak.y - nx) - Math.Abs(ak.x - ox) - Math.Abs(ak.y - ox);
                     break;
                 default:
                     /* 何もしない */

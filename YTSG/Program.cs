@@ -330,6 +330,10 @@ namespace YTSG {
                         //if ((tesuu == 39) || (tesuu == 40)) tekouho.ResetJoseki();
 
                         if (nokori < 60000) {
+                            aiTaskMain = Task.Run(() => {
+                                return cpu.thinkMove(myTeban, ban, 4, 0, 0, 0);
+                            });
+                        } else if ((tesuu < 20) || (nokori < 180000)) {
                             //cpu.maxDepth = 3;
                             //ret = cpu.thinkMove(myTeban, ban, 3, 0)[0]; //コンピュータ思考
 
@@ -342,7 +346,7 @@ namespace YTSG {
                             //ret = cpu.thinkMove(myTeban, ban, 4)[0]; //コンピュータ思考
 
                             aiTaskMain = Task.Run(() => {
-                                return cpu.thinkMove(myTeban, ban, 5, 5, 0, 0);
+                                return cpu.thinkMove(myTeban, ban, 4, 5, 7, 4);
                             });
 
                         } else {
@@ -416,7 +420,7 @@ namespace YTSG {
                         }
 
                         // 定跡の場合
-                        if ((sMove.currentKmv != null)&&((retList?.Count > 1))) {
+                        if ((sMove.currentKmv != null) && ((retList?.Count > 1))) {
                             /* 何もしない */
                         } else {
 
@@ -434,12 +438,16 @@ namespace YTSG {
                                 //if ((tesuu == 9) || (tesuu == 10)) tekouho.ReadJoseki03("");
                                 //if ((tesuu == 39) || (tesuu == 40)) tekouho.ResetJoseki();
 
-                                if ((tesuu < 20) || (nokori < 60000)) {
+                                if (nokori < 60000) {
+                                    aiTaskMain = Task.Run(() => {
+                                        return cpu.thinkMove(myTeban, ban, 4, 0, 0, 0);
+                                    });
+                                }else if ((tesuu < 20) || (nokori < 180000)) {
                                     //cpu.maxDepth = 4;
                                     //ret = cpu.thinkMove(myTeban, ban, 3)[0]; //コンピュータ思考
 
                                     aiTaskMain = Task.Run(() => {
-                                        return cpu.thinkMove(myTeban, ban, 4, 0, 5, 4);
+                                        return cpu.thinkMove(myTeban, ban, 4, 0, 3, 4);
                                     });
 
                                 } else if ((tesuu < 50) || (nokori < 300000)) {
@@ -447,7 +455,7 @@ namespace YTSG {
                                     //ret = cpu.thinkMove(myTeban, ban, 4)[0]; //コンピュータ思考
 
                                     aiTaskMain = Task.Run(() => {
-                                        return cpu.thinkMove(myTeban, ban, 5, 5, 0, 0);
+                                        return cpu.thinkMove(myTeban, ban, 4, 5, 7, 4);
                                     });
 
                                 } else {
@@ -456,7 +464,7 @@ namespace YTSG {
 
                                     aiTaskMain = Task.Run(() => {
                                         //return cpu.thinkMove(myTeban, ban, 4, 7, 5, 4);
-                                        return cpu.thinkMove(myTeban, ban, 5, 7, 5, 5);
+                                        return cpu.thinkMove(myTeban, ban, 5, 7, 0, 0);
                                     });
 
                                 }

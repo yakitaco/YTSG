@@ -452,14 +452,14 @@ namespace YTSG {
         //
         //    //指せる手を全てリスト追加
         //    foreach (koma km in OkiKo[TEIGI.TEBAN_SENTE]) {
-        //        List<koPos> poslist = km.baninfo(this);
+        //        List<koPos> poslist = km.listUpMoveable(this);
         //
         //        foreach (koPos pos in poslist) {
         //            IdouList[TEIGI.TEBAN_SENTE, pos.x, pos.y]++;
         //        }
         //    }
         //    foreach (koma km in OkiKo[TEIGI.TEBAN_GOTE]) {
-        //        List<koPos> poslist = km.baninfo(this);
+        //        List<koPos> poslist = km.listUpMoveable(this);
         //
         //        foreach (koPos pos in poslist) {
         //            IdouList[TEIGI.TEBAN_GOTE, pos.x, pos.y]++;
@@ -475,7 +475,7 @@ namespace YTSG {
         //    //指せる手を全てリスト追加
         //    foreach (koma km in OkiKo[TEIGI.TEBAN_SENTE]) {
         //
-        //        //List<koPos> poslist = km.baninfo(this);
+        //        //List<koPos> poslist = km.listUpMoveable(this);
         //
         //
         //        //foreach (koPos pos in poslist) {
@@ -483,7 +483,7 @@ namespace YTSG {
         //        //}
         //    }
         //    foreach (koma km in OkiKo[TEIGI.TEBAN_GOTE]) {
-        //        //List<koPos> poslist = km.baninfo(this);
+        //        //List<koPos> poslist = km.listUpMoveable(this);
         //
         //        //foreach (koPos pos in poslist) {
         //        //    list[TEIGI.TEBAN_GOTE, pos.x, pos.y]++;

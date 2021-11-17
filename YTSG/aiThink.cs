@@ -40,7 +40,7 @@ namespace YTSG {
         //        if (ban.MochiKo[teban].Count > 0)
         //        {
         //            rnd = r.Next(ban.MochiKo[teban].Count);  //動かす駒を選択
-        //            teList = ban.MochiKo[teban][rnd].baninfo(ban);  //動かす駒の移動可能位置一覧
+        //            teList = ban.MochiKo[teban][rnd].listUpMoveable(ban);  //動かす駒の移動可能位置一覧
         //            if (teList.Count > 0)
         //            {
         //                int rnd2 = r.Next(teList.Count);  //動かす先を選択
@@ -52,7 +52,7 @@ namespace YTSG {
         //        }
         //
         //        rnd = r.Next(ban.OkiKo[teban].Count);  //動かす駒を選択
-        //        teList = ban.OkiKo[teban][rnd].baninfo(ban);  //動かす駒の移動可能位置一覧
+        //        teList = ban.OkiKo[teban][rnd].listUpMoveable(ban);  //動かす駒の移動可能位置一覧
         //        if (teList.Count > 0)
         //        {
         //            int rnd2 = r.Next(teList.Count);  //動かす先を選択
@@ -88,14 +88,14 @@ namespace YTSG {
 
             //指せる手を全てリスト追加
             foreach (koma km in ban.OkiKo[teban]) {
-                //teAllList.AddRange(km.baninfo(ban));
-                List<koPos> poslist = km.baninfo(ban);
+                List<koPos> poslist = new List<koPos>();
+                km.listUpMoveable(ref poslist, ban);
 
                 foreach (koPos pos in poslist) {
                     //if (ban.BanKo[pos.x, pos.y] == null) pos.val += tekouho.GetKouho(pos);
                     for (int i = Program.kifu.Count - 1; i>=0 && i > Program.kifu.Count - 6; i -= 2) {
                         if ((pos.x == Program.kifu[i].x) && (pos.y == Program.kifu[i].y) && (pos.ko.type == Program.kifu[i].ko.type)){
-                            //pos.val -= 500;
+                            pos.val -= 500;
                         }
                     }
 
@@ -105,7 +105,8 @@ namespace YTSG {
 
             for (int i = 0; i < 7; i++) {
                 if (ban.MochiKo[teban, i]?.Count > 0) {
-                    List<koPos> poslist = ban.MochiKo[teban, i][0].baninfo(ban);
+                    List<koPos> poslist = new List<koPos>();
+                    ban.MochiKo[teban, i][0].listUpMoveable(ref poslist, ban);
                     foreach (koPos pos in poslist) {
                         if (ban.IdouList[teban, pos.x, pos.y] == 0) {
                             pos.val -= 100;  // 味方連携無し
@@ -114,7 +115,7 @@ namespace YTSG {
                         }
                         for (int ii = Program.kifu.Count - 1; ii >= 0 && ii > Program.kifu.Count - 6; ii -= 2) {
                             if ((pos.x == Program.kifu[ii].x) && (pos.y == Program.kifu[ii].y) && (pos.ko.type == Program.kifu[ii].ko.type)) {
-                                //pos.val -= 500;
+                                pos.val -= 500;
                             }
                         }
                     }
@@ -135,7 +136,7 @@ namespace YTSG {
             Parallel.For(0, workMin, id => {
                 while (true) {
                     BanInfo ban_local = new BanInfo(ban);
-
+                    bool uchifuzume = false;  // 打ち歩詰めチェック
 
                     koma ko_local;
                     //int score = -99999;
@@ -151,6 +152,7 @@ namespace YTSG {
 
                     if (teAllList[cnt_local].ko.x == 9) {
                         ko_local = ban_local.MochiKo[teban, (int)teAllList[cnt_local].ko.type - 1][0];
+                        if (teAllList[cnt_local].ko.type == KomaType.Fuhyou) uchifuzume = true;
                     } else {
                         ko_local = ban_local.BanKo[teAllList[cnt_local].ko.x, teAllList[cnt_local].ko.y];
                     }
@@ -168,6 +170,7 @@ namespace YTSG {
                         nexTe = think(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, 1, maxScore, teAllList[cnt_local].val, teAllList[cnt_local].ko.type, teAllList[cnt_local].x, teAllList[cnt_local].y);
 
                         if (nexTe?.Count > 0) {
+                            if ((uchifuzume == true) && (nexTe[0].val < -5000)) nexTe[0].val = 99999;
                             teAllList[cnt_local].val -= nexTe[0].val;// - tekouho.GetKouho(teAllList[cnt_local]);
                         }
                     }
@@ -274,19 +277,20 @@ namespace YTSG {
             //指せる手を全てリスト追加
             foreach (koma km in ban.OkiKo[teban]) {
                 if (depth < maxDepth) {
-                    teAllList.AddRange(km.baninfo(ban));
+                    km.listUpMoveable(ref teAllList, ban);
                 } else {
-                    teAllList.AddRange(km.baninfo(ban, false));
+                    km.listUpMoveable(ref teAllList, ban, 1);
                 }
             }
             //最下層または王手でない場合は駒打ちを無視
             if ((depth < maxDepth) || (check == true)) {
                 for (int i = 0; i < 7; i++) {
                     if (ban.MochiKo[teban, i]?.Count > 0) {
-                        List<koPos> poslist = ban.MochiKo[teban, i][0].baninfo(ban);
-                        foreach (koPos pos in poslist) {
-                            if (ban.IdouList[teban, pos.x, pos.y] >= ban.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, pos.x, pos.y]) teAllList.Add(pos);
-                        }
+                        ban.MochiKo[teban, i][0].listUpMoveable(ref teAllList, ban);
+                        //List<koPos> poslist = ban.MochiKo[teban, i][0].listUpMoveable(ban);
+                        //foreach (koPos pos in poslist) {
+                        //    if (ban.IdouList[teban, pos.x, pos.y] >= ban.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, pos.x, pos.y]) teAllList.Add(pos);
+                        //}
                     }
                 }
 
@@ -484,7 +488,7 @@ namespace YTSG {
             //ban.renewNifList(teban);  //二歩リスト更新
 
             // 王の移動(王手の駒を取るも含む)
-            teAllList.AddRange(ban.KingKo[teban].baninfo(ban));
+            ban.KingKo[teban].listUpMoveable(ref teAllList, ban);
 
             // (王以外の駒で)王手の駒を取る
             foreach (koma km in ban.OkiKo[teban]) {
@@ -526,7 +530,7 @@ namespace YTSG {
             //    for (int i = 0; i < 7; i++) {
             //
             //        if (ban.MochiKo[teban, i]?.Count > 0) {
-            //            teAllList.AddRange(ban.MochiKo[teban, i][0].baninfo(ban));
+            //            teAllList.AddRange(ban.MochiKo[teban, i][0].listUpMoveable(ban));
             //        }
             //    }
             //}
