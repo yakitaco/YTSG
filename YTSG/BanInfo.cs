@@ -666,17 +666,17 @@ namespace YTSG {
         public int chkScore(int teban) {
             int score = 0;
             foreach (var k in OkiKo[TEIGI.TEBAN_SENTE]) {
-                score += (k.kScore / 10);
+                score += (k.kScore / 5);
             }
             for (int i = 0; i < 7; i++) {
-                if (MochiKo[TEIGI.TEBAN_SENTE, i]?.Count > 0) score += (MochiKo[TEIGI.TEBAN_SENTE, i][0].kScore / 5);
+                if (MochiKo[TEIGI.TEBAN_SENTE, i]?.Count > 0) score += (MochiKo[TEIGI.TEBAN_SENTE, i][0].kScore / 2);
             }
 
             foreach (var k in OkiKo[TEIGI.TEBAN_GOTE]) {
-                score -= (k.kScore / 10);
+                score -= (k.kScore / 5);
             }
             for (int i = 0; i < 7; i++) {
-                if (MochiKo[TEIGI.TEBAN_GOTE, i]?.Count > 0) score -= (MochiKo[TEIGI.TEBAN_GOTE, i][0].kScore / 5);
+                if (MochiKo[TEIGI.TEBAN_GOTE, i]?.Count > 0) score -= (MochiKo[TEIGI.TEBAN_GOTE, i][0].kScore / 2);
             }
 
             banScore = score;

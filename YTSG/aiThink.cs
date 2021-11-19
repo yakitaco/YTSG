@@ -99,6 +99,10 @@ namespace YTSG {
                         }
                     }
 
+                    pos.val += mVal.get(pos.ko.type, pos.x, pos.y, pos.ko.x, pos.ko.y, teban);
+                    //int val = mVal.get(pos.ko.type, pos.x, pos.y, pos.ko.x, pos.ko.y, teban);
+                    //Form1.Form1Instance.addMsg("[" + (pos.ko.x + 1) + "," + (pos.ko.y + 1) + ")" + pos.ko.type + " ->" + (pos.x + 1) + "," + (pos.y + 1) + "val=" + val);
+
                 }
                 teAllList.AddRange(poslist);
             }

@@ -39,9 +39,10 @@ namespace YTSG {
                             tmp.val[(count - 2) / 9, (count - 2) % 9, i] = int.Parse(arr[i]);
                         }
                     }
-                    mV.Add(tmp);
+                    //Form1.Form1Instance.addMsg("ddd" + ((count - 2) / 9) + ":" + ((count - 2) % 9) + ":" + line);
                     count++;
                 }
+                mV.Add(tmp);
             }
         }
 
@@ -51,8 +52,8 @@ namespace YTSG {
         }
 
         public static void reset() {
-            senTeNum = 0;
-            goTeNum = 0;
+            setType(OPLIST.None, TEIGI.TEBAN_SENTE, 0);
+            setType(OPLIST.None, TEIGI.TEBAN_GOTE, 0);
             stage = 0;
         }
 
@@ -202,10 +203,10 @@ namespace YTSG {
         // 指定評価値を取得
         public static int get(KomaType type, int nx, int ny, int ox, int oy, int turn) {
             if (stage == 0) {
-                if (turn == 0) {
-                    return mV[0].val[(int)type - 1, ny, 8 - nx] - mV[0].val[(int)type - 1, oy, 8 - ox];
+                if (turn == TEIGI.TEBAN_SENTE) {
+                    return mV[senTeNum].val[(int)type - 1, ny, 8 - nx] - mV[senTeNum].val[(int)type - 1, oy, 8 - ox];
                 } else {
-                    return mV[0].val[(int)type - 1, 8 - ny, nx] - mV[0].val[(int)type - 1, 8 - oy, ox];
+                    return mV[goTeNum].val[(int)type - 1, 8 - ny, nx] - mV[goTeNum].val[(int)type - 1, 8 - oy, ox];
                 }
             } else {
                 return 0;
