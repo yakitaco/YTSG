@@ -136,6 +136,12 @@ namespace YTSG {
             //thread同時数
             Form1.Form1Instance.addMsg("MinThreads work= " + workMin + ", i/o= " + ioMin + ", teAllList=" + teAllList.Count);
 
+            if ((teAllList.Count > 150)&&(depth > 4)) {
+                maxDepth = 4;
+                deepThinkNum = 5;
+                deepThinkDepth = 4;
+            }
+
             // 並行処理
             Parallel.For(0, workMin, id => {
                 while (true) {
@@ -232,8 +238,8 @@ namespace YTSG {
                     } else {
 
                         /* 盤情報表示 */
-                        string b = ban_local.showBanInfo();
-                        Form1.Form1Instance.addMsg("" + b);
+                        //string b = ban_local.showBanInfo();
+                        //Form1.Form1Instance.addMsg("" + b);
                         nexTe = thinkMove(teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, deepThinkDepth, 0, 0, 0);
                         if (nexTe?.Count > 0) {
                             teAllList[cnt_local].val = teAllList[cnt_local].tval - nexTe[0].val;
@@ -249,6 +255,8 @@ namespace YTSG {
                 }
 
             }
+
+
 
             //return teAllList.Find(s => s.val == teAllList.Max(p => p.val));
             return retList;
@@ -274,9 +282,9 @@ namespace YTSG {
             //}
 
             // 王手
-            if (ban.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban.KingKo[teban].x, ban.KingKo[teban].y] > 0) {
-                check = true;
-            }
+            //if (ban.IdouList[teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban.KingKo[teban].x, ban.KingKo[teban].y] > 0) {
+            //    check = true;
+            //}
 
             //指せる手を全てリスト追加
             foreach (koma km in ban.OkiKo[teban]) {

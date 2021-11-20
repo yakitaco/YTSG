@@ -250,6 +250,7 @@ namespace YTSG {
             int startStrPos = 0;
             int teban = 0;
             int score = 0;
+            int nokori = 0;
             List<koPos> retList = new List<koPos>();
 
             //Application.Run(form1);
@@ -294,7 +295,7 @@ namespace YTSG {
                     //通常読み
                     if (arr[1] == "btime") {
 
-                        int nokori = Convert.ToInt32(myTeban == TEIGI.TEBAN_SENTE ? arr[2] : arr[4]);
+                        nokori = Convert.ToInt32(myTeban == TEIGI.TEBAN_SENTE ? arr[2] : arr[4]);
                         retList = new List<koPos>();
 
                         // タイマー設定
@@ -329,7 +330,7 @@ namespace YTSG {
                         //if ((tesuu == 9) || (tesuu == 10)) tekouho.ReadJoseki03("");
                         //if ((tesuu == 39) || (tesuu == 40)) tekouho.ResetJoseki();
 
-                        if (nokori < 60000) {
+                        if (nokori < 90000) {
                             aiTaskMain = Task.Run(() => {
                                 return cpu.thinkMove(myTeban, ban, 4, 0, 0, 0);
                             });
@@ -355,7 +356,7 @@ namespace YTSG {
                             mVal.setStage(1);//中盤
                             aiTaskMain = Task.Run(() => {
                                 //return cpu.thinkMove(myTeban, ban, 4, 10, 7, 4);
-                                return cpu.thinkMove(myTeban, ban, 5, 7, 3, 5);
+                                return cpu.thinkMove(myTeban, ban, 5, 7, 0, 0);
                             });
 
                         }
@@ -374,10 +375,31 @@ namespace YTSG {
                             Console.WriteLine("bestmove resign");
 
                         } else {
+
+                            // その先の手を検討
+                            if ((retList[0].val < 5000) && (retList[0].val > -5000) && (retList?.Count > 2) && (nokori > 180000)) {
+                                retList.RemoveAt(retList.Count - 1);
+                                BanInfo ban_local = new BanInfo(ban);
+                                for (int cnt_local = 0; cnt_local < retList.Count; cnt_local++) {
+                                    koma ko_local;
+                                    if (retList[cnt_local].ko.x == 9) {
+                                        ko_local = ban_local.MochiKo[retList[cnt_local].ko.p, (int)retList[cnt_local].ko.type - 1][0];
+                                    } else {
+                                        ko_local = ban_local.BanKo[retList[cnt_local].ko.x, retList[cnt_local].ko.y];
+                                    }
+                                    ban_local.moveKoma(ko_local, retList[cnt_local], retList[cnt_local].nari, false);
+                                    //teban = (teban == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE);
+                                }
+                                
+                                retList.AddRange(cpu.thinkMove(retList[retList.Count - 1].ko.p == TEIGI.TEBAN_SENTE ? TEIGI.TEBAN_GOTE : TEIGI.TEBAN_SENTE, ban_local, 4, 0, 0, 0));
+                            }
+
                             string pstr = "";
                             for (int i = 0; i < retList.Count; i++) {
                                 pstr += " " + usiIO.pos2usi(retList[i].ko, retList[i]);
                             }
+
+
 
                             if (retList[0].val > 5000) {
                                 Console.WriteLine("info score mate " + retList.Count + " pv " + pstr);  //標準出力
@@ -388,6 +410,9 @@ namespace YTSG {
                             }
 
                             if (retList.Count > 1) {
+
+
+
                                 Console.WriteLine("bestmove " + usiIO.pos2usi(retList[0].ko, retList[0]) + " ponder " + usiIO.pos2usi(retList[1].ko, retList[1]));  //標準出力
                                 Form1.Form1Instance.addMsg("[SEND]MOVE:" + retList[0].ko.type + ":(" + (retList[0].ko.x + 1) + "," + (retList[0].ko.y + 1) + ")->(" + (retList[0].x + 1) + "," + (retList[0].y + 1) + ")" + (retList[0].nari == true ? "<NARI>" : "") +
                                     " ponder " + retList[1].ko.type + ":(" + (retList[1].ko.x + 1) + "," + (retList[1].ko.y + 1) + ")->(" + (retList[1].x + 1) + "," + (retList[1].y + 1) + ")" + (retList[1].nari == true ? "<NARI>" : "") + "\n");
@@ -433,12 +458,12 @@ namespace YTSG {
                                 Form1.Form1Instance.addMsg("Think Ponder.");
 
                                 thisProcess.PriorityClass = ProcessPriorityClass.RealTime; //優先度高
-                                int nokori = Convert.ToInt32(myTeban == TEIGI.TEBAN_SENTE ? arr[3] : arr[5]);
+                                nokori = Convert.ToInt32(myTeban == TEIGI.TEBAN_SENTE ? arr[3] : arr[5]);
 
                                 //if ((tesuu == 9) || (tesuu == 10)) tekouho.ReadJoseki03("");
                                 //if ((tesuu == 39) || (tesuu == 40)) tekouho.ResetJoseki();
 
-                                if (nokori < 60000) {
+                                if (nokori < 90000) {
                                     aiTaskMain = Task.Run(() => {
                                         return cpu.thinkMove(myTeban, ban, 4, 0, 0, 0);
                                     });
@@ -659,8 +684,8 @@ namespace YTSG {
                     myTeban = teban;
 
                     /* 盤情報表示 */
-                    string b = ban.showBanInfo();
-                    Form1.Form1Instance.addMsg("" + b);
+                    //string b = ban.showBanInfo();
+                    //Form1.Form1Instance.addMsg("" + b);
 
                 } else if ((str.Length == 4) && (str.Substring(0, 4) == "stop")) {
                     Form1.Form1Instance.addMsg("ponder miss...");

@@ -160,7 +160,7 @@ namespace YTSG {
                             break;
                         case 1:    // 8筋 (向かい飛車？)
                             fuhyou = ban.OkiKo[TEIGI.TEBAN_GOTE].FirstOrDefault(k => k.type == KomaType.Fuhyou && k.x == 2);
-                            if ((fuhyou == null) || (fuhyou.y > 2)) setType(OPLIST.MUKAIBISYA, TEIGI.TEBAN_SENTE, 0);
+                            if ((fuhyou == null) || (fuhyou.y > 2)) setType(OPLIST.MUKAIBISYA, TEIGI.TEBAN_GOTE, 0);
                             break;
                         case 0:    // 9筋 (左地下鉄？)
                             setType(OPLIST.HIDARICHIKATETU, TEIGI.TEBAN_GOTE, 0);
