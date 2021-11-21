@@ -93,7 +93,7 @@ namespace YTSG {
 
                 foreach (koPos pos in poslist) {
                     //if (ban.BanKo[pos.x, pos.y] == null) pos.val += tekouho.GetKouho(pos);
-                    for (int i = Program.kifu.Count - 1; i>=0 && i > Program.kifu.Count - 6; i -= 2) {
+                    for (int i = Program.kifu.Count - 2; i>=0 && i > Program.kifu.Count - 6; i -= 2) {
                         if ((pos.x == Program.kifu[i].x) && (pos.y == Program.kifu[i].y) && (pos.ko.type == Program.kifu[i].ko.type)){
                             pos.val -= 500;
                         }
@@ -117,10 +117,13 @@ namespace YTSG {
                         } else {
                             pos.val -= 20;  // 味方連携有り
                         }
-                        for (int ii = Program.kifu.Count - 1; ii >= 0 && ii > Program.kifu.Count - 6; ii -= 2) {
+                        for (int ii = Program.kifu.Count - 2; ii >= 0 && ii > Program.kifu.Count - 6; ii -= 2) {
                             if ((pos.x == Program.kifu[ii].x) && (pos.y == Program.kifu[ii].y) && (pos.ko.type == Program.kifu[ii].ko.type)) {
                                 pos.val -= 500;
                             }
+                        }
+                        if (((Program.kifu[Program.kifu.Count-1].ko.type == KomaType.Kyousha) || (Program.kifu[Program.kifu.Count - 1].ko.type == KomaType.Hisya)) && (pos.x == Program.kifu[Program.kifu.Count - 1].x) && (pos.py < Program.kifu[Program.kifu.Count - 1].py)){
+                            pos.val += 150 - (Program.kifu[Program.kifu.Count - 1].py - pos.py) * 10;
                         }
                     }
                     teAllList.AddRange(poslist);

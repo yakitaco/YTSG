@@ -905,23 +905,23 @@ namespace YTSG {
                     if ((this.type == KomaType.Ginsyou) || ((this.type == KomaType.Keima) && (pos.py > 1))) {
 
                         if ((chkType == 1) && (ban.IdouList[this.p, pos.x, pos.y] <= ban.IdouList[this.ap, pos.x, pos.y])) {
-                            teList.Add(pos.Copy().setVal(-KoScore[(int)this.type] + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p))); // 劣勢の場所
+                            teList.Add(pos.Copy().setVal(-KoScore[(int)this.type] + aVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p , ban)　+ mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p))); // 劣勢の場所
                         } else {
-                            teList.Add(pos.Copy().setVal(0 + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)));
+                            teList.Add(pos.Copy().setVal(0 + aVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p, ban) + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)));
                         }
                     }
 
                     if ((chkType == 1) && (ban.IdouList[this.p, pos.x, pos.y] <= ban.IdouList[this.ap, pos.x, pos.y])) {
-                        teList.Add(pos.setVal(50 - KoScore[(int)this.type] + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)).setNari(true)); // 劣勢の場所
+                        teList.Add(pos.setVal(50 - KoScore[(int)this.type] + aVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p, ban) + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)).setNari(true)); // 劣勢の場所
                     } else {
-                        teList.Add(pos.setVal(250 + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)).setNari(true));
+                        teList.Add(pos.setVal(250 + aVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p, ban) + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)).setNari(true));
                     }
 
                 } else {
                     if ((chkType == 1) && (ban.IdouList[this.p, pos.x, pos.y] <= ban.IdouList[this.ap, pos.x, pos.y])) {
-                        teList.Add(pos.setVal(-KoScore[(int)this.type] + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p))); // 劣勢の場所
+                        teList.Add(pos.setVal(-KoScore[(int)this.type] + aVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p, ban) + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p))); // 劣勢の場所
                     } else {
-                        teList.Add(pos.setVal(0 + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p) /* + tekouho.GetKouho(this, pos.x, pos.y) */));
+                        teList.Add(pos.setVal(0 + aVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p, ban) + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p) /* + tekouho.GetKouho(this, pos.x, pos.y) */));
                     }
                 }
                 return 0;
@@ -936,38 +936,38 @@ namespace YTSG {
                     if ((this.type == KomaType.Ginsyou) || (((this.type == KomaType.Keima) || (this.type == KomaType.Kyousha)) && (pos.py > 1))) {
                         if (chkType == 1) {
                             if (ban.IdouList[this.p, pos.x, pos.y] < ban.IdouList[this.ap, pos.x, pos.y]) {
-                                teList.Add(pos.Copy().setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] / 2 + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)));
+                                teList.Add(pos.Copy().setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] / 2 + aVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p, ban) + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)));
                             } else {
-                                teList.Add(pos.Copy().setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] - KoScore[(int)this.type] + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)));
+                                teList.Add(pos.Copy().setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] - KoScore[(int)this.type] + aVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p, ban) + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)));
                             }
                         } else {
-                            teList.Add(pos.Copy().setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)));
+                            teList.Add(pos.Copy().setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] + aVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p, ban) + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)));
                         }
 
                     }
 
                     if (chkType == 1) {
                         if (ban.IdouList[this.p, pos.x, pos.y] > ban.IdouList[this.ap, pos.x, pos.y]) {
-                            teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] / 2 + 150 + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)).setNari(true));
+                            teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] / 2 + 150 + aVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p, ban) + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)).setNari(true));
                         } else {
-                            teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] + 50 - KoScore[(int)this.type] + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)).setNari(true)); // 劣勢の場所
+                            teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] + 50 - KoScore[(int)this.type] + aVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p, ban) + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)).setNari(true)); // 劣勢の場所
                         }
                     } else {
-                        teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] + 150 + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)).setNari(true));
+                        teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] + 150 + aVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p, ban) + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)).setNari(true));
                     }
 
                 } else {
                     if (chkType == 1) {
                         if (ban.IdouList[this.p, pos.x, pos.y] > ban.IdouList[this.ap, pos.x, pos.y]) {
-                            teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] / 2 + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)));
+                            teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] / 2 + aVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p, ban) + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)));
                         } else {
-                            teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] - KoScore[(int)this.type] + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p))); // 劣勢の場所
+                            teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] - KoScore[(int)this.type] + aVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p, ban) + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p))); // 劣勢の場所
                         }
                     } else {
                         if ((this.type == KomaType.Fuhyou) && (ban.BanKo[pos.x, pos.y].type == KomaType.Fuhyou)) {
-                            teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] + 200));
+                            teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] + 50));
                         } else {
-                            teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)));
+                            teList.Add(pos.setVal(KoScore[(int)ban.BanKo[pos.x, pos.y].type] + aVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p, ban) + mVal.get(this.type, pos.x, pos.y, this.x, this.y, this.p)));
                         }
                     }
                 }
